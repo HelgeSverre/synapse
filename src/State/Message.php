@@ -25,9 +25,25 @@ final readonly class Message
         return new self(Role::User, $content, $name);
     }
 
-    public static function assistant(string $content): self
+    /**
+     * @param  list<\LlmExe\Provider\Request\ToolCall>  $toolCalls
+     */
+    public static function assistant(string $content, array $toolCalls = []): self
     {
-        return new self(Role::Assistant, $content);
+        $metadata = [];
+        if ($toolCalls !== []) {
+            $metadata['tool_calls'] = $toolCalls;
+        }
+
+        return new self(Role::Assistant, $content, null, null, $metadata);
+    }
+
+    /**
+     * @return list<\LlmExe\Provider\Request\ToolCall>
+     */
+    public function getToolCalls(): array
+    {
+        return $this->metadata['tool_calls'] ?? [];
     }
 
     public static function tool(string $content, string $toolCallId, ?string $name = null): self
