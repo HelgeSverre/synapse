@@ -60,7 +60,8 @@
     "infection": [
       "herd coverage ./vendor/bin/phpunit --coverage-xml=coverage-xml --log-junit=junit.xml",
       "./vendor/bin/infection --threads=4 --coverage=. --skip-initial-tests --show-mutations"
-    ]
+    ],
+    "clean": "rm -rf coverage coverage.xml coverage-xml junit.xml"
   },
   "config": {
     "sort-packages": true,
