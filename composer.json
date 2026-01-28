@@ -57,7 +57,10 @@
     "examples": "for f in examples/*.php; do echo \"=== $f ===\"; php \"$f\" 2>&1 | head -10; echo; done",
     "rector": "rector process",
     "rector:dry": "rector process --dry-run",
-    "infection": "infection --threads=4"
+    "infection": [
+      "herd coverage ./vendor/bin/phpunit --coverage-xml=coverage-xml --log-junit=junit.xml",
+      "./vendor/bin/infection --threads=4 --coverage=. --skip-initial-tests --show-mutations"
+    ]
   },
   "config": {
     "sort-packages": true,

@@ -33,3 +33,5 @@ composer.lock
 # Infection
 infection.log
 infection-summary.log
+/coverage-xml/
+/junit.xml

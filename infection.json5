@@ -13,5 +13,8 @@
     "minMsi": 50,
     "minCoveredMsi": 70,
     "testFramework": "phpunit",
-    "testFrameworkOptions": "--no-coverage"
+    "phpUnit": {
+        "configDir": ".",
+        "customPath": "./vendor/bin/phpunit"
+    }
 }
