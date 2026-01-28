@@ -26,7 +26,6 @@ use LlmExe\Parser\StringParser;
 use LlmExe\Prompt\ChatPrompt;
 use LlmExe\Prompt\TextPrompt;
 use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Bedrock\BedrockProvider;
 use LlmExe\Provider\Google\GoogleProvider;
 use LlmExe\Provider\Http\TransportInterface;
 use LlmExe\Provider\OpenAI\OpenAIProvider;
@@ -125,32 +124,12 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(XAIProvider::class, $provider);
     }
 
-    public function test_use_llm_creates_bedrock_provider(): void
-    {
-        $provider = Factory::useLlm('bedrock.claude-3', [
-            'region' => 'us-east-1',
-            'transport' => $this->mockTransport,
-        ]);
-
-        $this->assertInstanceOf(BedrockProvider::class, $provider);
-    }
-
     public function test_use_llm_throws_for_missing_api_key(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('apiKey is required');
 
         Factory::useLlm('openai.gpt-4', [
-            'transport' => $this->mockTransport,
-        ]);
-    }
-
-    public function test_use_llm_throws_for_missing_region_on_bedrock(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('region is required');
-
-        Factory::useLlm('bedrock.claude-3', [
             'transport' => $this->mockTransport,
         ]);
     }

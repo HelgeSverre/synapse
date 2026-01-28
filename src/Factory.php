@@ -32,7 +32,6 @@ use LlmExe\Parser\StringParser;
 use LlmExe\Prompt\ChatPrompt;
 use LlmExe\Prompt\TextPrompt;
 use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Bedrock\BedrockProvider;
 use LlmExe\Provider\Google\GoogleProvider;
 use LlmExe\Provider\Http\Psr18Transport;
 use LlmExe\Provider\Http\TransportInterface;
@@ -126,11 +125,6 @@ final class Factory
                 transport: $transport,
                 apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
                 baseUrl: $options['baseUrl'] ?? 'https://api.mistral.ai/v1',
-            ),
-            'bedrock' => new BedrockProvider(
-                transport: $transport,
-                region: $options['region'] ?? throw new \InvalidArgumentException('region is required'),
-                baseUrl: $options['baseUrl'] ?? null,
             ),
             default => throw new \InvalidArgumentException("Unknown provider: {$providerName}"),
         };
