@@ -43,6 +43,9 @@
   },
   "scripts": {
     "test": "./vendor/bin/phpunit --no-coverage",
+    "test:unit": "./vendor/bin/phpunit --testsuite=Unit --no-coverage",
+    "test:integration": "./vendor/bin/phpunit --testsuite=Integration --no-coverage",
+    "test:all": "./vendor/bin/phpunit --testsuite=Unit,Integration --no-coverage",
     "test:coverage": "herd coverage ./vendor/bin/phpunit",
     "analyze": "@analyse",
     "analyse": "phpstan analyse --configuration=phpstan.neon src/",

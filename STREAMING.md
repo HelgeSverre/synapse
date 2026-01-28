@@ -1,17 +1,26 @@
-# Streaming Support Investigation
+# Streaming Support
 
-## Current State
+## Implementation Status
 
-The library declares `supportsStreaming: true` in provider capabilities but **does not implement streaming**. All providers use synchronous request/response patterns.
+✅ **Streaming is fully implemented** for the following providers:
 
-### Blocking Points
+| Provider | Status | Notes |
+|----------|--------|-------|
+| OpenAI | ✅ Implemented | Full streaming with tool calls, usage info |
+| Anthropic | ✅ Implemented | Full streaming with tool calls, usage info |
+| Mistral | ✅ Implemented | OpenAI-compatible SSE format |
+| Moonshot | ✅ Implemented | OpenAI-compatible SSE format (Kimi models) |
+| XAI | ✅ Implemented | OpenAI-compatible SSE format (Grok models) |
+| Google | ❌ Not yet | Uses newline-delimited JSON |
 
-| Layer | Current Implementation | Streaming Requirement |
-|-------|----------------------|----------------------|
-| Transport | `Psr18Transport::post()` returns `array` after full response | Must return `Generator<string>` or `iterable` of chunks |
-| Provider | `generate()` returns `GenerationResponse` | Must yield `StreamChunk` objects incrementally |
-| Executor | `handler()` returns `ExecutionResult` | Must yield partial results or emit events |
-| Parser | Expects complete `GenerationResponse` | Must handle partial/incremental text |
+### Implemented Components
+
+| Layer | Implementation |
+|-------|---------------|
+| Transport | `GuzzleStreamTransport::streamPost()` returns `ResponseInterface` for streaming |
+| Provider | `stream()` method yields `StreamEvent` objects incrementally |
+| Executor | `StreamingLlmExecutor` and `StreamingLlmExecutorWithFunctions` for streaming |
+| Parser | `SseParser` handles SSE format parsing |
 
 ## API Formats by Provider
 

@@ -293,6 +293,31 @@ class MyProvider implements LlmProviderInterface
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Testing
+
+### Running Tests
+
+```bash
+# Run unit tests (default)
+composer test
+phpunit
+
+# Run integration tests (requires API keys)
+phpunit --testsuite=Integration
+composer test:integration
+
+# Run all tests
+phpunit --testsuite=Unit,Integration
+composer test:all
+```
+
+### Integration Tests
+
+Integration tests require valid API keys set as environment variables:
+- `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`
+
+Tests will automatically skip if the required API key is not set.
+
 ## License
 
 MIT
