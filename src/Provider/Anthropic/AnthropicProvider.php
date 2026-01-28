@@ -14,17 +14,17 @@ use LlmExe\Provider\Response\UsageInfo;
 use LlmExe\State\Message;
 use LlmExe\State\Role;
 
-final class AnthropicProvider implements LlmProviderInterface
+final readonly class AnthropicProvider implements LlmProviderInterface
 {
     private const BASE_URL = 'https://api.anthropic.com/v1';
 
     private const API_VERSION = '2023-06-01';
 
     public function __construct(
-        private readonly TransportInterface $transport,
-        private readonly string $apiKey,
-        private readonly string $baseUrl = self::BASE_URL,
-        private readonly string $apiVersion = self::API_VERSION,
+        private TransportInterface $transport,
+        private string $apiKey,
+        private string $baseUrl = self::BASE_URL,
+        private string $apiVersion = self::API_VERSION,
     ) {}
 
     public function generate(GenerationRequest $request): GenerationResponse
@@ -116,7 +116,7 @@ final class AnthropicProvider implements LlmProviderInterface
 
         if (count($request->tools) > 0) {
             $body['tools'] = array_map(
-                fn ($tool) => $tool->toAnthropicFormat(),
+                fn (\LlmExe\Provider\Request\ToolDefinition $tool): array => $tool->toAnthropicFormat(),
                 $request->tools,
             );
 

@@ -52,7 +52,7 @@ final class HookDispatcher implements HookDispatcherInterface
         $this->listeners[$eventClass] = array_values(
             array_filter(
                 $this->listeners[$eventClass],
-                fn ($l) => $l !== $listener,
+                fn (callable $l): bool => $l !== $listener,
             ),
         );
     }

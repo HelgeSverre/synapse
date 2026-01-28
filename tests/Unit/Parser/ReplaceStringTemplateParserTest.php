@@ -54,7 +54,7 @@ final class ReplaceStringTemplateParserTest extends TestCase
     {
         $parser = new ReplaceStringTemplateParser;
         $parser->setReplacement('name', 'alice');
-        $parser->registerHelper('upper', fn ($s) => strtoupper($s));
+        $parser->registerHelper('upper', fn ($s) => strtoupper((string) $s));
 
         $result = $parser->parse($this->createResponse('{{upper name}}'));
 

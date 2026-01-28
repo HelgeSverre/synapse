@@ -25,10 +25,6 @@ use LlmExe\State\Message;
  */
 final class LlmExecutorWithFunctions extends LlmExecutor
 {
-    private UseExecutors $tools;
-
-    private int $maxIterations;
-
     /**
      * @param  list<ToolDefinition>  $toolDefinitions
      */
@@ -37,8 +33,8 @@ final class LlmExecutorWithFunctions extends LlmExecutor
         PromptInterface $prompt,
         ParserInterface $parser,
         string $model,
-        UseExecutors $tools,
-        int $maxIterations = 10,
+        private readonly UseExecutors $tools,
+        private readonly int $maxIterations = 10,
         ?float $temperature = null,
         ?int $maxTokens = null,
         ?string $name = null,
@@ -56,8 +52,6 @@ final class LlmExecutorWithFunctions extends LlmExecutor
             $hooks,
             $state,
         );
-        $this->tools = $tools;
-        $this->maxIterations = $maxIterations;
     }
 
     protected function handler(mixed $input): ExecutionResult
@@ -92,7 +86,7 @@ final class LlmExecutorWithFunctions extends LlmExecutor
                 $parsed = $this->parser->parse($response);
 
                 $newState = $this->state;
-                if ($response->getAssistantMessage() !== null) {
+                if ($response->getAssistantMessage() instanceof \LlmExe\State\Message) {
                     $newState = $newState->withMessage($response->getAssistantMessage());
                 }
                 $this->state = $newState;
@@ -106,7 +100,7 @@ final class LlmExecutorWithFunctions extends LlmExecutor
 
             // Handle tool calls
             $assistantMessage = $response->getAssistantMessage();
-            if ($assistantMessage !== null) {
+            if ($assistantMessage instanceof \LlmExe\State\Message) {
                 $messages[] = $assistantMessage;
             }
 

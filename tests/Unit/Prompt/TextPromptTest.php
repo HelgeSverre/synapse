@@ -60,7 +60,7 @@ final class TextPromptTest extends TestCase
     public function test_helper(): void
     {
         $prompt = new TextPrompt;
-        $prompt->registerHelper('upper', fn ($s) => strtoupper($s));
+        $prompt->registerHelper('upper', fn ($s) => strtoupper((string) $s));
         $prompt->setContent('{{upper greeting}}');
 
         $result = $prompt->render(['greeting' => 'hello']);
@@ -111,7 +111,7 @@ final class TextPromptTest extends TestCase
         $prompt = (new TextPrompt)
             ->addContent('Line 1')
             ->addContent('Line 2')
-            ->registerHelper('test', fn ($s) => $s)
+            ->registerHelper('test', fn ($s): mixed => $s)
             ->registerPartial('part', 'content')
             ->strict(false);
 
@@ -129,7 +129,7 @@ final class TextPromptTest extends TestCase
     public function test_complex_template(): void
     {
         $prompt = new TextPrompt;
-        $prompt->registerHelper('format', fn ($n) => number_format((float) $n, 2));
+        $prompt->registerHelper('format', fn ($n): string => number_format((float) $n, 2));
         $prompt->registerPartial('disclaimer', 'This is not financial advice.');
 
         $prompt->setContent(

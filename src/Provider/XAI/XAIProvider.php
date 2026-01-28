@@ -17,14 +17,14 @@ use LlmExe\State\Message;
  * xAI (Grok) API provider.
  * Uses OpenAI-compatible API format.
  */
-final class XAIProvider implements LlmProviderInterface
+final readonly class XAIProvider implements LlmProviderInterface
 {
     private const BASE_URL = 'https://api.x.ai/v1';
 
     public function __construct(
-        private readonly TransportInterface $transport,
-        private readonly string $apiKey,
-        private readonly string $baseUrl = self::BASE_URL,
+        private TransportInterface $transport,
+        private string $apiKey,
+        private string $baseUrl = self::BASE_URL,
     ) {}
 
     public function generate(GenerationRequest $request): GenerationResponse
@@ -98,7 +98,7 @@ final class XAIProvider implements LlmProviderInterface
 
         if (count($request->tools) > 0) {
             $body['tools'] = array_map(
-                fn ($tool) => $tool->toOpenAIFormat(),
+                fn (\LlmExe\Provider\Request\ToolDefinition $tool): array => $tool->toOpenAIFormat(),
                 $request->tools,
             );
 

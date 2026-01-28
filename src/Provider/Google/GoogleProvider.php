@@ -17,14 +17,14 @@ use LlmExe\State\Role;
 /**
  * Google Gemini API provider.
  */
-final class GoogleProvider implements LlmProviderInterface
+final readonly class GoogleProvider implements LlmProviderInterface
 {
     private const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
     public function __construct(
-        private readonly TransportInterface $transport,
-        private readonly string $apiKey,
-        private readonly string $baseUrl = self::BASE_URL,
+        private TransportInterface $transport,
+        private string $apiKey,
+        private string $baseUrl = self::BASE_URL,
     ) {}
 
     public function generate(GenerationRequest $request): GenerationResponse
@@ -108,7 +108,7 @@ final class GoogleProvider implements LlmProviderInterface
         if ($request->stopSequences !== null) {
             $generationConfig['stopSequences'] = $request->stopSequences;
         }
-        if (! empty($generationConfig)) {
+        if ($generationConfig !== []) {
             $body['generationConfig'] = $generationConfig;
         }
 

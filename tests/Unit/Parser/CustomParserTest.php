@@ -23,9 +23,7 @@ final class CustomParserTest extends TestCase
 
     public function test_calls_custom_handler(): void
     {
-        $parser = new CustomParser(function (GenerationResponse $response): string {
-            return 'Custom: '.$response->getText();
-        });
+        $parser = new CustomParser(fn (GenerationResponse $response): string => 'Custom: '.$response->getText());
 
         $result = $parser->parse($this->createResponse('test'));
 
@@ -34,9 +32,7 @@ final class CustomParserTest extends TestCase
 
     public function test_returns_custom_type(): void
     {
-        $parser = new CustomParser(function (GenerationResponse $response): array {
-            return ['text' => $response->getText(), 'length' => strlen($response->getText() ?? '')];
-        });
+        $parser = new CustomParser(fn (GenerationResponse $response): array => ['text' => $response->getText(), 'length' => strlen($response->getText() ?? '')]);
 
         $result = $parser->parse($this->createResponse('hello'));
 
@@ -45,27 +41,25 @@ final class CustomParserTest extends TestCase
 
     public function test_defaults_to_text_target(): void
     {
-        $parser = new CustomParser(fn ($r) => $r->getText());
+        $parser = new CustomParser(fn ($r): ?string => $r->getText());
 
         $this->assertSame(ParserTarget::Text, $parser->getTarget());
     }
 
     public function test_allows_custom_target(): void
     {
-        $parser = new CustomParser(fn ($r) => $r->getToolCalls(), ParserTarget::FunctionCall);
+        $parser = new CustomParser(fn ($r): array => $r->getToolCalls(), ParserTarget::FunctionCall);
 
         $this->assertSame(ParserTarget::FunctionCall, $parser->getTarget());
     }
 
     public function test_accesses_full_response(): void
     {
-        $parser = new CustomParser(function (GenerationResponse $response): array {
-            return [
-                'text' => $response->getText(),
-                'model' => $response->model,
-                'hasTools' => $response->hasToolCalls(),
-            ];
-        });
+        $parser = new CustomParser(fn (GenerationResponse $response): array => [
+            'text' => $response->getText(),
+            'model' => $response->model,
+            'hasTools' => $response->hasToolCalls(),
+        ]);
 
         $result = $parser->parse($this->createResponse('test'));
 

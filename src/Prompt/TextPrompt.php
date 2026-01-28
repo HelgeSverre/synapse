@@ -10,7 +10,7 @@ final class TextPrompt extends BasePrompt
 
     public function addContent(string $content): self
     {
-        $this->content .= ($this->content ? "\n\n" : '').$content;
+        $this->content .= ($this->content !== '' && $this->content !== '0' ? "\n\n" : '').$content;
 
         return $this;
     }

@@ -50,7 +50,7 @@ final class Factory
 
     public static function getDefaultTransport(): TransportInterface
     {
-        if (self::$defaultTransport === null) {
+        if (! self::$defaultTransport instanceof \LlmExe\Provider\Http\TransportInterface) {
             self::$defaultTransport = self::discoverTransport();
         }
 

@@ -78,11 +78,7 @@ final class ListToJsonParser extends BaseParser
                     $j++;
                 }
 
-                if (count($childLines) > 0) {
-                    $result[$key] = $this->parseLines($childLines, $indent + $this->indentSpaces);
-                } else {
-                    $result[$key] = null;
-                }
+                $result[$key] = count($childLines) > 0 ? $this->parseLines($childLines, $indent + $this->indentSpaces) : null;
 
                 $i = $j;
             }
@@ -116,7 +112,7 @@ final class ListToJsonParser extends BaseParser
 
         // Check for array notation [a, b, c]
         if (preg_match('/^\[(.+)\]$/', $value, $matches)) {
-            return array_map('trim', explode(',', $matches[1]));
+            return array_map(trim(...), explode(',', $matches[1]));
         }
 
         return $value;

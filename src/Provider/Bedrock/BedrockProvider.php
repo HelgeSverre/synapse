@@ -21,12 +21,12 @@ use LlmExe\State\Role;
  * Note: This provider requires AWS credentials to be configured.
  * You must use a custom transport that handles AWS Signature V4 signing.
  */
-final class BedrockProvider implements LlmProviderInterface
+final readonly class BedrockProvider implements LlmProviderInterface
 {
     public function __construct(
-        private readonly TransportInterface $transport,
-        private readonly string $region,
-        private readonly ?string $baseUrl = null,
+        private TransportInterface $transport,
+        private string $region,
+        private ?string $baseUrl = null,
     ) {}
 
     public function generate(GenerationRequest $request): GenerationResponse
@@ -117,7 +117,7 @@ final class BedrockProvider implements LlmProviderInterface
         if ($request->stopSequences !== null) {
             $inferenceConfig['stopSequences'] = $request->stopSequences;
         }
-        if (! empty($inferenceConfig)) {
+        if ($inferenceConfig !== []) {
             $body['inferenceConfig'] = $inferenceConfig;
         }
 

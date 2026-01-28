@@ -29,3 +29,7 @@ composer.lock
 
 # Logs
 *.log
+
+# Infection
+infection.log
+infection-summary.log

@@ -33,7 +33,7 @@ final class MarkdownCodeBlockParser extends BaseParser
                 return trim($matches[1][0] ?? '');
             }
 
-            return implode("\n\n", array_map('trim', $matches[1]));
+            return implode("\n\n", array_map(trim(...), $matches[1]));
         }
 
         return '';
@@ -49,7 +49,7 @@ final class MarkdownCodeBlockParser extends BaseParser
             : '/```(?:\w+)?\s*\n?(.*?)\n?```/s';
 
         if (preg_match_all($pattern, $text, $matches)) {
-            return array_map('trim', $matches[1]);
+            return array_map(trim(...), $matches[1]);
         }
 
         return [];

@@ -73,7 +73,7 @@ class LlmExecutor extends BaseExecutor
 
         // Update state with assistant message
         $newState = $this->state;
-        if ($response->getAssistantMessage() !== null) {
+        if ($response->getAssistantMessage() instanceof \LlmExe\State\Message) {
             $newState = $newState->withMessage($response->getAssistantMessage());
         }
         $this->state = $newState;
@@ -106,7 +106,7 @@ class LlmExecutor extends BaseExecutor
             $history = $input[$dialogueKey];
             if (is_array($history)) {
                 // Prepend history before rendered messages
-                $historyMessages = array_filter($history, fn ($m) => $m instanceof Message);
+                $historyMessages = array_filter($history, fn ($m): bool => $m instanceof Message);
                 $messages = [...$historyMessages, ...$messages];
             }
         }

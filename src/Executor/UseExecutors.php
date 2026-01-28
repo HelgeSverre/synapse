@@ -99,7 +99,7 @@ final class UseExecutors
     public function getToolDefinitions(): array
     {
         return array_map(
-            fn (CallableExecutor $e) => $e->toToolDefinition(),
+            fn (CallableExecutor $e): \LlmExe\Provider\Request\ToolDefinition => $e->toToolDefinition(),
             array_values($this->executors),
         );
     }
@@ -111,7 +111,7 @@ final class UseExecutors
     public function getVisibleToolDefinitions(array $input = [], ?ConversationState $state = null): array
     {
         return array_map(
-            fn (CallableExecutor $e) => $e->toToolDefinition(),
+            fn (CallableExecutor $e): \LlmExe\Provider\Request\ToolDefinition => $e->toToolDefinition(),
             $this->getVisibleFunctions($input, $state),
         );
     }

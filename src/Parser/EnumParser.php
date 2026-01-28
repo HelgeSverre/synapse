@@ -31,10 +31,8 @@ final class EnumParser extends BaseParser
                 if ($text === $value) {
                     return $value;
                 }
-            } else {
-                if (strcasecmp($text, $value) === 0) {
-                    return $value;
-                }
+            } elseif (strcasecmp($text, $value) === 0) {
+                return $value;
             }
         }
 
@@ -44,10 +42,8 @@ final class EnumParser extends BaseParser
                 if (str_contains($text, $value)) {
                     return $value;
                 }
-            } else {
-                if (stripos($text, $value) !== false) {
-                    return $value;
-                }
+            } elseif (stripos($text, $value) !== false) {
+                return $value;
             }
         }
 

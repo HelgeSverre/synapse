@@ -13,14 +13,14 @@ use LlmExe\Provider\Response\GenerationResponse;
 use LlmExe\Provider\Response\UsageInfo;
 use LlmExe\State\Message;
 
-final class OpenAIProvider implements LlmProviderInterface
+final readonly class OpenAIProvider implements LlmProviderInterface
 {
     private const BASE_URL = 'https://api.openai.com/v1';
 
     public function __construct(
-        private readonly TransportInterface $transport,
-        private readonly string $apiKey,
-        private readonly string $baseUrl = self::BASE_URL,
+        private TransportInterface $transport,
+        private string $apiKey,
+        private string $baseUrl = self::BASE_URL,
     ) {}
 
     public function generate(GenerationRequest $request): GenerationResponse
@@ -94,7 +94,7 @@ final class OpenAIProvider implements LlmProviderInterface
 
         if (count($request->tools) > 0) {
             $body['tools'] = array_map(
-                fn ($tool) => $tool->toOpenAIFormat(),
+                fn (\LlmExe\Provider\Request\ToolDefinition $tool): array => $tool->toOpenAIFormat(),
                 $request->tools,
             );
 

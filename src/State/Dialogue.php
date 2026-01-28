@@ -94,7 +94,7 @@ final class Dialogue
     public function addFromOutput(GenerationResponse $output): self
     {
         $assistantMessage = $output->getAssistantMessage();
-        if ($assistantMessage !== null) {
+        if ($assistantMessage instanceof \LlmExe\State\Message) {
             $this->messages[] = $assistantMessage;
         }
 
@@ -125,7 +125,7 @@ final class Dialogue
     public function getMessagesByRole(Role $role): array
     {
         return array_values(
-            array_filter($this->messages, fn (Message $m) => $m->role === $role),
+            array_filter($this->messages, fn (Message $m): bool => $m->role === $role),
         );
     }
 

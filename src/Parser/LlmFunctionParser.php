@@ -54,7 +54,7 @@ final class LlmFunctionParser extends BaseParser
      */
     public static function isToolCallResult(mixed $result): bool
     {
-        if (! is_array($result) || empty($result)) {
+        if (! is_array($result) || $result === []) {
             return false;
         }
 

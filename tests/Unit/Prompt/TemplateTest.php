@@ -94,7 +94,7 @@ final class TemplateTest extends TestCase
     public function test_helper_function(): void
     {
         $template = new Template('Hello {{upper name}}!');
-        $template->registerHelper('upper', fn ($s) => strtoupper($s));
+        $template->registerHelper('upper', fn ($s) => strtoupper((string) $s));
         $result = $template->render(['name' => 'world']);
 
         $this->assertSame('Hello WORLD!', $result);
@@ -103,8 +103,8 @@ final class TemplateTest extends TestCase
     public function test_multiple_helpers(): void
     {
         $template = new Template('{{upper name}} - {{lower title}}');
-        $template->registerHelper('upper', fn ($s) => strtoupper($s));
-        $template->registerHelper('lower', fn ($s) => strtolower($s));
+        $template->registerHelper('upper', fn ($s) => strtoupper((string) $s));
+        $template->registerHelper('lower', fn ($s) => strtolower((string) $s));
 
         $result = $template->render(['name' => 'Alice', 'title' => 'QUEEN']);
 
@@ -114,7 +114,7 @@ final class TemplateTest extends TestCase
     public function test_helper_with_nested_path(): void
     {
         $template = new Template('{{upper user.name}}');
-        $template->registerHelper('upper', fn ($s) => strtoupper($s));
+        $template->registerHelper('upper', fn ($s) => strtoupper((string) $s));
 
         $result = $template->render(['user' => ['name' => 'alice']]);
 
@@ -310,7 +310,7 @@ final class TemplateTest extends TestCase
     public function test_helper_returning_non_string(): void
     {
         $template = new Template('{{double num}}');
-        $template->registerHelper('double', fn ($n) => (string) ($n * 2));
+        $template->registerHelper('double', fn ($n): string => (string) ($n * 2));
 
         $result = $template->render(['num' => 21]);
 
@@ -320,7 +320,7 @@ final class TemplateTest extends TestCase
     public function test_chained_helper_calls(): void
     {
         $template = new Template('{{wrap text}} and {{wrap other}}');
-        $template->registerHelper('wrap', fn ($s) => "[{$s}]");
+        $template->registerHelper('wrap', fn ($s): string => "[{$s}]");
 
         $result = $template->render(['text' => 'first', 'other' => 'second']);
 
@@ -354,7 +354,7 @@ final class TemplateTest extends TestCase
     public function test_fluent_helper_registration(): void
     {
         $template = new Template('{{upper name}}');
-        $fluent = $template->registerHelper('upper', fn ($s) => strtoupper($s));
+        $fluent = $template->registerHelper('upper', fn ($s) => strtoupper((string) $s));
 
         $this->assertSame($template, $fluent);
     }

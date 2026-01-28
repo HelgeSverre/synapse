@@ -197,7 +197,7 @@ final class ChatPromptTest extends TestCase
     public function test_register_helper(): void
     {
         $prompt = new ChatPrompt;
-        $prompt->registerHelper('shout', fn ($s) => strtoupper($s).'!');
+        $prompt->registerHelper('shout', fn ($s): string => strtoupper((string) $s).'!');
         $prompt->addSystemMessage('{{shout greeting}}');
 
         $messages = $prompt->render(['greeting' => 'hello']);

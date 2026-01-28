@@ -73,7 +73,7 @@ final readonly class ConversationState
     public function getMessagesByRole(Role $role): array
     {
         return array_values(
-            array_filter($this->messages, fn (Message $m) => $m->role === $role),
+            array_filter($this->messages, fn (Message $m): bool => $m->role === $role),
         );
     }
 
