@@ -37,7 +37,7 @@ final class WeatherTool
                     'unit' => $unit,
                     'conditions' => $condition,
                     'humidity' => $humidity,
-                    'wind' => $windSpeed . ' km/h',
+                    'wind' => $windSpeed.' km/h',
                 ], JSON_THROW_ON_ERROR);
             },
             parameters: [

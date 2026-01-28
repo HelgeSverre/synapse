@@ -12,11 +12,11 @@ use LlmExe\Examples\AgenticTools\WebSearchTool;
 use LlmExe\Executor\CallableExecutor;
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../../examples/agentic-tools/WeatherTool.php';
-require_once __DIR__ . '/../../../examples/agentic-tools/CalculatorTool.php';
-require_once __DIR__ . '/../../../examples/agentic-tools/NotesTool.php';
-require_once __DIR__ . '/../../../examples/agentic-tools/WebSearchTool.php';
-require_once __DIR__ . '/../../../examples/agentic-tools/DateTimeTool.php';
+require_once __DIR__.'/../../../examples/agentic-tools/WeatherTool.php';
+require_once __DIR__.'/../../../examples/agentic-tools/CalculatorTool.php';
+require_once __DIR__.'/../../../examples/agentic-tools/NotesTool.php';
+require_once __DIR__.'/../../../examples/agentic-tools/WebSearchTool.php';
+require_once __DIR__.'/../../../examples/agentic-tools/DateTimeTool.php';
 
 final class AgenticToolsTest extends TestCase
 {

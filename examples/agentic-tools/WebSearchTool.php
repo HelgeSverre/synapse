@@ -43,8 +43,8 @@ final class WebSearchTool
                     $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $query));
 
                     $results[] = [
-                        'title' => ucwords($query) . ' - Result ' . ($i + 1),
-                        'url' => "https://{$domain}/{$slug}-" . ($resultHash % 1000),
+                        'title' => ucwords($query).' - Result '.($i + 1),
+                        'url' => "https://{$domain}/{$slug}-".($resultHash % 1000),
                         'snippet' => "{$prefix} {$query}. This resource provides detailed information and examples.",
                     ];
                 }

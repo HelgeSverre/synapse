@@ -104,7 +104,7 @@ final class NotesTool
             return json_encode(['error' => 'Note ID is required'], JSON_THROW_ON_ERROR);
         }
 
-        if (!isset(self::$notes[$id])) {
+        if (! isset(self::$notes[$id])) {
             return json_encode(['error' => "Note with ID {$id} not found"], JSON_THROW_ON_ERROR);
         }
 
@@ -120,7 +120,7 @@ final class NotesTool
             return json_encode(['error' => 'Note ID is required'], JSON_THROW_ON_ERROR);
         }
 
-        if (!isset(self::$notes[$id])) {
+        if (! isset(self::$notes[$id])) {
             return json_encode(['error' => "Note with ID {$id} not found"], JSON_THROW_ON_ERROR);
         }
 
