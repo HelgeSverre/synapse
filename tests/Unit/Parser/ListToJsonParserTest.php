@@ -130,4 +130,153 @@ final class ListToJsonParserTest extends TestCase
         $this->assertSame('My App', $result['title']);
         $this->assertSame(1.0, $result['version']);
     }
+
+    public function test_multiple_nesting_levels(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "a:\n  b:\n    c:\n      d: deep value";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame([
+            'a' => [
+                'b' => [
+                    'c' => [
+                        'd' => 'deep value',
+                    ],
+                ],
+            ],
+        ], $result);
+    }
+
+    public function test_empty_value_becomes_null(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "name:\nage: 30";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertArrayHasKey('name', $result);
+        $this->assertNull($result['name']);
+        $this->assertSame(30, $result['age']);
+    }
+
+    public function test_indent_detection_with_spaces(): void
+    {
+        $parser = new ListToJsonParser(indentSpaces: 4);
+        $text = "parent:\n    child: value";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame([
+            'parent' => [
+                'child' => 'value',
+            ],
+        ], $result);
+    }
+
+    public function test_get_indent_level_calculation(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "root:\n  child1: a\n  child2: b";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame([
+            'root' => [
+                'child1' => 'a',
+                'child2' => 'b',
+            ],
+        ], $result);
+    }
+
+    public function test_sibling_nesting_levels(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "first:\n  nested: 1\nsecond:\n  nested: 2";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame([
+            'first' => ['nested' => 1],
+            'second' => ['nested' => 2],
+        ], $result);
+    }
+
+    public function test_line_with_less_indent_breaks_nesting(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "outer:\n  inner: value\nnext: item";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame([
+            'outer' => ['inner' => 'value'],
+            'next' => 'item',
+        ], $result);
+    }
+
+    public function test_empty_lines_in_nested_structure(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "parent:\n  child1: a\n\n  child2: b";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertArrayHasKey('parent', $result);
+    }
+
+    public function test_key_only_with_no_children(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = 'lonely:';
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['lonely' => null], $result);
+    }
+
+    public function test_array_notation_with_spaces(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = 'items: [one, two, three]';
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['items' => ['one', 'two', 'three']], $result);
+    }
+
+    public function test_numeric_string_detection(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "int: 42\nfloat: 3.14\nstring: not a number";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(42, $result['int']);
+        $this->assertSame(3.14, $result['float']);
+        $this->assertSame('not a number', $result['string']);
+    }
+
+    public function test_list_markers_removed_in_nested(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "items:\n  - first: 1\n  - second: 2";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertArrayHasKey('items', $result);
+    }
+
+    public function test_trim_preserves_structure(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "\n\nname: Alice\nage: 30\n\n";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame([
+            'name' => 'Alice',
+            'age' => 30,
+        ], $result);
+    }
+
+    public function test_while_loop_processes_all_lines(): void
+    {
+        $parser = new ListToJsonParser;
+        $text = "a: 1\nb: 2\nc: 3\nd: 4\ne: 5";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertCount(5, $result);
+        $this->assertSame(1, $result['a']);
+        $this->assertSame(5, $result['e']);
+    }
 }

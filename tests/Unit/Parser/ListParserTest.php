@@ -99,4 +99,66 @@ final class ListParserTest extends TestCase
 
         $this->assertSame(['First', 'Second', 'Third'], $result);
     }
+
+    public function test_items_with_extra_whitespace_on_lines(): void
+    {
+        $parser = new ListParser;
+        $text = "   1. First item   \n   2. Second item   ";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['First item', 'Second item'], $result);
+    }
+
+    public function test_multiple_empty_lines_between_items(): void
+    {
+        $parser = new ListParser;
+        $text = "1. First\n\n\n\n2. Second\n\n\n3. Third";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['First', 'Second', 'Third'], $result);
+    }
+
+    public function test_line_becomes_empty_after_marker_removal(): void
+    {
+        $parser = new ListParser;
+        $text = "1. \n2. Actual item\n- \n* Another";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['Actual item', 'Another'], $result);
+    }
+
+    public function test_handles_windows_line_endings(): void
+    {
+        $parser = new ListParser;
+        $text = "1. First\r\n2. Second\r\n3. Third";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['First', 'Second', 'Third'], $result);
+    }
+
+    public function test_handles_only_whitespace_input(): void
+    {
+        $parser = new ListParser;
+        $result = $parser->parse($this->createResponse("   \n   \n   "));
+
+        $this->assertSame([], $result);
+    }
+
+    public function test_trim_outer_text_is_required(): void
+    {
+        $parser = new ListParser;
+        $text = "\n\n1. First\n2. Second\n\n";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['First', 'Second'], $result);
+    }
+
+    public function test_preg_replace_returns_null_handled(): void
+    {
+        $parser = new ListParser;
+        $text = '1. Item with special chars: test';
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['Item with special chars: test'], $result);
+    }
 }

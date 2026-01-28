@@ -83,4 +83,61 @@ final class EnumParserTest extends TestCase
 
         $this->assertNull($result);
     }
+
+    public function test_trim_is_required_for_match(): void
+    {
+        $parser = new EnumParser(['apple', 'banana']);
+
+        $this->assertSame('apple', $parser->parse($this->createResponse("\t\napple\t\n")));
+        $this->assertSame('banana', $parser->parse($this->createResponse('   banana   ')));
+    }
+
+    public function test_case_insensitive_exact_match(): void
+    {
+        $parser = new EnumParser(['Apple', 'Banana']);
+
+        $this->assertSame('Apple', $parser->parse($this->createResponse('apple')));
+        $this->assertSame('Apple', $parser->parse($this->createResponse('APPLE')));
+        $this->assertSame('Banana', $parser->parse($this->createResponse('BaNaNa')));
+    }
+
+    public function test_case_sensitive_no_match(): void
+    {
+        $parser = new EnumParser(['Apple', 'Banana'], caseSensitive: true);
+
+        $this->assertNull($parser->parse($this->createResponse('apple')));
+        $this->assertNull($parser->parse($this->createResponse('BANANA')));
+    }
+
+    public function test_case_sensitive_contains_match(): void
+    {
+        $parser = new EnumParser(['Apple', 'Banana'], caseSensitive: true);
+
+        $this->assertSame('Apple', $parser->parse($this->createResponse('I want an Apple please')));
+        $this->assertNull($parser->parse($this->createResponse('I want an apple please')));
+    }
+
+    public function test_case_insensitive_contains_match(): void
+    {
+        $parser = new EnumParser(['apple', 'banana']);
+
+        $this->assertSame('apple', $parser->parse($this->createResponse('I would like an APPLE')));
+        $this->assertSame('banana', $parser->parse($this->createResponse('Give me a BANANA')));
+    }
+
+    public function test_stripos_used_for_case_insensitive_contains(): void
+    {
+        $parser = new EnumParser(['yes', 'no']);
+
+        $this->assertSame('yes', $parser->parse($this->createResponse('The answer is YES!')));
+        $this->assertSame('no', $parser->parse($this->createResponse('I say NO to that')));
+    }
+
+    public function test_str_contains_used_for_case_sensitive_contains(): void
+    {
+        $parser = new EnumParser(['Yes', 'No'], caseSensitive: true);
+
+        $this->assertSame('Yes', $parser->parse($this->createResponse('The answer is Yes!')));
+        $this->assertNull($parser->parse($this->createResponse('The answer is YES!')));
+    }
 }

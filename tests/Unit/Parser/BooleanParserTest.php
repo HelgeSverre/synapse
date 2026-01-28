@@ -80,4 +80,57 @@ final class BooleanParserTest extends TestCase
 
         $this->assertFalse($result);
     }
+
+    public function test_trim_is_required_for_exact_match(): void
+    {
+        $parser = new BooleanParser;
+
+        $this->assertTrue($parser->parse($this->createResponse("\t\nyes\t\n")));
+        $this->assertFalse($parser->parse($this->createResponse("\t\nno\t\n")));
+    }
+
+    public function test_strtolower_is_required_for_exact_match(): void
+    {
+        $parser = new BooleanParser;
+
+        $this->assertTrue($parser->parse($this->createResponse('YES')));
+        $this->assertTrue($parser->parse($this->createResponse('TRUE')));
+        $this->assertFalse($parser->parse($this->createResponse('NO')));
+        $this->assertFalse($parser->parse($this->createResponse('FALSE')));
+    }
+
+    public function test_contains_match_finds_true_in_longer_text(): void
+    {
+        $parser = new BooleanParser;
+
+        $this->assertTrue($parser->parse($this->createResponse('I think the answer is yes definitely')));
+        $this->assertTrue($parser->parse($this->createResponse('This is true based on evidence')));
+        $this->assertTrue($parser->parse($this->createResponse('That is correct!')));
+        $this->assertTrue($parser->parse($this->createResponse('Response: affirmative')));
+    }
+
+    public function test_contains_match_finds_false_in_longer_text(): void
+    {
+        $parser = new BooleanParser;
+
+        $this->assertFalse($parser->parse($this->createResponse('no way at all')));
+        $this->assertFalse($parser->parse($this->createResponse('that seems false to me')));
+        $this->assertFalse($parser->parse($this->createResponse('that seems wrong!')));
+        $this->assertFalse($parser->parse($this->createResponse('my response: negative')));
+    }
+
+    public function test_exact_match_takes_precedence_over_contains_match(): void
+    {
+        $parser = new BooleanParser;
+
+        $this->assertTrue($parser->parse($this->createResponse('yes')));
+        $this->assertFalse($parser->parse($this->createResponse('no')));
+    }
+
+    public function test_true_contains_match_checked_before_false(): void
+    {
+        $parser = new BooleanParser;
+
+        $this->assertTrue($parser->parse($this->createResponse('yes and no both apply')));
+    }
 }

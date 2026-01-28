@@ -100,4 +100,78 @@ final class JsonParserTest extends TestCase
 
         $this->assertSame($schema, $parser->getSchema());
     }
+
+    public function test_extracts_json_from_surrounding_markdown(): void
+    {
+        $parser = new JsonParser;
+        $text = "Here is the JSON data you requested:\n```json\n{\"name\": \"Test\"}\n```\nLet me know if you need anything else.";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['name' => 'Test'], $result);
+    }
+
+    public function test_extracts_json_array_from_code_block(): void
+    {
+        $parser = new JsonParser;
+        $text = "```json\n[\"a\", \"b\", \"c\"]\n```";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['a', 'b', 'c'], $result);
+    }
+
+    public function test_regex_extraction_with_newlines_in_json(): void
+    {
+        $parser = new JsonParser;
+        $text = "```json\n{\n  \"key\": \"value\",\n  \"nested\": {\n    \"inner\": true\n  }\n}\n```";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame([
+            'key' => 'value',
+            'nested' => ['inner' => true],
+        ], $result);
+    }
+
+    public function test_validates_schema_when_enabled(): void
+    {
+        $schema = ['type' => 'object', 'properties' => ['name' => ['type' => 'string']]];
+        $parser = new JsonParser(schema: $schema, validateSchema: true);
+
+        $result = $parser->parse($this->createResponse('{"name": "Alice"}'));
+        $this->assertSame(['name' => 'Alice'], $result);
+    }
+
+    public function test_validates_schema_with_null_validator_passes(): void
+    {
+        $schema = ['type' => 'object', 'required' => ['name']];
+        $parser = new JsonParser(schema: $schema, validateSchema: true);
+
+        $result = $parser->parse($this->createResponse('{"other": "field"}'));
+        $this->assertSame(['other' => 'field'], $result);
+    }
+
+    public function test_trim_is_required_before_parsing(): void
+    {
+        $parser = new JsonParser;
+        $result = $parser->parse($this->createResponse("\n\n  {\"key\": \"value\"}  \n\n"));
+
+        $this->assertSame(['key' => 'value'], $result);
+    }
+
+    public function test_code_block_without_json_language_tag(): void
+    {
+        $parser = new JsonParser;
+        $text = "Some text before\n```\n{\"extracted\": true}\n```\nSome text after";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['extracted' => true], $result);
+    }
+
+    public function test_handles_code_block_with_minimal_newlines(): void
+    {
+        $parser = new JsonParser;
+        $text = "```json\n{\"compact\":true}\n```";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['compact' => true], $result);
+    }
 }
