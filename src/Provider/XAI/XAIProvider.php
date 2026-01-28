@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LlmExe\Provider\XAI;
 
+use Generator;
+use LlmExe\Provider\Http\StreamTransportInterface;
 use LlmExe\Provider\Http\TransportInterface;
 use LlmExe\Provider\LlmProviderInterface;
 use LlmExe\Provider\ProviderCapabilities;
@@ -12,12 +14,20 @@ use LlmExe\Provider\Request\ToolCall;
 use LlmExe\Provider\Response\GenerationResponse;
 use LlmExe\Provider\Response\UsageInfo;
 use LlmExe\State\Message;
+use LlmExe\Streaming\SseParser;
+use LlmExe\Streaming\StreamableProviderInterface;
+use LlmExe\Streaming\StreamCompleted;
+use LlmExe\Streaming\StreamContext;
+use LlmExe\Streaming\StreamEvent;
+use LlmExe\Streaming\TextDelta;
+use LlmExe\Streaming\ToolCallDelta;
+use LlmExe\Streaming\ToolCallsReady;
 
 /**
  * xAI (Grok) API provider.
  * Uses OpenAI-compatible API format.
  */
-final readonly class XAIProvider implements LlmProviderInterface
+final readonly class XAIProvider implements LlmProviderInterface, StreamableProviderInterface
 {
     private const BASE_URL = 'https://api.x.ai/v1';
 
@@ -70,6 +80,21 @@ final readonly class XAIProvider implements LlmProviderInterface
 
             if ($message->toolCallId !== null) {
                 $msg['tool_call_id'] = $message->toolCallId;
+            }
+
+            $toolCalls = $message->getToolCalls();
+            if ($toolCalls !== []) {
+                $msg['tool_calls'] = array_map(
+                    fn (ToolCall $tc): array => [
+                        'id' => $tc->id,
+                        'type' => 'function',
+                        'function' => [
+                            'name' => $tc->name,
+                            'arguments' => json_encode($tc->arguments),
+                        ],
+                    ],
+                    $toolCalls,
+                );
             }
 
             $messages[] = $msg;
@@ -176,5 +201,128 @@ final readonly class XAIProvider implements LlmProviderInterface
     public function getName(): string
     {
         return 'xai';
+    }
+
+    /**
+     * @return Generator<StreamEvent>
+     */
+    public function stream(GenerationRequest $request, ?StreamContext $ctx = null): Generator
+    {
+        if (! $this->transport instanceof StreamTransportInterface) {
+            throw new \RuntimeException(
+                'Streaming requires a transport that implements StreamTransportInterface (e.g., GuzzleStreamTransport)',
+            );
+        }
+
+        $body = $this->buildRequestBody($request);
+        $body['stream'] = true;
+        $body['stream_options'] = ['include_usage' => true];
+
+        $headers = [
+            'Authorization' => "Bearer {$this->apiKey}",
+            'Content-Type' => 'application/json',
+        ];
+
+        $response = $this->transport->streamPost(
+            "{$this->baseUrl}/chat/completions",
+            $headers,
+            $body,
+            $ctx,
+        );
+
+        $toolCallDeltas = [];
+        $finishReason = null;
+        $usage = null;
+
+        foreach (SseParser::parseStream($response->getBody(), $ctx) as $event) {
+            if ($ctx?->shouldCancel()) {
+                return;
+            }
+
+            $data = $event['data'];
+
+            if ($data === '[DONE]') {
+                break;
+            }
+
+            $chunk = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+            $choice = $chunk['choices'][0] ?? null;
+
+            if ($choice === null) {
+                if (isset($chunk['usage'])) {
+                    $usage = new UsageInfo(
+                        inputTokens: $chunk['usage']['prompt_tokens'] ?? 0,
+                        outputTokens: $chunk['usage']['completion_tokens'] ?? 0,
+                        totalTokens: $chunk['usage']['total_tokens'] ?? null,
+                    );
+                }
+
+                continue;
+            }
+
+            $delta = $choice['delta'] ?? [];
+
+            if (isset($delta['content']) && $delta['content'] !== '') {
+                yield new TextDelta($delta['content']);
+            }
+
+            if (isset($delta['tool_calls']) && is_array($delta['tool_calls'])) {
+                foreach ($delta['tool_calls'] as $toolCallChunk) {
+                    $index = $toolCallChunk['index'] ?? 0;
+
+                    yield new ToolCallDelta(
+                        index: $index,
+                        id: $toolCallChunk['id'] ?? null,
+                        name: $toolCallChunk['function']['name'] ?? null,
+                        arguments: $toolCallChunk['function']['arguments'] ?? null,
+                    );
+
+                    if (! isset($toolCallDeltas[$index])) {
+                        $toolCallDeltas[$index] = ['id' => '', 'name' => '', 'arguments' => ''];
+                    }
+                    if (isset($toolCallChunk['id'])) {
+                        $toolCallDeltas[$index]['id'] = $toolCallChunk['id'];
+                    }
+                    if (isset($toolCallChunk['function']['name'])) {
+                        $toolCallDeltas[$index]['name'] = $toolCallChunk['function']['name'];
+                    }
+                    if (isset($toolCallChunk['function']['arguments'])) {
+                        $toolCallDeltas[$index]['arguments'] .= $toolCallChunk['function']['arguments'];
+                    }
+                }
+            }
+
+            if (isset($choice['finish_reason']) && is_string($choice['finish_reason'])) {
+                $finishReason = $choice['finish_reason'];
+            }
+
+            if (isset($chunk['usage'])) {
+                $usage = new UsageInfo(
+                    inputTokens: $chunk['usage']['prompt_tokens'] ?? 0,
+                    outputTokens: $chunk['usage']['completion_tokens'] ?? 0,
+                    totalTokens: $chunk['usage']['total_tokens'] ?? null,
+                );
+            }
+        }
+
+        if ($toolCallDeltas !== []) {
+            $toolCalls = [];
+            foreach ($toolCallDeltas as $tc) {
+                $arguments = $tc['arguments'] !== ''
+                    ? (json_decode($tc['arguments'], true) ?? [])
+                    : [];
+                $toolCalls[] = new ToolCall(
+                    id: $tc['id'],
+                    name: $tc['name'],
+                    arguments: is_array($arguments) ? $arguments : [],
+                );
+            }
+            yield new ToolCallsReady($toolCalls);
+        }
+
+        yield new StreamCompleted(
+            finishReason: $finishReason,
+            usage: $usage,
+        );
     }
 }
