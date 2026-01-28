@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LlmExe;
 
+use LlmExe\Embeddings\EmbeddingProviderInterface;
 use LlmExe\Executor\CallableExecutor;
 use LlmExe\Executor\CoreExecutor;
 use LlmExe\Executor\LlmExecutor;
@@ -131,4 +132,14 @@ function createState(): ConversationState
 function createDialogue(?string $name = null): Dialogue
 {
     return Factory::createDialogue($name);
+}
+
+/**
+ * Create an embedding provider instance.
+ *
+ * @param  array<string, mixed>  $options
+ */
+function useEmbeddings(string $provider, array $options = []): EmbeddingProviderInterface
+{
+    return Factory::useEmbeddings($provider, $options);
 }

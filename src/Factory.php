@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace LlmExe;
 
+use LlmExe\Embeddings\Cohere\CohereEmbeddingProvider;
+use LlmExe\Embeddings\EmbeddingProviderInterface;
+use LlmExe\Embeddings\Jina\JinaEmbeddingProvider;
+use LlmExe\Embeddings\Mistral\MistralEmbeddingProvider;
+use LlmExe\Embeddings\OpenAI\OpenAIEmbeddingProvider;
+use LlmExe\Embeddings\Voyage\VoyageEmbeddingProvider;
 use LlmExe\Executor\CallableExecutor;
 use LlmExe\Executor\CoreExecutor;
 use LlmExe\Executor\LlmExecutor;
@@ -31,6 +37,7 @@ use LlmExe\Provider\Google\GoogleProvider;
 use LlmExe\Provider\Http\Psr18Transport;
 use LlmExe\Provider\Http\TransportInterface;
 use LlmExe\Provider\LlmProviderInterface;
+use LlmExe\Provider\Mistral\MistralProvider;
 use LlmExe\Provider\OpenAI\OpenAIProvider;
 use LlmExe\Provider\XAI\XAIProvider;
 use LlmExe\State\ConversationState;
@@ -114,6 +121,11 @@ final class Factory
                 transport: $transport,
                 apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
                 baseUrl: $options['baseUrl'] ?? 'https://api.x.ai/v1',
+            ),
+            'mistral' => new MistralProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.mistral.ai/v1',
             ),
             'bedrock' => new BedrockProvider(
                 transport: $transport,
@@ -280,5 +292,44 @@ final class Factory
     public static function createDialogue(?string $name = null): Dialogue
     {
         return new Dialogue($name ?? 'default');
+    }
+
+    /**
+     * Create an embedding provider instance.
+     *
+     * @param  array<string, mixed>  $options
+     */
+    public static function useEmbeddings(string $provider, array $options = []): EmbeddingProviderInterface
+    {
+        $transport = $options['transport'] ?? self::getDefaultTransport();
+
+        return match ($provider) {
+            'openai' => new OpenAIEmbeddingProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.openai.com/v1',
+            ),
+            'mistral' => new MistralEmbeddingProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.mistral.ai/v1',
+            ),
+            'voyage' => new VoyageEmbeddingProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.voyageai.com/v1',
+            ),
+            'cohere' => new CohereEmbeddingProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.cohere.com/v2',
+            ),
+            'jina' => new JinaEmbeddingProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.jina.ai/v1',
+            ),
+            default => throw new \InvalidArgumentException("Unknown embedding provider: {$provider}"),
+        };
     }
 }
