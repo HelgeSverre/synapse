@@ -13,7 +13,7 @@ final class CoreExecutorTest extends TestCase
 {
     public function test_executes_handler_and_returns_result(): void
     {
-        $executor = new CoreExecutor(fn (array $input) => $input['value'] * 2);
+        $executor = new CoreExecutor(fn (array $input): int|float => $input['value'] * 2);
 
         $result = $executor->execute(['value' => 5]);
 
@@ -23,7 +23,7 @@ final class CoreExecutorTest extends TestCase
     public function test_handler_receives_input_correctly(): void
     {
         $receivedInput = null;
-        $executor = new CoreExecutor(function (array $input) use (&$receivedInput) {
+        $executor = new CoreExecutor(function (array $input) use (&$receivedInput): string {
             $receivedInput = $input;
 
             return 'done';
@@ -36,7 +36,7 @@ final class CoreExecutorTest extends TestCase
 
     public function test_result_contains_string_value(): void
     {
-        $executor = new CoreExecutor(fn () => 'hello world');
+        $executor = new CoreExecutor(fn (): string => 'hello world');
 
         $result = $executor->execute([]);
 
@@ -46,7 +46,7 @@ final class CoreExecutorTest extends TestCase
 
     public function test_result_contains_array_value_as_json(): void
     {
-        $executor = new CoreExecutor(fn () => ['key' => 'value']);
+        $executor = new CoreExecutor(fn (): array => ['key' => 'value']);
 
         $result = $executor->execute([]);
 
@@ -56,7 +56,7 @@ final class CoreExecutorTest extends TestCase
 
     public function test_metadata_is_populated_correctly(): void
     {
-        $executor = new CoreExecutor(fn () => 'test');
+        $executor = new CoreExecutor(fn (): string => 'test');
 
         $executor->execute([]);
 
@@ -68,7 +68,7 @@ final class CoreExecutorTest extends TestCase
 
     public function test_execution_count_increments(): void
     {
-        $executor = new CoreExecutor(fn () => 'test');
+        $executor = new CoreExecutor(fn (): string => 'test');
 
         $executor->execute([]);
         $executor->execute([]);
@@ -79,7 +79,7 @@ final class CoreExecutorTest extends TestCase
 
     public function test_named_executor(): void
     {
-        $executor = new CoreExecutor(fn () => 'test', name: 'MyCustomExecutor');
+        $executor = new CoreExecutor(fn (): string => 'test', name: 'MyCustomExecutor');
 
         $executor->execute([]);
 
@@ -89,7 +89,7 @@ final class CoreExecutorTest extends TestCase
     public function test_uses_custom_hooks(): void
     {
         $hooks = new HookDispatcher;
-        $executor = new CoreExecutor(fn () => 'test', hooks: $hooks);
+        $executor = new CoreExecutor(fn (): string => 'test', hooks: $hooks);
 
         $this->assertSame($hooks, $executor->getHooks());
     }
@@ -97,7 +97,7 @@ final class CoreExecutorTest extends TestCase
     public function test_uses_custom_state(): void
     {
         $state = new ConversationState;
-        $executor = new CoreExecutor(fn () => 'test', state: $state);
+        $executor = new CoreExecutor(fn (): string => 'test', state: $state);
 
         $this->assertSame($state, $executor->getState());
     }
@@ -105,7 +105,7 @@ final class CoreExecutorTest extends TestCase
     public function test_result_contains_state(): void
     {
         $state = new ConversationState;
-        $executor = new CoreExecutor(fn () => 'test', state: $state);
+        $executor = new CoreExecutor(fn (): string => 'test', state: $state);
 
         $result = $executor->execute([]);
 
@@ -114,7 +114,7 @@ final class CoreExecutorTest extends TestCase
 
     public function test_response_has_core_model(): void
     {
-        $executor = new CoreExecutor(fn () => 'test');
+        $executor = new CoreExecutor(fn (): string => 'test');
 
         $result = $executor->execute([]);
 
@@ -123,7 +123,7 @@ final class CoreExecutorTest extends TestCase
 
     public function test_response_has_zero_usage(): void
     {
-        $executor = new CoreExecutor(fn () => 'test');
+        $executor = new CoreExecutor(fn (): string => 'test');
 
         $result = $executor->execute([]);
 

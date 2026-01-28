@@ -17,7 +17,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'test_tool',
             description: 'A test tool',
-            handler: fn (array $input) => $input,
+            handler: fn (array $input): array => $input,
         );
 
         $this->assertSame('test_tool', $executor->getName());
@@ -37,7 +37,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'search',
             description: 'Search tool',
-            handler: fn (array $input) => $input,
+            handler: fn (array $input): array => $input,
             parameters: $parameters,
         );
 
@@ -51,7 +51,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => $input,
+            handler: fn (array $input): array => $input,
             attributes: $attributes,
         );
 
@@ -64,7 +64,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: function (array $input) use (&$receivedInput) {
+            handler: function (array $input) use (&$receivedInput): string {
                 $receivedInput = $input;
 
                 return 'done';
@@ -83,7 +83,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: function (array $input, ConversationState $state) use (&$receivedState) {
+            handler: function (array $input, ConversationState $state) use (&$receivedState): string {
                 $receivedState = $state;
 
                 return 'done';
@@ -101,7 +101,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: function (array $input, ConversationState $state) use (&$receivedState) {
+            handler: function (array $input, ConversationState $state) use (&$receivedState): string {
                 $receivedState = $state;
 
                 return 'done';
@@ -118,7 +118,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result value',
+            handler: fn (array $input): string => 'result value',
         );
 
         $result = $executor->execute([]);
@@ -135,7 +135,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result',
+            handler: fn (array $input): string => 'result',
             attributes: $attributes,
         );
 
@@ -164,7 +164,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result',
+            handler: fn (array $input): string => 'result',
         );
 
         $this->assertTrue($executor->isVisible([]));
@@ -175,8 +175,8 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result',
-            visibilityHandler: fn (array $input, ConversationState $state) => $input['show'] ?? false,
+            handler: fn (array $input): string => 'result',
+            visibilityHandler: fn (array $input, ConversationState $state): mixed => $input['show'] ?? false,
         );
 
         $this->assertFalse($executor->isVisible([]));
@@ -191,8 +191,8 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result',
-            visibilityHandler: function (array $input, ConversationState $state) use (&$receivedState) {
+            handler: fn (array $input): string => 'result',
+            visibilityHandler: function (array $input, ConversationState $state) use (&$receivedState): true {
                 $receivedState = $state;
 
                 return true;
@@ -210,8 +210,8 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result',
-            visibilityHandler: function (array $input, ConversationState $state) use (&$receivedState) {
+            handler: fn (array $input): string => 'result',
+            visibilityHandler: function (array $input, ConversationState $state) use (&$receivedState): true {
                 $receivedState = $state;
 
                 return true;
@@ -228,7 +228,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result',
+            handler: fn (array $input): string => 'result',
         );
 
         $result = $executor->validateInput(['any' => 'input']);
@@ -241,8 +241,8 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => 'result',
-            validateInputHandler: function (array $input) {
+            handler: fn (array $input): string => 'result',
+            validateInputHandler: function (array $input): array {
                 if (! isset($input['required_field'])) {
                     return ['valid' => false, 'errors' => ['required_field is missing']];
                 }
@@ -266,12 +266,12 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: function (array $input) use (&$handlerCalled) {
+            handler: function (array $input) use (&$handlerCalled): string {
                 $handlerCalled = true;
 
                 return 'result';
             },
-            validateInputHandler: fn (array $input) => ['valid' => false, 'errors' => ['Validation failed']],
+            validateInputHandler: fn (array $input): array => ['valid' => false, 'errors' => ['Validation failed']],
         );
 
         $result = $executor->execute([]);
@@ -288,12 +288,12 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: function (array $input) use (&$handlerCalled) {
+            handler: function (array $input) use (&$handlerCalled): string {
                 $handlerCalled = true;
 
                 return 'result';
             },
-            validateInputHandler: fn (array $input) => ['valid' => true, 'errors' => []],
+            validateInputHandler: fn (array $input): array => ['valid' => true, 'errors' => []],
         );
 
         $result = $executor->execute([]);
@@ -314,7 +314,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'greet',
             description: 'Greet a person',
-            handler: fn (array $input) => "Hello, {$input['name']}!",
+            handler: fn (array $input): string => "Hello, {$input['name']}!",
             parameters: $parameters,
         );
 
@@ -331,7 +331,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'no_params',
             description: 'Tool with no params',
-            handler: fn (array $input) => 'result',
+            handler: fn (array $input): string => 'result',
         );
 
         $definition = $executor->toToolDefinition();
@@ -344,7 +344,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'my_tool',
             description: 'desc',
-            handler: fn (array $input) => null,
+            handler: fn (array $input): null => null,
         );
 
         $this->assertSame('my_tool', $executor->getName());
@@ -355,7 +355,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'My tool description',
-            handler: fn (array $input) => null,
+            handler: fn (array $input): null => null,
         );
 
         $this->assertSame('My tool description', $executor->getDescription());
@@ -366,7 +366,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => null,
+            handler: fn (array $input): null => null,
         );
 
         $this->assertSame([], $executor->getParameters());
@@ -377,7 +377,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => null,
+            handler: fn (array $input): null => null,
         );
 
         $this->assertSame([], $executor->getAttributes());
@@ -388,7 +388,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => ['key' => 'value', 'nested' => ['a' => 1]],
+            handler: fn (array $input): array => ['key' => 'value', 'nested' => ['a' => 1]],
         );
 
         $result = $executor->execute([]);
@@ -402,7 +402,7 @@ final class CallableExecutorTest extends TestCase
         $executor = new CallableExecutor(
             name: 'tool',
             description: 'desc',
-            handler: fn (array $input) => null,
+            handler: fn (array $input): null => null,
         );
 
         $result = $executor->execute([]);

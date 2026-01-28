@@ -37,7 +37,7 @@ use PHPUnit\Framework\TestCase;
 
 final class FactoryTest extends TestCase
 {
-    private TransportInterface $mockTransport;
+    private \PHPUnit\Framework\MockObject\MockObject $mockTransport;
 
     protected function setUp(): void
     {
@@ -439,7 +439,7 @@ final class FactoryTest extends TestCase
 
     public function test_create_parser_custom(): void
     {
-        $handler = fn ($response) => 'custom';
+        $handler = fn ($response): string => 'custom';
         $parser = Factory::createParser('custom', ['handler' => $handler]);
 
         $this->assertInstanceOf(CustomParser::class, $parser);
@@ -463,7 +463,7 @@ final class FactoryTest extends TestCase
 
     public function test_create_core_executor(): void
     {
-        $handler = fn ($input) => $input['value'] * 2;
+        $handler = fn ($input): int|float => $input['value'] * 2;
         $executor = Factory::createCoreExecutor($handler);
 
         $this->assertInstanceOf(CoreExecutor::class, $executor);
@@ -471,7 +471,7 @@ final class FactoryTest extends TestCase
 
     public function test_create_core_executor_with_name(): void
     {
-        $handler = fn ($input) => $input['value'] * 2;
+        $handler = fn ($input): int|float => $input['value'] * 2;
         $executor = Factory::createCoreExecutor($handler, 'doubler');
 
         $this->assertInstanceOf(CoreExecutor::class, $executor);
@@ -583,7 +583,7 @@ final class FactoryTest extends TestCase
             [
                 'name' => 'calculator',
                 'description' => 'Performs calculations',
-                'handler' => fn ($input) => $input['a'] + $input['b'],
+                'handler' => fn ($input): float|int|array => $input['a'] + $input['b'],
             ],
         ]);
 
@@ -612,7 +612,7 @@ final class FactoryTest extends TestCase
                 [
                     'name' => 'calculator',
                     'description' => 'Performs calculations',
-                    'handler' => fn ($input) => $input['a'] + $input['b'],
+                    'handler' => fn ($input): float|int|array => $input['a'] + $input['b'],
                 ],
             ],
         ]);
@@ -655,12 +655,12 @@ final class FactoryTest extends TestCase
         $executor1 = new CallableExecutor(
             name: 'func1',
             description: 'First function',
-            handler: fn () => 'result1',
+            handler: fn (): string => 'result1',
         );
         $executor2 = new CallableExecutor(
             name: 'func2',
             description: 'Second function',
-            handler: fn () => 'result2',
+            handler: fn (): string => 'result2',
         );
 
         $useExecutors = Factory::useExecutors([$executor1, $executor2]);
@@ -676,12 +676,12 @@ final class FactoryTest extends TestCase
             [
                 'name' => 'add',
                 'description' => 'Adds numbers',
-                'handler' => fn ($input) => $input['a'] + $input['b'],
+                'handler' => fn ($input): float|int|array => $input['a'] + $input['b'],
             ],
             [
                 'name' => 'multiply',
                 'description' => 'Multiplies numbers',
-                'handler' => fn ($input) => $input['a'] * $input['b'],
+                'handler' => fn ($input): int|float => $input['a'] * $input['b'],
             ],
         ]);
 
@@ -695,7 +695,7 @@ final class FactoryTest extends TestCase
         $executor = new CallableExecutor(
             name: 'existing',
             description: 'Existing executor',
-            handler: fn () => 'existing',
+            handler: fn (): string => 'existing',
         );
 
         $useExecutors = Factory::useExecutors([
@@ -703,7 +703,7 @@ final class FactoryTest extends TestCase
             [
                 'name' => 'new',
                 'description' => 'New executor',
-                'handler' => fn () => 'new',
+                'handler' => fn (): string => 'new',
             ],
         ]);
 
@@ -717,7 +717,7 @@ final class FactoryTest extends TestCase
         $executor = Factory::createCallableExecutor([
             'name' => 'test_func',
             'description' => 'Test function',
-            'handler' => fn ($input) => $input['value'] * 2,
+            'handler' => fn ($input): int|float => $input['value'] * 2,
         ]);
 
         $this->assertInstanceOf(CallableExecutor::class, $executor);
@@ -730,7 +730,7 @@ final class FactoryTest extends TestCase
         $executor = Factory::createCallableExecutor([
             'name' => 'test_func',
             'description' => 'Test function',
-            'handler' => fn ($input) => $input['value'] * 2,
+            'handler' => fn ($input): int|float => $input['value'] * 2,
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
@@ -738,8 +738,8 @@ final class FactoryTest extends TestCase
                 ],
             ],
             'attributes' => ['key' => 'value'],
-            'visibilityHandler' => fn () => true,
-            'validateInput' => fn () => ['valid' => true, 'errors' => []],
+            'visibilityHandler' => fn (): true => true,
+            'validateInput' => fn (): array => ['valid' => true, 'errors' => []],
         ]);
 
         $this->assertInstanceOf(CallableExecutor::class, $executor);
@@ -753,7 +753,7 @@ final class FactoryTest extends TestCase
 
         Factory::createCallableExecutor([
             'description' => 'Test function',
-            'handler' => fn () => 'result',
+            'handler' => fn (): string => 'result',
         ]);
     }
 
@@ -764,7 +764,7 @@ final class FactoryTest extends TestCase
 
         Factory::createCallableExecutor([
             'name' => 'test_func',
-            'handler' => fn () => 'result',
+            'handler' => fn (): string => 'result',
         ]);
     }
 

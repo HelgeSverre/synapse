@@ -115,10 +115,8 @@ final class BedrockProviderTest extends TestCase
             ->method('post')
             ->with(
                 $this->anything(),
-                $this->callback(function (array $headers): bool {
-                    return $headers['Content-Type'] === 'application/json'
-                        && $headers['Accept'] === 'application/json';
-                }),
+                $this->callback(fn (array $headers): bool => $headers['Content-Type'] === 'application/json'
+                    && $headers['Accept'] === 'application/json'),
                 $this->anything(),
             )
             ->willReturn($this->createBasicResponse());
@@ -165,11 +163,9 @@ final class BedrockProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return isset($body['system'])
-                        && is_array($body['system'])
-                        && $body['system'][0]['text'] === 'You are helpful';
-                }),
+                $this->callback(fn (array $body): bool => isset($body['system'])
+                    && is_array($body['system'])
+                    && $body['system'][0]['text'] === 'You are helpful'),
             )
             ->willReturn($this->createBasicResponse());
 
@@ -221,9 +217,7 @@ final class BedrockProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return ! isset($body['inferenceConfig']);
-                }),
+                $this->callback(fn (array $body): bool => ! isset($body['inferenceConfig'])),
             )
             ->willReturn($this->createBasicResponse());
 

@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AnthropicProviderTest extends TestCase
 {
-    private TransportInterface $mockTransport;
+    private \PHPUnit\Framework\MockObject\MockObject $mockTransport;
 
     protected function setUp(): void
     {
@@ -51,11 +51,9 @@ final class AnthropicProviderTest extends TestCase
             ->method('post')
             ->with(
                 $this->anything(),
-                $this->callback(function (array $headers): bool {
-                    return $headers['x-api-key'] === 'test-api-key'
-                        && $headers['anthropic-version'] === '2023-06-01'
-                        && $headers['Content-Type'] === 'application/json';
-                }),
+                $this->callback(fn (array $headers): bool => $headers['x-api-key'] === 'test-api-key'
+                    && $headers['anthropic-version'] === '2023-06-01'
+                    && $headers['Content-Type'] === 'application/json'),
                 $this->anything(),
             )
             ->willReturn([
@@ -80,10 +78,8 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['model'] === 'claude-3-sonnet'
-                        && $body['max_tokens'] === 1000;
-                }),
+                $this->callback(fn (array $body): bool => $body['model'] === 'claude-3-sonnet'
+                    && $body['max_tokens'] === 1000),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -108,9 +104,7 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['max_tokens'] === 4096;
-                }),
+                $this->callback(fn (array $body): bool => $body['max_tokens'] === 4096),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -157,9 +151,7 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['system'] === 'You are a helpful assistant.';
-                }),
+                $this->callback(fn (array $body): bool => $body['system'] === 'You are a helpful assistant.'),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -184,10 +176,8 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['system'] === 'You are a helpful assistant.'
-                        && ! $this->containsSystemMessage($body['messages']);
-                }),
+                $this->callback(fn (array $body): bool => $body['system'] === 'You are a helpful assistant.'
+                    && ! $this->containsSystemMessage($body['messages'])),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -214,9 +204,7 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['system'] === 'Request system prompt';
-                }),
+                $this->callback(fn (array $body): bool => $body['system'] === 'Request system prompt'),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -244,11 +232,9 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return count($body['messages']) === 1
-                        && $body['messages'][0]['role'] === 'user'
-                        && $body['messages'][0]['content'] === 'Hello';
-                }),
+                $this->callback(fn (array $body): bool => count($body['messages']) === 1
+                    && $body['messages'][0]['role'] === 'user'
+                    && $body['messages'][0]['content'] === 'Hello'),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hi!']],
@@ -272,11 +258,9 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return count($body['messages']) === 2
-                        && $body['messages'][0]['role'] === 'user'
-                        && $body['messages'][1]['role'] === 'assistant';
-                }),
+                $this->callback(fn (array $body): bool => count($body['messages']) === 2
+                    && $body['messages'][0]['role'] === 'user'
+                    && $body['messages'][1]['role'] === 'assistant'),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello again!']],
@@ -342,9 +326,7 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['temperature'] === 0.7;
-                }),
+                $this->callback(fn (array $body): bool => $body['temperature'] === 0.7),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -369,9 +351,7 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['top_p'] === 0.9;
-                }),
+                $this->callback(fn (array $body): bool => $body['top_p'] === 0.9),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -396,9 +376,7 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['stop_sequences'] === ['STOP', 'END'];
-                }),
+                $this->callback(fn (array $body): bool => $body['stop_sequences'] === ['STOP', 'END']),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -469,10 +447,8 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return isset($body['tool_choice'])
-                        && $body['tool_choice'] === ['type' => 'auto'];
-                }),
+                $this->callback(fn (array $body): bool => isset($body['tool_choice'])
+                    && $body['tool_choice'] === ['type' => 'auto']),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -645,9 +621,7 @@ final class AnthropicProviderTest extends TestCase
             ->method('post')
             ->with(
                 $this->anything(),
-                $this->callback(function (array $headers): bool {
-                    return $headers['anthropic-version'] === '2024-01-01';
-                }),
+                $this->callback(fn (array $headers): bool => $headers['anthropic-version'] === '2024-01-01'),
                 $this->anything(),
             )
             ->willReturn([
@@ -789,14 +763,12 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return ! array_key_exists('temperature', $body)
-                        && ! array_key_exists('top_p', $body)
-                        && ! array_key_exists('stop_sequences', $body)
-                        && ! array_key_exists('system', $body)
-                        && ! array_key_exists('tools', $body)
-                        && ! array_key_exists('tool_choice', $body);
-                }),
+                $this->callback(fn (array $body): bool => ! array_key_exists('temperature', $body)
+                    && ! array_key_exists('top_p', $body)
+                    && ! array_key_exists('stop_sequences', $body)
+                    && ! array_key_exists('system', $body)
+                    && ! array_key_exists('tools', $body)
+                    && ! array_key_exists('tool_choice', $body)),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],
@@ -820,10 +792,8 @@ final class AnthropicProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return isset($body['tools'])
-                        && ! array_key_exists('tool_choice', $body);
-                }),
+                $this->callback(fn (array $body): bool => isset($body['tools'])
+                    && ! array_key_exists('tool_choice', $body)),
             )
             ->willReturn([
                 'content' => [['type' => 'text', 'text' => 'Hello!']],

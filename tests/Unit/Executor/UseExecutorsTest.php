@@ -17,7 +17,7 @@ final class UseExecutorsTest extends TestCase
         return new CallableExecutor(
             name: $name,
             description: $description,
-            handler: fn () => 'result',
+            handler: fn (): string => 'result',
         );
     }
 
@@ -56,12 +56,12 @@ final class UseExecutorsTest extends TestCase
         $executor1 = new CallableExecutor(
             name: 'duplicate',
             description: 'First',
-            handler: fn () => 'first',
+            handler: fn (): string => 'first',
         );
         $executor2 = new CallableExecutor(
             name: 'duplicate',
             description: 'Second',
-            handler: fn () => 'second',
+            handler: fn (): string => 'second',
         );
 
         $useExecutors = new UseExecutors([$executor1]);
@@ -133,13 +133,13 @@ final class UseExecutorsTest extends TestCase
         $executor1 = new CallableExecutor(
             name: 'add',
             description: 'Add numbers',
-            handler: fn ($input) => $input['a'] + $input['b'],
+            handler: fn ($input): float|int|array => $input['a'] + $input['b'],
             parameters: ['type' => 'object', 'properties' => ['a' => ['type' => 'number'], 'b' => ['type' => 'number']]],
         );
         $executor2 = new CallableExecutor(
             name: 'greet',
             description: 'Greet someone',
-            handler: fn ($input) => "Hello, {$input['name']}!",
+            handler: fn ($input): string => "Hello, {$input['name']}!",
         );
 
         $useExecutors = new UseExecutors([$executor1, $executor2]);
@@ -166,7 +166,7 @@ final class UseExecutorsTest extends TestCase
         $executor = new CallableExecutor(
             name: 'multiply',
             description: 'Multiply',
-            handler: fn ($input) => $input['a'] * $input['b'],
+            handler: fn ($input): int|float => $input['a'] * $input['b'],
         );
         $useExecutors = new UseExecutors([$executor]);
 
@@ -207,7 +207,7 @@ final class UseExecutorsTest extends TestCase
         $executor = new CallableExecutor(
             name: 'test',
             description: 'Test',
-            handler: fn () => 'ok',
+            handler: fn (): string => 'ok',
         );
         $useExecutors = new UseExecutors([$executor]);
 
@@ -232,8 +232,8 @@ final class UseExecutorsTest extends TestCase
         $executor = new CallableExecutor(
             name: 'validated',
             description: 'Validated',
-            handler: fn () => 'ok',
-            validateInputHandler: fn ($input) => isset($input['required'])
+            handler: fn (): string => 'ok',
+            validateInputHandler: fn ($input): array => isset($input['required'])
                 ? ['valid' => true, 'errors' => []]
                 : ['valid' => false, 'errors' => ['required field missing']],
         );
@@ -263,14 +263,14 @@ final class UseExecutorsTest extends TestCase
         $visibleExecutor = new CallableExecutor(
             name: 'visible',
             description: 'Visible',
-            handler: fn () => 'ok',
-            visibilityHandler: fn () => true,
+            handler: fn (): string => 'ok',
+            visibilityHandler: fn (): true => true,
         );
         $hiddenExecutor = new CallableExecutor(
             name: 'hidden',
             description: 'Hidden',
-            handler: fn () => 'ok',
-            visibilityHandler: fn () => false,
+            handler: fn (): string => 'ok',
+            visibilityHandler: fn (): false => false,
         );
         $useExecutors = new UseExecutors([$visibleExecutor, $hiddenExecutor]);
 
@@ -287,8 +287,8 @@ final class UseExecutorsTest extends TestCase
         $executor = new CallableExecutor(
             name: 'test',
             description: 'Test',
-            handler: fn () => 'ok',
-            visibilityHandler: function ($input, $state) use (&$receivedInput, &$receivedState) {
+            handler: fn (): string => 'ok',
+            visibilityHandler: function ($input, $state) use (&$receivedInput, &$receivedState): true {
                 $receivedInput = $input;
                 $receivedState = $state;
 
@@ -309,14 +309,14 @@ final class UseExecutorsTest extends TestCase
         $visibleExecutor = new CallableExecutor(
             name: 'visible',
             description: 'Visible',
-            handler: fn () => 'ok',
-            visibilityHandler: fn () => true,
+            handler: fn (): string => 'ok',
+            visibilityHandler: fn (): true => true,
         );
         $hiddenExecutor = new CallableExecutor(
             name: 'hidden',
             description: 'Hidden',
-            handler: fn () => 'ok',
-            visibilityHandler: fn () => false,
+            handler: fn (): string => 'ok',
+            visibilityHandler: fn (): false => false,
         );
         $useExecutors = new UseExecutors([$visibleExecutor, $hiddenExecutor]);
 
@@ -332,7 +332,7 @@ final class UseExecutorsTest extends TestCase
         $executor = new CallableExecutor(
             name: 'stateful',
             description: 'Uses state',
-            handler: function ($input, $state) use (&$receivedState) {
+            handler: function ($input, $state) use (&$receivedState): string {
                 $receivedState = $state;
 
                 return 'ok';

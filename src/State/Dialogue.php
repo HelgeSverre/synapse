@@ -52,9 +52,46 @@ final class Dialogue
         return $this;
     }
 
-    public function setFunctionMessage(string $content, string $name, ?string $id = null): self
+    /**
+     * Add a tool result from a ToolCall object.
+     * Automatically extracts ID and name from the ToolCall.
+     */
+    public function addToolResult(\LlmExe\Provider\Request\ToolCall $toolCall, mixed $result): self
     {
-        $this->messages[] = Message::tool($content, $id ?? uniqid('call_'), $name);
+        $content = is_string($result) ? $result : (json_encode($result) ?: '');
+        $this->messages[] = Message::tool($content, $toolCall->id, $toolCall->name);
+
+        return $this;
+    }
+
+    /**
+     * Add tool results for all tool calls in a response.
+     *
+     * @param  array<string, mixed>  $results  Map of tool call ID to result
+     */
+    public function addToolResults(\LlmExe\Provider\Response\GenerationResponse $response, array $results): self
+    {
+        foreach ($response->getToolCalls() as $toolCall) {
+            if (array_key_exists($toolCall->id, $results)) {
+                $this->addToolResult($toolCall, $results[$toolCall->id]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add tool results using a callable executor.
+     * The callable receives the ToolCall and should return the result.
+     *
+     * @param  callable(\LlmExe\Provider\Request\ToolCall): mixed  $executor
+     */
+    public function executeToolCalls(\LlmExe\Provider\Response\GenerationResponse $response, callable $executor): self
+    {
+        foreach ($response->getToolCalls() as $toolCall) {
+            $result = $executor($toolCall);
+            $this->addToolResult($toolCall, $result);
+        }
 
         return $this;
     }

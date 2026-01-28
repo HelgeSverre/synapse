@@ -148,4 +148,123 @@ final class DialogueTest extends TestCase
 
         $this->assertCount(4, $dialogue->getHistory());
     }
+
+    public function test_set_tool_message(): void
+    {
+        $dialogue = new Dialogue;
+        $dialogue->setToolMessage('{"result": 42}', 'call_123', 'calculator');
+
+        $history = $dialogue->getHistory();
+        $this->assertCount(1, $history);
+        $this->assertSame(Role::Tool, $history[0]->role);
+        $this->assertSame('{"result": 42}', $history[0]->content);
+        $this->assertSame('call_123', $history[0]->toolCallId);
+        $this->assertSame('calculator', $history[0]->name);
+    }
+
+    public function test_set_tool_message_without_name(): void
+    {
+        $dialogue = new Dialogue;
+        $dialogue->setToolMessage('result', 'call_456');
+
+        $history = $dialogue->getHistory();
+        $this->assertNull($history[0]->name);
+        $this->assertSame('call_456', $history[0]->toolCallId);
+    }
+
+    public function test_add_tool_result(): void
+    {
+        $dialogue = new Dialogue;
+        $toolCall = new \LlmExe\Provider\Request\ToolCall(
+            id: 'call_abc',
+            name: 'get_weather',
+            arguments: ['city' => 'Oslo'],
+        );
+
+        $dialogue->addToolResult($toolCall, ['temperature' => 20]);
+
+        $history = $dialogue->getHistory();
+        $this->assertCount(1, $history);
+        $this->assertSame(Role::Tool, $history[0]->role);
+        $this->assertSame('{"temperature":20}', $history[0]->content);
+        $this->assertSame('call_abc', $history[0]->toolCallId);
+        $this->assertSame('get_weather', $history[0]->name);
+    }
+
+    public function test_add_tool_result_with_string(): void
+    {
+        $dialogue = new Dialogue;
+        $toolCall = new \LlmExe\Provider\Request\ToolCall(
+            id: 'call_xyz',
+            name: 'echo',
+            arguments: [],
+        );
+
+        $dialogue->addToolResult($toolCall, 'Hello World');
+
+        $this->assertSame('Hello World', $dialogue->getHistory()[0]->content);
+    }
+
+    public function test_add_tool_results(): void
+    {
+        $dialogue = new Dialogue;
+        $response = new \LlmExe\Provider\Response\GenerationResponse(
+            text: null,
+            messages: [],
+            toolCalls: [
+                new \LlmExe\Provider\Request\ToolCall('call_1', 'func_a', []),
+                new \LlmExe\Provider\Request\ToolCall('call_2', 'func_b', []),
+            ],
+            model: 'test',
+        );
+
+        $dialogue->addToolResults($response, [
+            'call_1' => 'result_a',
+            'call_2' => ['data' => 'result_b'],
+        ]);
+
+        $history = $dialogue->getHistory();
+        $this->assertCount(2, $history);
+        $this->assertSame('result_a', $history[0]->content);
+        $this->assertSame('{"data":"result_b"}', $history[1]->content);
+    }
+
+    public function test_add_tool_results_skips_missing(): void
+    {
+        $dialogue = new Dialogue;
+        $response = new \LlmExe\Provider\Response\GenerationResponse(
+            text: null,
+            messages: [],
+            toolCalls: [
+                new \LlmExe\Provider\Request\ToolCall('call_1', 'func_a', []),
+                new \LlmExe\Provider\Request\ToolCall('call_2', 'func_b', []),
+            ],
+            model: 'test',
+        );
+
+        $dialogue->addToolResults($response, ['call_1' => 'only_this']);
+
+        $this->assertCount(1, $dialogue->getHistory());
+    }
+
+    public function test_execute_tool_calls(): void
+    {
+        $dialogue = new Dialogue;
+        $response = new \LlmExe\Provider\Response\GenerationResponse(
+            text: null,
+            messages: [],
+            toolCalls: [
+                new \LlmExe\Provider\Request\ToolCall('call_1', 'double', ['n' => 5]),
+                new \LlmExe\Provider\Request\ToolCall('call_2', 'double', ['n' => 10]),
+            ],
+            model: 'test',
+        );
+
+        $dialogue->executeToolCalls($response, fn ($tc): int|float => $tc->arguments['n'] * 2);
+
+        $history = $dialogue->getHistory();
+        $this->assertCount(2, $history);
+        $this->assertSame('10', $history[0]->content);
+        $this->assertSame('20', $history[1]->content);
+    }
 }

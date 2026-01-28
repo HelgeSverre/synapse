@@ -89,12 +89,10 @@ final class XAIProviderTest extends TestCase
             ->method('post')
             ->with(
                 $this->anything(),
-                $this->callback(function (array $headers): bool {
-                    return isset($headers['Authorization'])
-                        && $headers['Authorization'] === 'Bearer test-api-key'
-                        && isset($headers['Content-Type'])
-                        && $headers['Content-Type'] === 'application/json';
-                }),
+                $this->callback(fn (array $headers): bool => isset($headers['Authorization'])
+                    && $headers['Authorization'] === 'Bearer test-api-key'
+                    && isset($headers['Content-Type'])
+                    && $headers['Content-Type'] === 'application/json'),
                 $this->anything(),
             )
             ->willReturn($this->createBasicResponse());
@@ -115,12 +113,10 @@ final class XAIProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['model'] === 'grok-beta'
-                        && count($body['messages']) === 1
-                        && $body['messages'][0]['role'] === 'user'
-                        && $body['messages'][0]['content'] === 'Hello';
-                }),
+                $this->callback(fn (array $body): bool => $body['model'] === 'grok-beta'
+                    && count($body['messages']) === 1
+                    && $body['messages'][0]['role'] === 'user'
+                    && $body['messages'][0]['content'] === 'Hello'),
             )
             ->willReturn($this->createBasicResponse());
 
@@ -140,12 +136,10 @@ final class XAIProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return count($body['messages']) === 2
-                        && $body['messages'][0]['role'] === 'system'
-                        && $body['messages'][0]['content'] === 'You are helpful'
-                        && $body['messages'][1]['role'] === 'user';
-                }),
+                $this->callback(fn (array $body): bool => count($body['messages']) === 2
+                    && $body['messages'][0]['role'] === 'system'
+                    && $body['messages'][0]['content'] === 'You are helpful'
+                    && $body['messages'][1]['role'] === 'user'),
             )
             ->willReturn($this->createBasicResponse());
 
@@ -166,12 +160,10 @@ final class XAIProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return $body['temperature'] === 0.7
-                        && $body['max_tokens'] === 1000
-                        && $body['top_p'] === 0.9
-                        && $body['stop'] === ['END'];
-                }),
+                $this->callback(fn (array $body): bool => $body['temperature'] === 0.7
+                    && $body['max_tokens'] === 1000
+                    && $body['top_p'] === 0.9
+                    && $body['stop'] === ['END']),
             )
             ->willReturn($this->createBasicResponse());
 
@@ -195,13 +187,11 @@ final class XAIProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return isset($body['tools'])
-                        && count($body['tools']) === 1
-                        && $body['tools'][0]['type'] === 'function'
-                        && $body['tools'][0]['function']['name'] === 'get_weather'
-                        && $body['tools'][0]['function']['description'] === 'Get weather';
-                }),
+                $this->callback(fn (array $body): bool => isset($body['tools'])
+                    && count($body['tools']) === 1
+                    && $body['tools'][0]['type'] === 'function'
+                    && $body['tools'][0]['function']['name'] === 'get_weather'
+                    && $body['tools'][0]['function']['description'] === 'Get weather'),
             )
             ->willReturn($this->createBasicResponse());
 
@@ -222,9 +212,7 @@ final class XAIProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return isset($body['tool_choice']) && $body['tool_choice'] === 'auto';
-                }),
+                $this->callback(fn (array $body): bool => isset($body['tool_choice']) && $body['tool_choice'] === 'auto'),
             )
             ->willReturn($this->createBasicResponse());
 
@@ -246,10 +234,8 @@ final class XAIProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body): bool {
-                    return isset($body['response_format'])
-                        && $body['response_format']['type'] === 'json_object';
-                }),
+                $this->callback(fn (array $body): bool => isset($body['response_format'])
+                    && $body['response_format']['type'] === 'json_object'),
             )
             ->willReturn($this->createBasicResponse());
 

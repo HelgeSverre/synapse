@@ -4,8 +4,8 @@
         "directories": ["src"]
     },
     "logs": {
-        "text": "infection.log",
-        "summary": "infection-summary.log"
+        "text": ".build/infection.log",
+        "summary": ".build/infection-summary.log"
     },
     "mutators": {
         "@default": true
@@ -13,6 +13,7 @@
     "minMsi": 50,
     "minCoveredMsi": 70,
     "testFramework": "phpunit",
+    "tmpDir": ".build/infection-tmp",
     "phpUnit": {
         "configDir": ".",
         "customPath": "./vendor/bin/phpunit"

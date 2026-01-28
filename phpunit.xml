@@ -3,7 +3,7 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
-         cacheDirectory=".phpunit.cache"
+         cacheDirectory=".build/phpunit-cache"
          executionOrder="depends,defects"
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
@@ -23,8 +23,12 @@
     </source>
     <coverage>
         <report>
-            <html outputDirectory="coverage"/>
+            <html outputDirectory=".build/coverage"/>
+            <clover outputFile=".build/coverage.xml"/>
             <text outputFile="php://stdout" showOnlySummary="true"/>
         </report>
     </coverage>
+    <logging>
+        <junit outputFile=".build/junit.xml"/>
+    </logging>
 </phpunit>

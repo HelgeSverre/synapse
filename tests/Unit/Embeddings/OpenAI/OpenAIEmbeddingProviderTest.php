@@ -115,9 +115,7 @@ final class OpenAIEmbeddingProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body) {
-                    return $body['dimensions'] === 256;
-                }),
+                $this->callback(fn (array $body) => $body['dimensions'] === 256),
             )
             ->willReturn([
                 'data' => [['embedding' => [0.1]]],
@@ -136,9 +134,7 @@ final class OpenAIEmbeddingProviderTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(function (array $body) {
-                    return $body['encoding_format'] === 'base64';
-                }),
+                $this->callback(fn (array $body) => $body['encoding_format'] === 'base64'),
             )
             ->willReturn([
                 'data' => [['embedding' => [0.1]]],

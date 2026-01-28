@@ -120,8 +120,8 @@ final class HookDispatcherTest extends TestCase
     {
         $dispatcher = new HookDispatcher;
 
-        $dispatcher->addListener(TestEvent::class, fn () => null);
-        $dispatcher->addListener(AnotherTestEvent::class, fn () => null);
+        $dispatcher->addListener(TestEvent::class, fn (): null => null);
+        $dispatcher->addListener(AnotherTestEvent::class, fn (): null => null);
 
         $dispatcher->clearListeners(TestEvent::class);
 
@@ -133,8 +133,8 @@ final class HookDispatcherTest extends TestCase
     {
         $dispatcher = new HookDispatcher;
 
-        $dispatcher->addListener(TestEvent::class, fn () => null);
-        $dispatcher->addListener(AnotherTestEvent::class, fn () => null);
+        $dispatcher->addListener(TestEvent::class, fn (): null => null);
+        $dispatcher->addListener(AnotherTestEvent::class, fn (): null => null);
 
         $dispatcher->clearListeners();
 
@@ -146,7 +146,7 @@ final class HookDispatcherTest extends TestCase
     {
         $dispatcher = new HookDispatcher;
 
-        $dispatcher->removeListener(TestEvent::class, fn () => null);
+        $dispatcher->removeListener(TestEvent::class, fn (): null => null);
 
         $this->assertFalse($dispatcher->hasListeners(TestEvent::class));
     }
@@ -172,12 +172,12 @@ final class HookDispatcherTest extends TestCase
     }
 }
 
-final class TestEvent
+final readonly class TestEvent
 {
-    public function __construct(public readonly string $message) {}
+    public function __construct(public string $message) {}
 }
 
-final class AnotherTestEvent
+final readonly class AnotherTestEvent
 {
-    public function __construct(public readonly int $value = 0) {}
+    public function __construct(public int $value = 0) {}
 }

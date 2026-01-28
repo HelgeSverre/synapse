@@ -8,12 +8,19 @@
 *.swo
 .DS_Store
 
-# PHPUnit
+# Build output (tests, coverage, infection, etc.)
+/.build/
 /.phpunit.cache/
+
+# Legacy locations (clean these up)
 /coverage/
-/coverage.txt
 /coverage.xml
+/coverage-xml/
 /coverage-report.txt
+/coverage.txt
+/junit.xml
+/infection.log
+/infection-summary.log
 .phpunit.result.cache
 
 # Composer
@@ -30,9 +37,3 @@ composer.lock
 
 # Logs
 *.log
-
-# Infection
-infection.log
-infection-summary.log
-/coverage-xml/
-/junit.xml
