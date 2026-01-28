@@ -13,6 +13,7 @@
 /coverage/
 /coverage.txt
 /coverage.xml
+/coverage-report.txt
 .phpunit.result.cache
 
 # Composer
