@@ -1,0 +1,19 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        - vendor
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#Parameter \#1 \$callback of function array_map expects#'
+        - '#does not specify its types: T#'
+        - '#with generic (class|interface)#'
+        - '#references unknown parameter#'
+        - '#with no value type specified in iterable type array#'
+        - '#should return list<.+> but returns array<.+>#'
+        - '#Match arm comparison between#'
+        - '#PHPDoc tag @var with type#'
+        - '#array.+ might not be a list#'
+        - '#Parameter \$tools of class#'
+        - '#Parameter \#1 \$executors of static method LlmExe\\Factory::useExecutors#'

@@ -1,0 +1,102 @@
+<?php
+
+declare(strict_types=1);
+
+namespace LlmExe\Tests\Unit\Parser;
+
+use LlmExe\Parser\ListParser;
+use LlmExe\Provider\Response\GenerationResponse;
+use PHPUnit\Framework\TestCase;
+
+final class ListParserTest extends TestCase
+{
+    private function createResponse(string $text): GenerationResponse
+    {
+        return new GenerationResponse(
+            text: $text,
+            messages: [],
+            toolCalls: [],
+            model: 'test',
+        );
+    }
+
+    public function test_parses_numbered_list(): void
+    {
+        $parser = new ListParser;
+        $text = "1. First item\n2. Second item\n3. Third item";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['First item', 'Second item', 'Third item'], $result);
+    }
+
+    public function test_parses_numbered_list_with_parentheses(): void
+    {
+        $parser = new ListParser;
+        $text = "1) Apple\n2) Banana\n3) Cherry";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['Apple', 'Banana', 'Cherry'], $result);
+    }
+
+    public function test_parses_dash_list(): void
+    {
+        $parser = new ListParser;
+        $text = "- Item A\n- Item B\n- Item C";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['Item A', 'Item B', 'Item C'], $result);
+    }
+
+    public function test_parses_asterisk_list(): void
+    {
+        $parser = new ListParser;
+        $text = "* Red\n* Green\n* Blue";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['Red', 'Green', 'Blue'], $result);
+    }
+
+    public function test_parses_bullet_list(): void
+    {
+        $parser = new ListParser;
+        $text = "• Alpha\n• Beta\n• Gamma";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['Alpha', 'Beta', 'Gamma'], $result);
+    }
+
+    public function test_skips_empty_lines(): void
+    {
+        $parser = new ListParser;
+        $text = "1. First\n\n2. Second\n\n3. Third";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['First', 'Second', 'Third'], $result);
+    }
+
+    public function test_trims_items(): void
+    {
+        $parser = new ListParser;
+        $text = "1.   Padded item   \n2. Normal item";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['Padded item', 'Normal item'], $result);
+    }
+
+    public function test_handles_empty_input(): void
+    {
+        $parser = new ListParser;
+        $result = $parser->parse($this->createResponse(''));
+
+        $this->assertSame([], $result);
+    }
+
+    public function test_handles_mixed_markers(): void
+    {
+        $parser = new ListParser;
+        $text = "1. First\n- Second\n* Third";
+        $result = $parser->parse($this->createResponse($text));
+
+        $this->assertSame(['First', 'Second', 'Third'], $result);
+    }
+}

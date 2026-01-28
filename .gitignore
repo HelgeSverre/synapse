@@ -1,0 +1,31 @@
+# Dependencies
+/vendor/
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# PHPUnit
+/.phpunit.cache/
+/coverage/
+/coverage.txt
+/coverage.xml
+.phpunit.result.cache
+
+# Composer
+composer.lock
+
+# Build artifacts
+/build/
+*.phar
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log

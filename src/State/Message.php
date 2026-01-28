@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+namespace LlmExe\State;
+
+final readonly class Message
+{
+    public function __construct(
+        public Role $role,
+        public string $content,
+        public ?string $name = null,
+        public ?string $toolCallId = null,
+        /** @var array<string, mixed> */
+        public array $metadata = [],
+    ) {}
+
+    public static function system(string $content): self
+    {
+        return new self(Role::System, $content);
+    }
+
+    public static function user(string $content, ?string $name = null): self
+    {
+        return new self(Role::User, $content, $name);
+    }
+
+    public static function assistant(string $content): self
+    {
+        return new self(Role::Assistant, $content);
+    }
+
+    public static function tool(string $content, string $toolCallId, ?string $name = null): self
+    {
+        return new self(Role::Tool, $content, $name, $toolCallId);
+    }
+
+    /** @return array{role: string, content: string, name?: string, tool_call_id?: string} */
+    public function toArray(): array
+    {
+        $data = [
+            'role' => $this->role->value,
+            'content' => $this->content,
+        ];
+
+        if ($this->name !== null) {
+            $data['name'] = $this->name;
+        }
+
+        if ($this->toolCallId !== null) {
+            $data['tool_call_id'] = $this->toolCallId;
+        }
+
+        return $data;
+    }
+}

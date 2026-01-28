@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "name": "llm-exe/llm-exe",
+  "description": "A modern PHP library for LLM orchestration with executors, prompts, parsers, and tool calling",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "llm",
+    "openai",
+    "anthropic",
+    "ai",
+    "executor",
+    "prompt",
+    "parser"
+  ],
+  "require": {
+    "php": "^8.2",
+    "psr/http-client": "^1.0",
+    "psr/http-factory": "^1.0",
+    "psr/http-message": "^2.0"
+  },
+  "require-dev": {
+    "guzzlehttp/guzzle": "^7.0",
+    "laravel/pint": "^1.27",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^11.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "LlmExe\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "LlmExe\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpunit --no-coverage",
+    "test:coverage": "herd coverage ./vendor/bin/phpunit --coverage-html=coverage --coverage-text --coverage-clover=coverage.xml",
+    "analyse": "phpstan analyse --configuration=phpstan.neon src/",
+    "format": "pint",
+    "lint": "pint",
+    "lint:check": "pint --test",
+    "check": [
+      "@lint:check",
+      "@analyse",
+      "@test"
+    ],
+    "examples": "for f in examples/*.php; do echo \"=== $f ===\"; php \"$f\" 2>&1 | head -10; echo; done"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "stable"
+}
