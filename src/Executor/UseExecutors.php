@@ -10,7 +10,7 @@ use LlmExe\State\ConversationState;
 /**
  * Registry/manager for multiple CallableExecutors (tools).
  */
-final class UseExecutors
+final class UseExecutors implements ToolExecutorInterface
 {
     /** @var array<string, CallableExecutor> */
     private array $executors = [];

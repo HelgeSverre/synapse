@@ -164,7 +164,7 @@ final readonly class XAIProvider implements LlmProviderInterface, StreamableProv
         }
 
         if ($text !== null || count($toolCalls) > 0) {
-            $messages[] = Message::assistant($text ?? '');
+            $messages[] = Message::assistant($text ?? '', $toolCalls);
         }
 
         $usage = null;

@@ -48,7 +48,7 @@ final class StreamingLlmExecutorWithFunctions
         private readonly StreamableProviderInterface $provider,
         private readonly PromptInterface $prompt,
         private readonly string $model,
-        private readonly UseExecutors $tools,
+        private readonly ToolExecutorInterface $tools,
         private readonly int $maxIterations = 10,
         private readonly ?float $temperature = null,
         private readonly ?int $maxTokens = null,
@@ -310,7 +310,7 @@ final class StreamingLlmExecutorWithFunctions
         return $this->model;
     }
 
-    public function getTools(): UseExecutors
+    public function getTools(): ToolExecutorInterface
     {
         return $this->tools;
     }

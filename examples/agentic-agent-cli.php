@@ -12,6 +12,8 @@ declare(strict_types=1);
  *   php examples/agentic-agent-cli.php                # Uses OpenAI (default)
  *   php examples/agentic-agent-cli.php anthropic      # Uses Anthropic
  *   php examples/agentic-agent-cli.php xai            # Uses XAI (Grok)
+ *   php examples/agentic-agent-cli.php groq           # Uses Groq (Llama)
+ *   php examples/agentic-agent-cli.php google         # Uses Google (Gemini)
  *
  * Commands:
  *   /clear  - Clear conversation history and notes
@@ -41,6 +43,8 @@ use LlmExe\Hooks\Events\OnToolCall;
 use LlmExe\Hooks\HookDispatcher;
 use LlmExe\Prompt\TextPrompt;
 use LlmExe\Provider\Anthropic\AnthropicProvider;
+use LlmExe\Provider\Google\GoogleProvider;
+use LlmExe\Provider\Groq\GroqProvider;
 use LlmExe\Provider\Http\GuzzleStreamTransport;
 use LlmExe\Provider\OpenAI\OpenAIProvider;
 use LlmExe\Provider\XAI\XAIProvider;
@@ -80,7 +84,17 @@ function createProvider(string $name): array
             'grok-3-mini-fast',
             'Grok 3 Mini Fast',
         ],
-        default => exit(RED."Unknown provider: {$name}. Use: openai, anthropic, or xai\n".RESET),
+        'groq' => [
+            new GroqProvider($transport, getenv('GROQ_API_KEY') ?: exit(RED."GROQ_API_KEY not set\n".RESET)),
+            'meta-llama/llama-4-scout-17b-16e-instruct',
+            'Llama 4 Scout (Groq)',
+        ],
+        'google' => [
+            new GoogleProvider($transport, getenv('GOOGLE_API_KEY') ?: exit(RED."GOOGLE_API_KEY not set\n".RESET)),
+            'gemini-2.0-flash',
+            'Gemini 2.0 Flash',
+        ],
+        default => exit(RED."Unknown provider: {$name}. Use: openai, anthropic, xai, groq, or google\n".RESET),
     };
 }
 

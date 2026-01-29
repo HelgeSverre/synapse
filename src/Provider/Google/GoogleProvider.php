@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace LlmExe\Provider\Google;
 
+use Generator;
+use LlmExe\Provider\Http\StreamTransportInterface;
 use LlmExe\Provider\Http\TransportInterface;
-use LlmExe\Provider\LlmProviderInterface;
 use LlmExe\Provider\ProviderCapabilities;
 use LlmExe\Provider\Request\GenerationRequest;
 use LlmExe\Provider\Request\ToolCall;
@@ -13,11 +14,19 @@ use LlmExe\Provider\Response\GenerationResponse;
 use LlmExe\Provider\Response\UsageInfo;
 use LlmExe\State\Message;
 use LlmExe\State\Role;
+use LlmExe\Streaming\SseParser;
+use LlmExe\Streaming\StreamableProviderInterface;
+use LlmExe\Streaming\StreamCompleted;
+use LlmExe\Streaming\StreamContext;
+use LlmExe\Streaming\StreamEvent;
+use LlmExe\Streaming\TextDelta;
+use LlmExe\Streaming\ToolCallDelta;
+use LlmExe\Streaming\ToolCallsReady;
 
 /**
  * Google Gemini API provider.
  */
-final readonly class GoogleProvider implements LlmProviderInterface
+final readonly class GoogleProvider implements StreamableProviderInterface
 {
     private const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
@@ -153,7 +162,7 @@ final readonly class GoogleProvider implements LlmProviderInterface
         }
 
         if ($text !== null || count($toolCalls) > 0) {
-            $messages[] = Message::assistant($text ?? '');
+            $messages[] = Message::assistant($text ?? '', $toolCalls);
         }
 
         $usage = null;
@@ -190,5 +199,107 @@ final readonly class GoogleProvider implements LlmProviderInterface
     public function getName(): string
     {
         return 'google';
+    }
+
+    /**
+     * @return Generator<StreamEvent>
+     */
+    public function stream(GenerationRequest $request, ?StreamContext $ctx = null): Generator
+    {
+        if (! $this->transport instanceof StreamTransportInterface) {
+            throw new \RuntimeException(
+                'Streaming requires a transport that implements StreamTransportInterface (e.g., GuzzleStreamTransport)',
+            );
+        }
+
+        $body = $this->buildRequestBody($request);
+        $url = "{$this->baseUrl}/models/{$request->model}:streamGenerateContent?key={$this->apiKey}";
+
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+
+        $response = $this->transport->streamPost($url, $headers, $body, $ctx);
+
+        $toolCallDeltas = [];
+        $finishReason = null;
+        $usage = null;
+
+        foreach (SseParser::readLines($response->getBody(), $ctx) as $line) {
+            if ($ctx?->shouldCancel()) {
+                return;
+            }
+
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            $chunk = json_decode($line, true);
+            if (! is_array($chunk)) {
+                continue;
+            }
+
+            $candidates = $chunk['candidates'] ?? [];
+            $candidate = $candidates[0] ?? [];
+            $content = $candidate['content'] ?? [];
+            $parts = $content['parts'] ?? [];
+
+            foreach ($parts as $index => $part) {
+                if (isset($part['text']) && $part['text'] !== '') {
+                    yield new TextDelta($part['text']);
+                }
+
+                if (isset($part['functionCall'])) {
+                    $toolCallId = uniqid('call_');
+
+                    $encodedArgs = isset($part['functionCall']['args'])
+                        ? json_encode($part['functionCall']['args'])
+                        : null;
+
+                    yield new ToolCallDelta(
+                        index: $index,
+                        id: $toolCallId,
+                        name: $part['functionCall']['name'] ?? null,
+                        arguments: $encodedArgs !== false ? $encodedArgs : null,
+                    );
+
+                    $toolCallDeltas[] = [
+                        'id' => $toolCallId,
+                        'name' => $part['functionCall']['name'] ?? '',
+                        'arguments' => $part['functionCall']['args'] ?? [],
+                    ];
+                }
+            }
+
+            if (isset($candidate['finishReason'])) {
+                $finishReason = $candidate['finishReason'];
+            }
+
+            if (isset($chunk['usageMetadata'])) {
+                $usage = new UsageInfo(
+                    inputTokens: $chunk['usageMetadata']['promptTokenCount'] ?? 0,
+                    outputTokens: $chunk['usageMetadata']['candidatesTokenCount'] ?? 0,
+                    totalTokens: $chunk['usageMetadata']['totalTokenCount'] ?? null,
+                );
+            }
+        }
+
+        if ($toolCallDeltas !== []) {
+            $toolCalls = [];
+            foreach ($toolCallDeltas as $tc) {
+                $toolCalls[] = new ToolCall(
+                    id: $tc['id'],
+                    name: $tc['name'],
+                    arguments: is_array($tc['arguments']) ? $tc['arguments'] : [],
+                );
+            }
+            yield new ToolCallsReady($toolCalls);
+        }
+
+        yield new StreamCompleted(
+            finishReason: $finishReason,
+            usage: $usage,
+        );
     }
 }

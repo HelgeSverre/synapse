@@ -76,7 +76,7 @@ $tools = useExecutors([
 
 $prompt = createChatPrompt()
     ->addSystemMessage('You are a helpful assistant with access to tools.')
-    ->addUserMessage('{{question}}');
+    ->addUserMessage('{{question}}', parseTemplate: true);
 
 $executor = createLlmExecutorWithFunctions([
     'llm' => $llm,

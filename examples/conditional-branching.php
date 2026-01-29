@@ -36,7 +36,7 @@ You are a question classifier. Analyze the question and classify it as either:
 
 Respond with ONLY one word: either "technical" or "creative"
 PROMPT)
-        ->addUserMessage('{{question}}');
+        ->addUserMessage('{{question}}', parseTemplate: true);
 
     $parser = createParser('enum', [
         'values' => ['technical', 'creative'],
@@ -65,7 +65,7 @@ You are a knowledgeable expert. Provide factual, concise, and accurate answers.
 Focus on scientific accuracy and clear explanations.
 Keep your response to 2-3 sentences.
 PROMPT)
-        ->addUserMessage('{{question}}');
+        ->addUserMessage('{{question}}', parseTemplate: true);
 
     $parser = createParser('string');
 
@@ -93,7 +93,7 @@ Provide imaginative, engaging, and story-like responses.
 Use descriptive language and paint a picture with your words.
 Keep your response to 3-4 sentences.
 PROMPT)
-        ->addUserMessage('{{question}}');
+        ->addUserMessage('{{question}}', parseTemplate: true);
 
     $parser = createParser('string');
 

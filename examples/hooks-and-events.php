@@ -24,7 +24,7 @@ $llm = useLlm('openai.gpt-4o-mini', [
 
 $prompt = createChatPrompt()
     ->addSystemMessage('You are a helpful assistant.')
-    ->addUserMessage('{{question}}');
+    ->addUserMessage('{{question}}', parseTemplate: true);
 
 $executor = createLlmExecutor([
     'llm' => $llm,
@@ -36,6 +36,7 @@ $executor = createLlmExecutor([
 // Add event listeners
 $executor
     ->on(BeforeProviderCall::class, function (BeforeProviderCall $event): void {
+
         echo "[Hook] Making API request to model: {$event->request->model}\n";
     })
     ->on(AfterProviderCall::class, function (AfterProviderCall $event): void {

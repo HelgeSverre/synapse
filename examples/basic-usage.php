@@ -26,7 +26,7 @@ $llm = useLlm('openai.gpt-4o-mini', [
 // Create a prompt
 $prompt = createChatPrompt()
     ->addSystemMessage('You are a helpful assistant that answers questions concisely.')
-    ->addUserMessage('{{question}}');
+    ->addUserMessage('{{question}}', parseTemplate: true);
 
 // Create a parser
 $parser = createParser('string');

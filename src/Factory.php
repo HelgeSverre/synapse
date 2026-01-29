@@ -208,6 +208,7 @@ final class Factory
             model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
             temperature: $options['temperature'] ?? null,
             maxTokens: $options['maxTokens'] ?? null,
+            responseFormat: $options['responseFormat'] ?? null,
             name: $options['name'] ?? null,
             hooks: $options['hooks'] ?? null,
             state: $options['state'] ?? null,

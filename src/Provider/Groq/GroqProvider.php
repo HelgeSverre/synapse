@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\Moonshot;
+namespace LlmExe\Provider\Groq;
 
 use Generator;
 use LlmExe\Provider\Http\StreamTransportInterface;
@@ -23,9 +23,9 @@ use LlmExe\Streaming\TextDelta;
 use LlmExe\Streaming\ToolCallDelta;
 use LlmExe\Streaming\ToolCallsReady;
 
-final readonly class MoonshotProvider implements LlmProviderInterface, StreamableProviderInterface
+final readonly class GroqProvider implements LlmProviderInterface, StreamableProviderInterface
 {
-    private const BASE_URL = 'https://api.moonshot.ai/v1';
+    private const BASE_URL = 'https://api.groq.com/openai/v1';
 
     public function __construct(
         private TransportInterface $transport,
@@ -79,7 +79,7 @@ final readonly class MoonshotProvider implements LlmProviderInterface, Streamabl
             $toolCalls = $message->getToolCalls();
             if ($toolCalls !== []) {
                 $msg['tool_calls'] = array_map(
-                    fn (\LlmExe\Provider\Request\ToolCall $tc): array => [
+                    fn (ToolCall $tc): array => [
                         'id' => $tc->id,
                         'type' => 'function',
                         'function' => [
@@ -193,7 +193,7 @@ final readonly class MoonshotProvider implements LlmProviderInterface, Streamabl
 
     public function getName(): string
     {
-        return 'moonshot';
+        return 'groq';
     }
 
     /**
@@ -209,8 +209,7 @@ final readonly class MoonshotProvider implements LlmProviderInterface, Streamabl
 
         $body = $this->buildRequestBody($request);
         $body['stream'] = true;
-        // Note: Moonshot claims OpenAI compatibility but stream_options support may vary
-        // Usage is included in the last chunk's usage field regardless
+        $body['stream_options'] = ['include_usage' => true];
 
         $headers = [
             'Authorization' => "Bearer {$this->apiKey}",
@@ -237,10 +236,6 @@ final readonly class MoonshotProvider implements LlmProviderInterface, Streamabl
 
             if ($data === '[DONE]') {
                 break;
-            }
-
-            if ($data === '') {
-                continue;
             }
 
             $chunk = json_decode($data, true, 512, JSON_THROW_ON_ERROR);

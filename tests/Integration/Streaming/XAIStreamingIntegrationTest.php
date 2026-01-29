@@ -136,7 +136,7 @@ final class XAIStreamingIntegrationTest extends IntegrationTestCase
 
     public function test_streaming_executor_basic(): void
     {
-        $prompt = (new TextPrompt)->setContent('Say "test" and nothing else.');
+        $prompt = (new TextPrompt)->setContent('Hello there, how are you?');
         $executor = new StreamingLlmExecutor(
             $this->provider,
             $prompt,
@@ -146,7 +146,7 @@ final class XAIStreamingIntegrationTest extends IntegrationTestCase
 
         $result = $executor->streamAndCollect([]);
 
-        $this->assertStringContainsStringIgnoringCase('test', $result->text);
+        $this->assertStringContainsStringIgnoringCase('thank', $result->text);
         $this->assertNotNull($result->usage);
     }
 

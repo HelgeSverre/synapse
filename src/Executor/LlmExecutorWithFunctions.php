@@ -48,6 +48,7 @@ final class LlmExecutorWithFunctions extends LlmExecutor
             $model,
             $temperature,
             $maxTokens,
+            null, // responseFormat not used with functions
             $name ?? 'LlmExecutorWithFunctions',
             $hooks,
             $state,

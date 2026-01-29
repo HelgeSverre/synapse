@@ -33,6 +33,7 @@ class LlmExecutor extends BaseExecutor
         protected readonly string $model,
         protected readonly ?float $temperature = null,
         protected readonly ?int $maxTokens = null,
+        protected readonly ?array $responseFormat = null,
         ?string $name = null,
         ?HookDispatcherInterface $hooks = null,
         ?ConversationState $state = null,
@@ -59,6 +60,7 @@ class LlmExecutor extends BaseExecutor
             messages: $messages,
             temperature: $this->temperature,
             maxTokens: $this->maxTokens,
+            responseFormat: $this->responseFormat,
         );
 
         $this->hooks->dispatch(new BeforeProviderCall($request));
