@@ -14,26 +14,23 @@ use LlmExe\Streaming\StreamCompleted;
 use LlmExe\Streaming\StreamContext;
 use LlmExe\Streaming\TextDelta;
 use LlmExe\Streaming\ToolCallsReady;
+use LlmExe\Tests\IntegrationTestCase;
+use LlmExe\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
-final class MistralStreamingIntegrationTest extends TestCase
+#[RequiresEnv('MISTRAL_API_KEY')]
+final class MistralStreamingIntegrationTest extends IntegrationTestCase
 {
     private MistralProvider $provider;
 
     protected function setUp(): void
     {
-        exit(print_r(getenv('MISTRAL_API_KEY')));
-
-        $apiKey = getenv('MISTRAL_API_KEY');
-        if ($apiKey === false || $apiKey === '') {
-            $this->markTestSkipped('MISTRAL_API_KEY not set');
-        }
+        parent::setUp();
 
         $client = new Client(['timeout' => 30]);
         $transport = new GuzzleStreamTransport($client);
-        $this->provider = new MistralProvider($transport, $apiKey);
+        $this->provider = new MistralProvider($transport, (string) getenv('MISTRAL_API_KEY'));
     }
 
     public function test_stream_basic_text_response(): void

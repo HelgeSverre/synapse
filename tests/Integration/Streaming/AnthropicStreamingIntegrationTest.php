@@ -14,24 +14,23 @@ use LlmExe\Streaming\StreamCompleted;
 use LlmExe\Streaming\StreamContext;
 use LlmExe\Streaming\TextDelta;
 use LlmExe\Streaming\ToolCallsReady;
+use LlmExe\Tests\IntegrationTestCase;
+use LlmExe\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
-final class AnthropicStreamingIntegrationTest extends TestCase
+#[RequiresEnv('ANTHROPIC_API_KEY')]
+final class AnthropicStreamingIntegrationTest extends IntegrationTestCase
 {
     private AnthropicProvider $provider;
 
     protected function setUp(): void
     {
-        $apiKey = getenv('ANTHROPIC_API_KEY');
-        if ($apiKey === false || $apiKey === '') {
-            $this->markTestSkipped('ANTHROPIC_API_KEY not set');
-        }
+        parent::setUp();
 
         $client = new Client(['timeout' => 30]);
         $transport = new GuzzleStreamTransport($client);
-        $this->provider = new AnthropicProvider($transport, $apiKey);
+        $this->provider = new AnthropicProvider($transport, (string) getenv('ANTHROPIC_API_KEY'));
     }
 
     public function test_stream_basic_text_response(): void

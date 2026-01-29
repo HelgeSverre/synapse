@@ -18,24 +18,23 @@ use LlmExe\Streaming\StreamCompleted;
 use LlmExe\Streaming\StreamContext;
 use LlmExe\Streaming\TextDelta;
 use LlmExe\Streaming\ToolCallsReady;
+use LlmExe\Tests\IntegrationTestCase;
+use LlmExe\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
-final class OpenAIStreamingIntegrationTest extends TestCase
+#[RequiresEnv('OPENAI_API_KEY')]
+final class OpenAIStreamingIntegrationTest extends IntegrationTestCase
 {
     private OpenAIProvider $provider;
 
     protected function setUp(): void
     {
-        $apiKey = getenv('OPENAI_API_KEY');
-        if ($apiKey === false || $apiKey === '') {
-            $this->markTestSkipped('OPENAI_API_KEY not set');
-        }
+        parent::setUp();
 
         $client = new Client(['timeout' => 30]);
         $transport = new GuzzleStreamTransport($client);
-        $this->provider = new OpenAIProvider($transport, $apiKey);
+        $this->provider = new OpenAIProvider($transport, (string) getenv('OPENAI_API_KEY'));
     }
 
     public function test_stream_basic_text_response(): void

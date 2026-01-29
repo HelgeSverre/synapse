@@ -14,24 +14,23 @@ use LlmExe\Streaming\StreamCompleted;
 use LlmExe\Streaming\StreamContext;
 use LlmExe\Streaming\TextDelta;
 use LlmExe\Streaming\ToolCallsReady;
+use LlmExe\Tests\IntegrationTestCase;
+use LlmExe\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
 
 #[Group('integration')]
-final class MoonshotStreamingIntegrationTest extends TestCase
+#[RequiresEnv('MOONSHOT_API_KEY')]
+final class MoonshotStreamingIntegrationTest extends IntegrationTestCase
 {
     private MoonshotProvider $provider;
 
     protected function setUp(): void
     {
-        $apiKey = getenv('MOONSHOT_API_KEY');
-        if ($apiKey === false || $apiKey === '') {
-            $this->markTestSkipped('MOONSHOT_API_KEY not set');
-        }
+        parent::setUp();
 
         $client = new Client(['timeout' => 60]);
         $transport = new GuzzleStreamTransport($client);
-        $this->provider = new MoonshotProvider($transport, $apiKey);
+        $this->provider = new MoonshotProvider($transport, (string) getenv('MOONSHOT_API_KEY'));
     }
 
     public function test_stream_basic_text_response(): void
