@@ -249,6 +249,151 @@
         .footer-copy { color: var(--text-3); font-size: 0.8125rem; }
         .footer-copy a { color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; }
 
+        /* ── Sticky Header ── */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 14, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 80rem;
+            margin: 0 auto;
+            padding: 0.875rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-logo {
+            font-family: var(--font-title);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--amber);
+            text-decoration: none;
+        }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .header-nav a {
+            color: var(--text-2);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .header-nav a:hover,
+        .header-nav a.active { color: var(--text); }
+        .header-nav .cta {
+            background: var(--amber);
+            color: var(--bg);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .header-nav .cta:hover { background: #fbbf24; color: var(--bg); }
+        @media (max-width: 48rem) {
+            .header-nav { gap: 1rem; }
+            .header-nav a:not(.cta) { display: none; }
+        }
+
+        /* ── Scroll margin for anchors ── */
+        [id] { scroll-margin-top: 4rem; }
+
+        /* ── Quick Start ── */
+        .quickstart {
+            padding: 4rem 0;
+            border-top: 1px solid var(--border);
+        }
+        .quickstart-title {
+            font-family: var(--font-title);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+        .quickstart-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .qs-step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        .qs-step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--amber);
+            color: var(--bg);
+            font-size: 0.875rem;
+            font-weight: 700;
+            border-radius: 50%;
+            margin-bottom: 0.75rem;
+        }
+        .qs-step h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .qs-step p {
+            font-size: 0.8125rem;
+            color: var(--text-2);
+            margin-bottom: 1rem;
+        }
+        .qs-step pre {
+            margin: 0;
+            font-size: 0.75rem;
+            padding: 0.875rem 1rem;
+        }
+        @media (max-width: 56rem) {
+            .quickstart-steps { grid-template-columns: 1fr; }
+        }
+
+        /* ── Provider Table ── */
+        .provider-table-wrap {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+        .provider-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .provider-table th,
+        .provider-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .provider-table th {
+            background: var(--surface-2);
+            font-weight: 600;
+            color: var(--text-2);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .provider-table tr:last-child td { border-bottom: none; }
+        .provider-table .check { color: var(--emerald); }
+        .provider-table .dash { color: var(--text-3); }
+        .provider-table .provider-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
         /* ── Reveal ── */
         .reveal {
             opacity: 0;
@@ -300,6 +445,21 @@
 </head>
 <body>
 
+<!-- Sticky Header -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="#" class="header-logo">Synapse</a>
+        <nav class="header-nav">
+            <a href="#quickstart">Quick Start</a>
+            <a href="#core">Core</a>
+            <a href="#use-cases">Use Cases</a>
+            <a href="#providers">Providers</a>
+            <a href="https://github.com/HelgeSverre/synapse" target="_blank">GitHub</a>
+            <a href="#quickstart" class="cta">Get Started</a>
+        </nav>
+    </div>
+</header>
+
 <div class="hero-wrap">
 <section class="hero">
     <div class="hero-left">
@@ -346,7 +506,42 @@ $data = $result-&gt;getValue();
 </section>
 </div>
 
+<!-- Quick Start -->
 <div class="wrap">
+    <section class="quickstart reveal" id="quickstart">
+        <h2 class="quickstart-title">Quick Start</h2>
+        <div class="quickstart-steps">
+            <div class="qs-step">
+                <div class="qs-step-num">1</div>
+                <h3>Install</h3>
+                <p>Add Synapse and an HTTP client to your project.</p>
+                <pre><code class="language-bash">composer require helgesverre/synapse
+composer require guzzlehttp/guzzle</code></pre>
+            </div>
+            <div class="qs-step">
+                <div class="qs-step-num">2</div>
+                <h3>Configure</h3>
+                <p>Create an LLM provider with your API key.</p>
+                <pre><code class="language-php">$llm = useLlm('openai.gpt-4o-mini', [
+    'apiKey' =&gt; getenv('OPENAI_API_KEY'),
+]);</code></pre>
+            </div>
+            <div class="qs-step">
+                <div class="qs-step-num">3</div>
+                <h3>Execute</h3>
+                <p>Build a prompt, parse the response, get typed data.</p>
+                <pre><code class="language-php">$result = createLlmExecutor([
+    'llm' =&gt; $llm, 'model' =&gt; 'gpt-4o-mini',
+    'prompt' =&gt; createChatPrompt()
+        -&gt;addUserMessage('{{q}}', parseTemplate: true),
+    'parser' =&gt; createParser('json'),
+])-&gt;execute(['q' =&gt; 'List 3 planets as JSON']);</code></pre>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="wrap" id="core">
 
     <!-- Parsers -->
     <div class="section reveal">
@@ -503,10 +698,84 @@ $result = $executor-&gt;execute([
         </div>
     </div>
 
+    <!-- Dialogue -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--emerald)">Dialogue</div>
+            <h2>Manage conversations</h2>
+            <p>Fluent API for multi-turn dialogues. Add messages, track history, handle tool results. Clean abstraction over raw message arrays.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$dialogue = createDialogue('support-chat')
+    -&gt;setSystemMessage('You are a helpful support agent.')
+    -&gt;setUserMessage('How do I reset my password?')
+    -&gt;setAssistantMessage('Go to Settings &gt; Security...');
+
+// Continue the conversation
+$dialogue-&gt;setUserMessage('What if I forgot my email?');
+
+// Use history in an executor call
+$messages = $dialogue-&gt;getHistory();
+$lastMessage = $dialogue-&gt;getLastMessage();</code></pre>
+        </div>
+    </div>
+
+    <!-- Embeddings -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--orange)">Embeddings</div>
+            <h2>Vectorize text</h2>
+            <p>Generate embeddings for semantic search, RAG, and similarity matching. Unified API across OpenAI, Mistral, Voyage, Cohere, and Jina.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$embeddings = useEmbeddings('openai', [
+    'apiKey' =&gt; getenv('OPENAI_API_KEY'),
+]);
+
+$response = $embeddings-&gt;embed(
+    'The quick brown fox jumps over the lazy dog.',
+    'text-embedding-3-small',
+);
+
+$vector = $response-&gt;embeddings[0];  // float[1536]
+$tokens = $response-&gt;totalTokens;    // 10</code></pre>
+        </div>
+    </div>
+
     <!-- ── Use Cases ── -->
-    <div class="heading reveal">
+    <div class="heading reveal" id="use-cases">
         <h2>Use cases</h2>
         <p>Patterns you can build with Synapse.</p>
+    </div>
+
+    <!-- RAG / Semantic Search -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--sky)">RAG</div>
+            <h2>Semantic search &amp; retrieval</h2>
+            <p>Embed queries and documents, find relevant context, augment prompts with retrieved knowledge. Build chatbots that know your data.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">// Embed user query
+$queryVec = $embeddings-&gt;embed($question, 'text-embedding-3-small');
+
+// Search your vector store (pseudo-code)
+$docs = $vectorStore-&gt;search($queryVec-&gt;embeddings[0], limit: 5);
+
+// Augment prompt with context
+$executor = createLlmExecutor([
+    'llm' =&gt; $llm, 'model' =&gt; 'gpt-4o-mini',
+    'prompt' =&gt; createChatPrompt()
+        -&gt;addSystemMessage('Answer based on context: {{context}}')
+        -&gt;addUserMessage('{{question}}', parseTemplate: true),
+    'parser' =&gt; createParser('string'),
+]);
+
+$answer = $executor-&gt;execute([
+    'context' =&gt; implode("\n", $docs),
+    'question' =&gt; $question,
+])-&gt;getValue();</code></pre>
+        </div>
     </div>
 
     <!-- Extraction -->
@@ -715,6 +984,124 @@ $results = $validator-&gt;execute([
         </div>
     </div>
 
+    <!-- Code Generation -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--violet)">Code Gen</div>
+            <h2>Generate code</h2>
+            <p>Generate code from specs, parse into structured file outputs, validate syntax. Build scaffolding tools, test generators, migration scripts.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$executor = createLlmExecutor([
+    'llm' =&gt; $llm, 'model' =&gt; 'gpt-4o-mini',
+    'prompt' =&gt; createChatPrompt()
+        -&gt;addSystemMessage('Generate PHP code. Return JSON:
+            {"files": [{"path": "...", "content": "..."}]}')
+        -&gt;addUserMessage('{{spec}}', parseTemplate: true),
+    'parser' =&gt; createParser('json'),
+]);
+
+$result = $executor-&gt;execute([
+    'spec' =&gt; 'Create a User model with name and email',
+])-&gt;getValue();
+
+foreach ($result['files'] as $file) {
+    file_put_contents($file['path'], $file['content']);
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Human-in-the-loop -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--rose)">Approval</div>
+            <h2>Human-in-the-loop</h2>
+            <p>Pause for approval before risky actions. Review tool calls, gate execution on risk level, maintain audit trails. Safe agentic workflows.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">// Define tools with risk levels
+$tools = useExecutors([
+    ['name' =&gt; 'read_file', 'risk' =&gt; 'low', ...],
+    ['name' =&gt; 'write_file', 'risk' =&gt; 'medium', ...],
+    ['name' =&gt; 'delete_files', 'risk' =&gt; 'high', ...],
+]);
+
+// Wrap with approval logic
+foreach ($executor-&gt;stream($input) as $event) {
+    if ($event instanceof ToolCallsReady) {
+        foreach ($event-&gt;toolCalls as $call) {
+            if (isRisky($call) &amp;&amp; !userApproves($call)) {
+                continue; // Skip unapproved actions
+            }
+            $tools-&gt;callFunction($call-&gt;name, $call-&gt;arguments);
+        }
+    }
+}</code></pre>
+        </div>
+    </div>
+
+</div>
+
+<!-- Provider Comparison -->
+<div class="wrap" id="providers">
+    <div class="heading reveal">
+        <h2>Provider support</h2>
+        <p>Feature availability by provider. Synapse normalizes the API across all of them.</p>
+    </div>
+
+    <div class="provider-table-wrap reveal">
+        <table class="provider-table">
+            <thead>
+                <tr>
+                    <th>Provider</th>
+                    <th>Streaming</th>
+                    <th>Tool Calling</th>
+                    <th>JSON Mode</th>
+                    <th>Embeddings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="provider-name">OpenAI</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                </tr>
+                <tr>
+                    <td class="provider-name">Anthropic</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="dash">—</td>
+                </tr>
+                <tr>
+                    <td class="provider-name">Google / Gemini</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                </tr>
+                <tr>
+                    <td class="provider-name">Mistral</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                </tr>
+                <tr>
+                    <td class="provider-name">xAI / Grok</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="check">✓</td>
+                    <td class="dash">—</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <p style="color: var(--text-3); font-size: 0.8125rem; margin-top: 1rem;" class="reveal">
+        Capabilities depend on specific models. Synapse provides a unified interface regardless of provider.
+    </p>
 </div>
 
 <footer>
@@ -731,18 +1118,52 @@ $results = $validator-&gt;execute([
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
 <script>
 hljs.highlightAll();
-const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+
+// Reveal animations
+const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            revealObs.unobserve(e.target);
+        }
+    });
 }, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// Scrollspy for nav
+const sections = ['quickstart', 'core', 'use-cases', 'providers'];
+const navLinks = document.querySelectorAll('.header-nav a[href^="#"]');
+
+const navObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const id = entry.target.id;
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+            });
+        }
+    });
+}, { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' });
+
+sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) navObs.observe(el);
+});
+
+// Copy install command
 function copyInstall(btn) {
     navigator.clipboard.writeText('composer require helgesverre/synapse');
     btn.querySelector('.ic').style.display='none';
     btn.querySelector('.ik').style.display='block';
     btn.classList.add('copied');
-    setTimeout(() => { btn.querySelector('.ic').style.display='block'; btn.querySelector('.ik').style.display='none'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => {
+        btn.querySelector('.ic').style.display='block';
+        btn.querySelector('.ik').style.display='none';
+        btn.classList.remove('copied');
+    }, 2000);
 }
 </script>
 </body>
