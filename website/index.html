@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse &mdash; LLM Orchestration for PHP</title>
+    <meta name="description" content="A modern PHP 8.2+ library for LLM orchestration with structured output, streaming, tool calling, and agentic workflows.">
+    <meta property="og:title" content="Synapse — LLM Orchestration for PHP">
+    <meta property="og:description" content="Composable LLM pipelines for PHP. Streaming, structured output, tool calling, multi-provider.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80' font-style='italic' font-family='serif' fill='%23f59e0b'>S</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;700;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0a0a0e;
+            --surface: #111116;
+            --surface-2: #19191f;
+            --border: #222230;
+            --text: #e4e4e7;
+            --text-2: #a1a1aa;
+            --text-3: #63636e;
+            --amber: #f59e0b;
+            --sky: #38bdf8;
+            --emerald: #34d399;
+            --violet: #a78bfa;
+            --rose: #fb7185;
+            --orange: #fb923c;
+            --font-title: 'Unbounded', system-ui, sans-serif;
+            --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Hero ── */
+        .hero-wrap {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+        .hero {
+            max-width: 80rem;
+            margin: 0 auto;
+            padding: 5rem 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .hero-links {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        .hero-links a {
+            color: var(--text-3);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: color 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .hero-links a:hover { color: var(--text-2); }
+        .hero-left h1 {
+            font-family: 'Unbounded', system-ui, sans-serif;
+            font-style: normal;
+            font-weight: 700;
+            font-size: clamp(3rem, 6vw, 4.5rem);
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+            color: var(--amber);
+            margin-bottom: 1.25rem;
+        }
+        .hero-left h1::after {
+            content: '_';
+            color: var(--amber);
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .hero-left .tagline {
+            font-size: 1.0625rem;
+            color: var(--text-2);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 28rem;
+        }
+        .hero-install {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem 0.6rem 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            transition: border-color 0.15s;
+        }
+        .hero-install:hover { border-color: var(--text-3); }
+        .hero-install .dollar { color: var(--text-3); user-select: none; }
+        .hero-install code { background: none; padding: 0; color: var(--emerald); user-select: all; font-size: inherit; }
+        .hero-install button {
+            background: none;
+            border: none;
+            color: var(--text-3);
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            transition: color 0.15s;
+        }
+        .hero-install button:hover { color: var(--text-2); }
+        .hero-install button.copied { color: var(--emerald); }
+        .hero-right pre { margin: 0; }
+
+        @media (max-width: 56rem) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+                padding: 3rem 1.5rem;
+            }
+        }
+
+        /* ── Code ── */
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            overflow-x: auto;
+            font-size: 0.8125rem;
+            line-height: 1.75;
+            font-family: var(--font-mono);
+        }
+        pre code { background: none; padding: 0; font-family: inherit; font-size: inherit; }
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            background: var(--surface-2);
+            padding: 0.15em 0.35em;
+            border-radius: 3px;
+        }
+
+        /* ── Sections ── */
+        .wrap {
+            max-width: 80rem;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .section {
+            display: grid;
+            grid-template-columns: 22rem 1fr;
+            gap: 3rem;
+            align-items: start;
+            padding: 4rem 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .section.flip .s-text { order: 2; }
+        .section.flip .s-code { order: 1; }
+        .section.flip { grid-template-columns: 1fr 22rem; }
+
+        .s-label {
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+        }
+
+        .s-text h2 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.625rem;
+            line-height: 1.3;
+        }
+
+        .s-text p {
+            color: var(--text-2);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+        }
+
+        .s-code pre { margin: 0; }
+
+        /* ── Divider heading ── */
+        .heading {
+            padding: 5rem 0 0;
+            border-top: 1px solid var(--border);
+        }
+        .heading h2 {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 2.25rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .heading p {
+            color: var(--text-2);
+            font-size: 1rem;
+        }
+
+        /* ── Footer ── */
+        footer {
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+            padding: 2.5rem 1.5rem;
+        }
+        .footer-inner {
+            max-width: 80rem;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .footer-links a {
+            color: var(--text-3);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .footer-links a:hover { color: var(--text-2); }
+        .footer-copy { color: var(--text-3); font-size: 0.8125rem; }
+        .footer-copy a { color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; }
+
+        /* ── Reveal ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .reveal.visible { opacity: 1; transform: none; }
+        .d1 { transition-delay: 80ms; }
+        .d2 { transition-delay: 160ms; }
+        .d3 { transition-delay: 240ms; }
+
+        /* ── Responsive ── */
+        @media (max-width: 56rem) {
+            .section, .section.flip {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .section.flip .s-text { order: 1; }
+            .section.flip .s-code { order: 2; }
+            .hero { padding: 4rem 1.5rem 3rem; }
+            pre { font-size: 0.75rem; padding: 1rem 1.125rem; }
+            .heading h2 { font-size: 1.75rem; }
+        }
+        @media (max-width: 30rem) {
+            .install { font-size: 0.75rem; }
+            .hero h1 { font-size: 2.75rem; }
+            .footer-inner { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* ── Syntax (dark vibrant) ── */
+        .hljs { background: transparent; color: #d4d4d8; }
+        .hljs-keyword { color: #c084fc; }
+        .hljs-string { color: #34d399; }
+        .hljs-number { color: #fb923c; }
+        .hljs-comment { color: #3f3f50; font-style: italic; }
+        .hljs-title.function_,
+        .hljs-title.function_.invoke__ { color: #60a5fa; }
+        .hljs-built_in { color: #38bdf8; }
+        .hljs-variable { color: #e4e4e7; }
+        .hljs-operator { color: #f59e0b; }
+        .hljs-punctuation { color: #52525b; }
+        .hljs-meta { color: #52525b; }
+        .hljs-title.class_ { color: #fbbf24; }
+        .hljs-property { color: #d4d4d8; }
+        .hljs-literal { color: #fb923c; }
+        .hljs-type { color: #a78bfa; }
+        .hljs-attr { color: #34d399; }
+    </style>
+</head>
+<body>
+
+<div class="hero-wrap">
+<section class="hero">
+    <div class="hero-left">
+        <h1 class="reveal">Synapse</h1>
+        <p class="tagline reveal d1">LLM orchestration for PHP. Structured output, streaming, tool calling, and agentic workflows with any provider.</p>
+        <div class="hero-install reveal d2">
+            <span class="dollar">$</span>
+            <code>composer require helgesverre/synapse</code>
+            <button onclick="copyInstall(this)" aria-label="Copy">
+                <svg class="ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <svg class="ik" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+        </div>
+        <div class="hero-links reveal d2">
+            <a href="https://github.com/HelgeSverre/synapse">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+            </a>
+            <a href="https://packagist.org/packages/helgesverre/synapse">Packagist</a>
+            <a href="https://github.com/HelgeSverre/synapse/tree/main/examples">Examples</a>
+        </div>
+    </div>
+    <div class="hero-right reveal d3">
+        <pre><code class="language-php">$executor = createLlmExecutor([
+    'llm'    =&gt; useLlm('openai.gpt-4o-mini', ['apiKey' =&gt; $key]),
+    'prompt' =&gt; createChatPrompt()-&gt;addUserMessage('{{question}}'),
+    'parser' =&gt; createParser('json', [
+        'schema' =&gt; [
+            'type' =&gt; 'object',
+            'properties' =&gt; [
+                'answer'     =&gt; ['type' =&gt; 'string'],
+                'confidence' =&gt; ['type' =&gt; 'number'],
+            ],
+        ],
+    ]),
+]);
+
+$result = $executor-&gt;execute(['question' =&gt; 'What is PHP?']);
+$data = $result-&gt;getValue();
+// ['answer' =&gt; 'A server-side scripting language...', 'confidence' =&gt; 0.95]</code></pre>
+    </div>
+</section>
+</div>
+
+<div class="wrap">
+
+    <!-- Parsers -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--violet)">Parsers</div>
+            <h2>Parse anything</h2>
+            <p>Extract typed data from LLM responses. JSON with schema validation, booleans, numbers, enums, lists, code blocks &mdash; or write your own.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$parser = createParser('json', [
+    'schema' =&gt; [
+        'type' =&gt; 'object',
+        'properties' =&gt; [
+            'name'       =&gt; ['type' =&gt; 'string'],
+            'sentiment'  =&gt; ['type' =&gt; 'string', 'enum' =&gt; ['positive', 'negative', 'neutral']],
+            'confidence' =&gt; ['type' =&gt; 'number'],
+        ],
+    ],
+]);
+
+$bool   = createParser('boolean');
+$number = createParser('number');
+$enum   = createParser('enum', ['values' =&gt; ['low', 'medium', 'high']]);</code></pre>
+        </div>
+    </div>
+
+    <!-- Streaming -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--sky)">Streaming</div>
+            <h2>Stream in real-time</h2>
+            <p>Get tokens as they generate. Every provider supports streaming with the same event-driven interface. Build chat UIs, live demos, interactive agents.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$executor = new StreamingLlmExecutor($provider, $prompt, 'gpt-4o-mini');
+
+foreach ($executor-&gt;stream(['question' =&gt; $input]) as $event) {
+    match (true) {
+        $event instanceof TextDelta
+            =&gt; print($event-&gt;text),
+
+        $event instanceof ToolCallsReady
+            =&gt; handleTools($event-&gt;toolCalls),
+
+        $event instanceof StreamCompleted
+            =&gt; printf("\n[%d tokens]", $event-&gt;usage-&gt;total),
+    };
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--emerald)">Tools</div>
+            <h2>Call your code</h2>
+            <p>Define tools as arrays. The LLM decides when to call them. Synapse handles the execution loop, including multi-turn conversations with automatic tool resolution.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$tools = useExecutors([
+    [
+        'name'        =&gt; 'get_weather',
+        'description' =&gt; 'Get current weather for a city',
+        'parameters'  =&gt; [
+            'type'       =&gt; 'object',
+            'properties' =&gt; ['city' =&gt; ['type' =&gt; 'string']],
+            'required'   =&gt; ['city'],
+        ],
+        'handler' =&gt; fn($args) =&gt; fetchWeatherApi($args['city']),
+    ],
+]);
+
+$executor = createLlmExecutorWithFunctions([
+    'llm' =&gt; $provider, 'prompt' =&gt; $prompt,
+    'parser' =&gt; createParser('string'),
+    'tools' =&gt; $tools, 'maxIterations' =&gt; 5,
+]);</code></pre>
+        </div>
+    </div>
+
+    <!-- Providers -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--amber)">Providers</div>
+            <h2>Any provider, one interface</h2>
+            <p>OpenAI, Anthropic, Google Gemini, Mistral, Groq, xAI, Moonshot. Switch providers by changing one line. Your prompts, parsers, and tools work with all of them.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$openai    = useLlm('openai.gpt-4o-mini',       ['apiKey' =&gt; $key]);
+$anthropic = useLlm('anthropic.claude-3-sonnet', ['apiKey' =&gt; $key]);
+$google    = useLlm('google.gemini-pro',         ['apiKey' =&gt; $key]);
+$groq      = useLlm('groq.llama-3.1-70b',       ['apiKey' =&gt; $key]);
+$mistral   = useLlm('mistral.mistral-large',     ['apiKey' =&gt; $key]);
+$xai       = useLlm('xai.grok-beta',            ['apiKey' =&gt; $key]);
+
+// Same executor, any provider
+$executor = createLlmExecutor([
+    'llm'    =&gt; $anthropic,  // swap freely
+    'prompt' =&gt; $prompt,
+    'parser' =&gt; $parser,
+]);</code></pre>
+        </div>
+    </div>
+
+    <!-- Hooks -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--rose)">Hooks</div>
+            <h2>Hook into everything</h2>
+            <p>Tap into the execution lifecycle. Log requests, track token usage, monitor latency, handle errors. Every step emits an event.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$executor
+    -&gt;on(BeforeProviderCall::class, function ($e) {
+        logger("Calling {$e-&gt;request-&gt;model}");
+    })
+    -&gt;on(AfterProviderCall::class, function ($e) {
+        $tokens = $e-&gt;response-&gt;usage-&gt;getTotal();
+        metrics()-&gt;increment('llm.tokens', $tokens);
+    })
+    -&gt;on(OnError::class, function ($e) {
+        alert("LLM error: {$e-&gt;error-&gt;getMessage()}");
+    });</code></pre>
+        </div>
+    </div>
+
+    <!-- State -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--sky)">State</div>
+            <h2>Manage state</h2>
+            <p>Built-in conversation history, context items, and attribute tracking. Immutable state objects that compose naturally with prompts and executors.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$state = (new ConversationState())
+    -&gt;withMessage(Message::user('Hello'))
+    -&gt;withMessage(Message::assistant('Hi there!'))
+    -&gt;withContext(new ContextItem('user_id', '12345'));
+
+$prompt = createChatPrompt()
+    -&gt;addSystemMessage('You are helpful.')
+    -&gt;addHistoryPlaceholder('history')
+    -&gt;addUserMessage('{{message}}');
+
+$result = $executor-&gt;execute([
+    'history' =&gt; $state-&gt;messages,
+    'message' =&gt; 'What did I say earlier?',
+]);</code></pre>
+        </div>
+    </div>
+
+    <!-- ── Use Cases ── -->
+    <div class="heading reveal">
+        <h2>Use cases</h2>
+        <p>Patterns you can build with Synapse.</p>
+    </div>
+
+    <!-- Extraction -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--orange)">Extraction</div>
+            <h2>Extract structured data</h2>
+            <p>Pull structured information from unstructured text. Hotel bookings, receipts, contacts, support tickets &mdash; define a schema and let the LLM do the parsing.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$prompt = createChatPrompt()
+    -&gt;addSystemMessage('Extract hotel booking info as JSON.')
+    -&gt;addUserMessage('Extract from: "{{input}}"');
+
+$executor = createLlmExecutor([
+    'llm'    =&gt; $llm,
+    'prompt' =&gt; $prompt,
+    'parser' =&gt; createParser('json', [
+        'schema' =&gt; [
+            'type' =&gt; 'object',
+            'properties' =&gt; [
+                'city'      =&gt; ['type' =&gt; 'string'],
+                'startDate' =&gt; ['type' =&gt; 'string'],
+                'endDate'   =&gt; ['type' =&gt; 'string'],
+            ],
+        ],
+    ]),
+]);
+
+$data = $executor-&gt;execute([
+    'input' =&gt; "I'll be in Berlin from the 14th to the 18th",
+])-&gt;getValue();
+// ['city' =&gt; 'Berlin', 'startDate' =&gt; '14th', 'endDate' =&gt; '18th']</code></pre>
+        </div>
+    </div>
+
+    <!-- Classification -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--violet)">Classification</div>
+            <h2>Classify intent</h2>
+            <p>Route user input to the right handler. Define intents, get structured classifications with confidence scores.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$executor = createLlmExecutor([
+    'llm'    =&gt; $llm,
+    'prompt' =&gt; createChatPrompt()
+        -&gt;addSystemMessage('Classify intent. Return JSON:
+            {"intent": "book_hotel|book_flight|rent_car|unknown",
+             "confidence": 0-1}')
+        -&gt;addUserMessage('{{input}}'),
+    'parser' =&gt; createParser('json'),
+]);
+
+$inputs = [
+    'I need a hotel in Paris for 3 nights',
+    'Book me a flight to London',
+    'What is the weather like today?',
+];
+
+foreach ($inputs as $input) {
+    $r = $executor-&gt;execute(['input' =&gt; $input])-&gt;getValue();
+    echo "{$r['intent']} ({$r['confidence']})\n";
+}
+// book_hotel (0.95)
+// book_flight (0.92)
+// unknown (0.88)</code></pre>
+        </div>
+    </div>
+
+    <!-- Pipelines -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--sky)">Pipelines</div>
+            <h2>Chain executors</h2>
+            <p>Build multi-step workflows by chaining executors. Output of one becomes input to the next. Each step is its own testable unit.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">function generateStory($llm, string $idea): array
+{
+    // Step 1: Generate outline
+    $outline = createLlmExecutor([
+        'llm' =&gt; $llm, 'parser' =&gt; createParser('list'),
+        'prompt' =&gt; createChatPrompt()
+            -&gt;addSystemMessage('Create a 4-6 point story outline.')
+            -&gt;addUserMessage('Idea: {{idea}}'),
+    ])-&gt;execute(['idea' =&gt; $idea])-&gt;getValue();
+
+    // Step 2: Write from outline
+    $story = createLlmExecutor([
+        'llm' =&gt; $llm, 'parser' =&gt; createParser('string'),
+        'prompt' =&gt; createChatPrompt()
+            -&gt;addSystemMessage('Write a short story from this outline.')
+            -&gt;addUserMessage('{{outline}}'),
+    ])-&gt;execute(['outline' =&gt; implode("\n", $outline)])-&gt;getValue();
+
+    return compact('outline', 'story');
+}
+
+$result = generateStory($llm, 'A robot learns to paint');</code></pre>
+        </div>
+    </div>
+
+    <!-- Self-Refinement -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--emerald)">Refinement</div>
+            <h2>Self-refinement loops</h2>
+            <p>Generate, validate, retry. Use one executor to produce output and another to check it. Loop until it passes or hits max attempts.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">function refine($llm, string $question, int $max = 3): string
+{
+    for ($i = 0; $i &lt; $max; $i++) {
+        $answer = createLlmExecutor([
+            'llm' =&gt; $llm, 'parser' =&gt; createParser('string'),
+            'prompt' =&gt; createChatPrompt()
+                -&gt;addUserMessage('Answer in under 10 words: {{q}}'),
+        ])-&gt;execute(['q' =&gt; $question])-&gt;getValue();
+
+        $ok = createLlmExecutor([
+            'llm' =&gt; $llm, 'parser' =&gt; createParser('json'),
+            'prompt' =&gt; createChatPrompt()
+                -&gt;addSystemMessage('Is this under 10 words? {"pass": bool}')
+                -&gt;addUserMessage('{{a}}'),
+        ])-&gt;execute(['a' =&gt; $answer])-&gt;getValue();
+
+        if ($ok['pass']) return $answer;
+    }
+    return $answer;
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Agents -->
+    <div class="section reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--rose)">Agents</div>
+            <h2>Build agents</h2>
+            <p>Interactive agents with multiple tools, streaming responses, and conversation history. The LLM orchestrates tool execution in real-time.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$tools = new UseExecutors([
+    CalculatorTool::create(),
+    WeatherTool::create(),
+    WebSearchTool::create(),
+    NotesTool::create(),
+]);
+
+$executor = new StreamingLlmExecutorWithFunctions(
+    provider: $provider,
+    prompt: $prompt,
+    model: 'gpt-4o-mini',
+    tools: $tools,
+    maxIterations: 10,
+);
+
+foreach ($executor-&gt;stream(['message' =&gt; $userInput]) as $event) {
+    if ($event instanceof TextDelta) {
+        echo $event-&gt;text;
+    }
+    if ($event instanceof ToolCallsReady) {
+        foreach ($event-&gt;toolCalls as $call) {
+            echo "  {$call-&gt;name}(" . json_encode($call-&gt;arguments) . ")\n";
+        }
+    }
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Validation -->
+    <div class="section flip reveal">
+        <div class="s-text">
+            <div class="s-label" style="color:var(--amber)">Validation</div>
+            <h2>Validate with LLMs</h2>
+            <p>Use LLMs as validators. Check statements against conversations, verify outputs meet criteria, gate actions on confidence scores.</p>
+        </div>
+        <div class="s-code">
+            <pre><code class="language-php">$validator = createLlmExecutor([
+    'llm'    =&gt; $llm,
+    'parser' =&gt; createParser('json'),
+    'prompt' =&gt; createChatPrompt()
+        -&gt;addSystemMessage('For each statement, check if it is true given
+            the conversation. Return [{statement, answer, confidence}].')
+        -&gt;addUserMessage("Conversation:\n{{history}}\n\nStatements:\n{{stmts}}"),
+]);
+
+$results = $validator-&gt;execute([
+    'history' =&gt; "User: Hi, I'm Alice",
+    'stmts'   =&gt; "The user told us their name\nThe user told us their age",
+])-&gt;getValue();
+
+// [{statement: "...name", answer: true,  confidence: 0.95},
+//  {statement: "...age",  answer: false, confidence: 0.90}]</code></pre>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-links">
+            <a href="https://github.com/HelgeSverre/synapse">GitHub</a>
+            <a href="https://packagist.org/packages/helgesverre/synapse">Packagist</a>
+            <a href="https://github.com/HelgeSverre/synapse/tree/main/examples">Examples</a>
+            <a href="https://github.com/HelgeSverre/synapse/blob/main/LICENSE">MIT License</a>
+        </div>
+        <span class="footer-copy">Built by <a href="https://github.com/HelgeSverre">Helge Sverre</a></span>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script>
+hljs.highlightAll();
+const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+function copyInstall(btn) {
+    navigator.clipboard.writeText('composer require helgesverre/synapse');
+    btn.querySelector('.ic').style.display='none';
+    btn.querySelector('.ik').style.display='block';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.querySelector('.ic').style.display='block'; btn.querySelector('.ik').style.display='none'; btn.classList.remove('copied'); }, 2000);
+}
+</script>
+</body>
+</html>
