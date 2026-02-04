@@ -1,15 +1,17 @@
 # Synapse
 
-A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers, and tool calling. Inspired by [llm-exe](https://github.com/gregreindel/llm-exe).
+A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers, streaming, and tool calling. Inspired by [llm-exe](https://github.com/gregreindel/llm-exe).
 
 ## Features
 
 - **Executor Pattern**: Composable execution pipeline with lifecycle hooks
-- **Prompt System**: Template-based prompts with variable substitution
-- **Parser System**: Extract structured data from LLM responses (JSON, boolean, lists, etc.)
-- **Tool/Function Calling**: Built-in support for LLM function calling
+- **Prompt System**: Template-based prompts with helpers, partials, and history
+- **Parser System**: Extract structured data from LLM responses (JSON, boolean, lists, enums, code blocks)
+- **Tool/Function Calling**: Built-in support for multi-step tool calling
 - **State Management**: Conversation history and context tracking
-- **Multi-Provider**: OpenAI, Anthropic, and extensible for others
+- **Streaming**: Token streaming and streaming tool calls
+- **Multi-Provider**: OpenAI, Anthropic, Google/Gemini, Mistral, xAI (plus more via custom providers)
+- **Embeddings**: Unified embedding providers (OpenAI, Mistral, Jina, Cohere, Voyage)
 - **Event Hooks**: Lifecycle events for logging, metrics, and debugging
 - **PSR Standards**: PSR-4, PSR-7, PSR-17, PSR-18 compatible
 
@@ -19,10 +21,16 @@ A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers
 composer require helgesverre/synapse
 ```
 
-You'll also need an HTTP client (PSR-18) and HTTP factories (PSR-17):
+You'll also need an HTTP client (PSR-18) and HTTP factories (PSR-17). Synapse can auto-discover Guzzle or Symfony HTTP client if installed:
 
 ```bash
 composer require guzzlehttp/guzzle
+```
+
+If you prefer Symfony:
+
+```bash
+composer require symfony/http-client
 ```
 
 ## Quick Start
@@ -30,22 +38,14 @@ composer require guzzlehttp/guzzle
 ```php
 <?php
 
-use HelgeSverre\Synapse\Factory;
 use function HelgeSverre\Synapse\{createChatPrompt, createLlmExecutor, createParser, useLlm};
 
-// Configure HTTP transport
-$client = new \GuzzleHttp\Client();
-$psr17Factory = new \GuzzleHttp\Psr7\HttpFactory();
-Factory::setDefaultTransport(
-    Factory::createTransport($client, $psr17Factory, $psr17Factory)
-);
-
-// Create provider, prompt, and parser
+// Create provider, prompt, and parser (transport auto-discovered if available)
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
 $prompt = createChatPrompt()
     ->addSystemMessage('You are a helpful assistant.')
-    ->addUserMessage('{{question}}');
+    ->addUserMessage('{{question}}', parseTemplate: true);
 
 $parser = createParser('string');
 
@@ -59,6 +59,20 @@ $executor = createLlmExecutor([
 
 $result = $executor->execute(['question' => 'What is the capital of France?']);
 echo $result->getValue(); // "Paris"
+```
+
+If you want to configure transport manually:
+
+```php
+<?php
+
+use HelgeSverre\Synapse\Factory;
+
+$client = new \GuzzleHttp\Client();
+$psr17Factory = new \GuzzleHttp\Psr7\HttpFactory();
+Factory::setDefaultTransport(
+    Factory::createTransport($client, $psr17Factory, $psr17Factory)
+);
 ```
 
 ## Core Concepts
@@ -85,7 +99,7 @@ $executor = createLlmExecutor([
 
 ### Prompts
 
-Prompts use `{{variable}}` syntax for template replacement.
+Prompts use `{{variable}}` syntax for template replacement. Note: `addUserMessage()` defaults to `parseTemplate: false`, so pass `parseTemplate: true` when you want template rendering.
 
 ```php
 use function HelgeSverre\Synapse\{createChatPrompt, createTextPrompt};
@@ -93,7 +107,7 @@ use function HelgeSverre\Synapse\{createChatPrompt, createTextPrompt};
 // Chat prompt (recommended)
 $prompt = createChatPrompt()
     ->addSystemMessage('You are an expert on {{topic}}.')
-    ->addUserMessage('{{question}}');
+    ->addUserMessage('{{question}}', parseTemplate: true);
 
 // Text prompt (simple)
 $prompt = createTextPrompt()
@@ -110,15 +124,15 @@ $messages = $prompt->render([
 
 ```php
 // Nested paths
-$prompt->addUserMessage('Hello {{user.name}}!');
+$prompt->addUserMessage('Hello {{user.name}}!', parseTemplate: true);
 
 // Custom helpers
 $prompt->registerHelper('upper', fn($s) => strtoupper($s));
-$prompt->addUserMessage('{{upper name}}'); // Uses helper
+$prompt->addUserMessage('{{upper name}}', parseTemplate: true); // Uses helper
 
 // Partials (reusable snippets)
 $prompt->registerPartial('greeting', 'Hello, {{name}}!');
-$prompt->addUserMessage('{{> greeting}}');
+$prompt->addUserMessage('{{> greeting}}', parseTemplate: true);
 
 // Strict mode (throws on missing variables)
 $prompt->strict(true);
@@ -153,6 +167,12 @@ $parser = createParser('number');
 
 // List/Array
 $parser = createParser('list');
+
+// Key-value list
+$parser = createParser('keyvalue', ['separator' => ':']);
+
+// List to JSON
+$parser = createParser('listjson', ['separator' => ':']);
 
 // Code block extraction
 $parser = createParser('code', ['language' => 'php']);
@@ -198,6 +218,35 @@ $executor = createLlmExecutorWithFunctions([
 ]);
 ```
 
+### Streaming
+
+Streaming requires a stream-capable transport (for example `GuzzleStreamTransport`).
+
+```php
+use GuzzleHttp\Client;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+
+$transport = new GuzzleStreamTransport(new Client(['timeout' => 60]));
+$llm = useLlm('openai.gpt-4o-mini', [
+    'apiKey' => getenv('OPENAI_API_KEY'),
+    'transport' => $transport,
+]);
+
+$prompt = (new TextPrompt)->setContent('Write a haiku about PHP.');
+$executor = new StreamingLlmExecutor($llm, $prompt, 'gpt-4o-mini');
+
+foreach ($executor->stream([]) as $event) {
+    if ($event instanceof TextDelta) {
+        echo $event->text;
+    }
+}
+```
+
+See `examples/streaming-cli.php` and `examples/streaming-chat-cli.php` for full demos.
+
 ### State Management
 
 ```php
@@ -221,7 +270,7 @@ $state = $state->withAttribute('session_start', time());
 $prompt = createChatPrompt()
     ->addSystemMessage('You are helpful.')
     ->addHistoryPlaceholder('history')
-    ->addUserMessage('{{message}}');
+    ->addUserMessage('{{message}}', parseTemplate: true);
 
 $result = $executor->execute([
     'history' => $state->messages,
@@ -241,7 +290,34 @@ $executor
     ->on(OnError::class, fn($e) => logger("Error: {$e->error->getMessage()}"));
 ```
 
+### Embeddings
+
+```php
+use function HelgeSverre\Synapse\useEmbeddings;
+
+$embeddings = useEmbeddings('openai', [
+    'apiKey' => getenv('OPENAI_API_KEY'),
+]);
+
+$response = $embeddings->embed(
+    'The quick brown fox jumps over the lazy dog.',
+    'text-embedding-3-small',
+);
+
+$vector = $response->getEmbedding();
+```
+
 ## Providers
+
+`useLlm()` supports the following provider prefixes:
+
+- `openai.*`
+- `anthropic.*`
+- `google.*` / `gemini.*`
+- `mistral.*`
+- `xai.*` / `grok.*`
+
+Additional providers exist as classes (e.g. Groq, Moonshot) and can be instantiated directly if needed.
 
 ### OpenAI
 
@@ -257,6 +333,30 @@ $llm = useLlm('openai.gpt-4o-mini', [
 ```php
 $llm = useLlm('anthropic.claude-3-sonnet', [
     'apiKey' => 'sk-ant-...',
+]);
+```
+
+### Google (Gemini)
+
+```php
+$llm = useLlm('google.gemini-1.5-flash', [
+    'apiKey' => '...',
+]);
+```
+
+### Mistral
+
+```php
+$llm = useLlm('mistral.mistral-small-latest', [
+    'apiKey' => '...',
+]);
+```
+
+### xAI (Grok)
+
+```php
+$llm = useLlm('xai.grok-beta', [
+    'apiKey' => '...',
 ]);
 ```
 
@@ -314,7 +414,8 @@ composer test:all
 ### Integration Tests
 
 Integration tests require valid API keys set as environment variables:
-- `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`
+
+- `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `MISTRAL_API_KEY`, `MOONSHOT_API_KEY`, `XAI_API_KEY`, `GOOGLE_API_KEY`, `GROQ_API_KEY`
 
 Tests will automatically skip if the required API key is not set.
 
