@@ -1,6 +1,6 @@
-# LLM-Exe PHP
+# Synapse
 
-A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers, and tool calling. This is a PHP adaptation of [llm-exe](https://github.com/gregreindel/llm-exe).
+A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers, and tool calling. Inspired by [llm-exe](https://github.com/gregreindel/llm-exe).
 
 ## Features
 

@@ -39,3 +39,4 @@ composer.lock
 *.log
 
 wip/
+docs/
