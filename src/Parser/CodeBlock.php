@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Parser;
+namespace HelgeSverre\Synapse\Parser;
 
 /**
  * Represents a parsed code block with language and code.

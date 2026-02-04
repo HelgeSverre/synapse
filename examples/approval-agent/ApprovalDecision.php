@@ -3,7 +3,7 @@
 // examples/approval-agent/ApprovalDecision.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 enum ApprovalAction: string
 {

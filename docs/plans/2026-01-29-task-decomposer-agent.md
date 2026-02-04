@@ -24,7 +24,7 @@
 // examples/task-decomposer/StepStatus.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\TaskDecomposer;
+namespace HelgeSverre\Synapse\Examples\TaskDecomposer;
 
 enum StepStatus: string
 {
@@ -43,7 +43,7 @@ enum StepStatus: string
 // examples/task-decomposer/PlanStep.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\TaskDecomposer;
+namespace HelgeSverre\Synapse\Examples\TaskDecomposer;
 
 final class PlanStep
 {
@@ -118,7 +118,7 @@ final class PlanStep
 // examples/task-decomposer/Plan.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\TaskDecomposer;
+namespace HelgeSverre\Synapse\Examples\TaskDecomposer;
 
 final class Plan
 {
@@ -247,7 +247,7 @@ Run: `php -l examples/task-decomposer/Plan.php && php -l examples/task-decompose
 // examples/task-decomposer/PlanValidator.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\TaskDecomposer;
+namespace HelgeSverre\Synapse\Examples\TaskDecomposer;
 
 final class PlanValidator
 {
@@ -402,9 +402,9 @@ Run: `php -l examples/task-decomposer/PlanValidator.php`
 // examples/task-decomposer/SubmitPlanTool.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\TaskDecomposer;
+namespace HelgeSverre\Synapse\Examples\TaskDecomposer;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class SubmitPlanTool
 {
@@ -510,14 +510,14 @@ Run: `php -l examples/task-decomposer/SubmitPlanTool.php`
 // examples/task-decomposer/PlanExecutor.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\TaskDecomposer;
+namespace HelgeSverre\Synapse\Examples\TaskDecomposer;
 
 use Generator;
-use LlmExe\Executor\StreamingLlmExecutor;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Streaming\StreamableProviderInterface;
-use LlmExe\Streaming\StreamEvent;
-use LlmExe\Streaming\TextDelta;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Streaming\StreamEvent;
+use HelgeSverre\Synapse\Streaming\TextDelta;
 
 /**
  * Executes a plan step by step, yielding progress events.
@@ -691,19 +691,19 @@ require_once __DIR__ . '/task-decomposer/SubmitPlanTool.php';
 require_once __DIR__ . '/task-decomposer/PlanExecutor.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Examples\TaskDecomposer\PlanExecutor;
-use LlmExe\Examples\TaskDecomposer\StepEvent;
-use LlmExe\Examples\TaskDecomposer\SubmitPlanTool;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\PlanExecutor;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\StepEvent;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\SubmitPlanTool;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 
 const CYAN = "\033[36m";
 const GREEN = "\033[32m";
@@ -894,7 +894,7 @@ Run: `php -l examples/task-decomposer-cli.php`
 <?php
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Examples;
+namespace HelgeSverre\Synapse\Tests\Unit\Examples;
 
 require_once __DIR__ . '/../../../examples/task-decomposer/StepStatus.php';
 require_once __DIR__ . '/../../../examples/task-decomposer/PlanStep.php';
@@ -902,11 +902,11 @@ require_once __DIR__ . '/../../../examples/task-decomposer/Plan.php';
 require_once __DIR__ . '/../../../examples/task-decomposer/PlanValidator.php';
 require_once __DIR__ . '/../../../examples/task-decomposer/SubmitPlanTool.php';
 
-use LlmExe\Examples\TaskDecomposer\Plan;
-use LlmExe\Examples\TaskDecomposer\PlanStep;
-use LlmExe\Examples\TaskDecomposer\PlanValidator;
-use LlmExe\Examples\TaskDecomposer\StepStatus;
-use LlmExe\Examples\TaskDecomposer\SubmitPlanTool;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\Plan;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\PlanStep;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\PlanValidator;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\StepStatus;
+use HelgeSverre\Synapse\Examples\TaskDecomposer\SubmitPlanTool;
 use PHPUnit\Framework\TestCase;
 
 final class TaskDecomposerTest extends TestCase

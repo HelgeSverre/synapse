@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use function LlmExe\createChatPrompt;
-use function LlmExe\createLlmExecutor;
-use function LlmExe\createParser;
-use function LlmExe\useLlm;
+use function HelgeSverre\Synapse\createChatPrompt;
+use function HelgeSverre\Synapse\createLlmExecutor;
+use function HelgeSverre\Synapse\createParser;
+use function HelgeSverre\Synapse\useLlm;
 
 // Assume transport is configured...
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Streaming;
+namespace HelgeSverre\Synapse\Tests\Unit\Streaming;
 
-use LlmExe\Streaming\StreamContext;
+use HelgeSverre\Synapse\Streaming\StreamContext;
 use PHPUnit\Framework\TestCase;
 
 final class StreamContextTest extends TestCase

@@ -32,7 +32,7 @@ foreach ($executor->stream(['question' => 'Explain PHP generators']) as $event) 
 ```
 
 ### Call to Action
-- **Primary:** `composer require llm-exe/llm-exe` (with copy button)
+- **Primary:** `composer require helgesverre/synapse` (with copy button)
 - **Secondary:** "View Examples" (scroll anchor)
 
 ---
@@ -51,13 +51,13 @@ Three steps from zero to streaming AI responses.
 
 ### Step 1: Install
 ```bash
-composer require llm-exe/llm-exe guzzlehttp/guzzle
+composer require helgesverre/synapse guzzlehttp/guzzle
 ```
 
 ### Step 2: Configure
 ```php
-use LlmExe\Factory;
-use function LlmExe\useLlm;
+use HelgeSverre\Synapse\Factory;
+use function HelgeSverre\Synapse\useLlm;
 
 // One-time setup
 $client = new \GuzzleHttp\Client();
@@ -72,9 +72,9 @@ $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
 ### Step 3: Stream
 ```php
-use LlmExe\Executor\StreamingLlmExecutor;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Streaming\TextDelta;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Streaming\TextDelta;
 
 $prompt = (new TextPrompt)->setContent('{{question}}');
 $executor = new StreamingLlmExecutor($llm, $prompt, 'gpt-4o-mini');
@@ -90,7 +90,7 @@ foreach ($executor->stream(['question' => 'What is PHP?']) as $event) {
 ### Callout
 ```
 💡 Streaming First
-Unlike traditional request-response libraries, llm-exe is built
+Unlike traditional request-response libraries, Synapse is built
 for streaming from the ground up. Every feature—prompts, parsers,
 tools—works seamlessly with real-time token streams.
 ```
@@ -413,8 +413,8 @@ All examples are in the examples/ directory—copy, run, modify.
 ### Call to Action
 ```bash
 # Clone and run
-git clone https://github.com/llm-exe/llm-exe-php
-cd llm-exe-php
+git clone https://github.com/helgesverre/synapse
+cd synapse
 composer install
 php examples/streaming-cli.php
 ```
@@ -433,7 +433,7 @@ Ready to Build?
 #### Path 1: Quick Start
 **For:** Developers who want to jump in
 
-1. `composer require llm-exe/llm-exe guzzlehttp/guzzle`
+1. `composer require helgesverre/synapse guzzlehttp/guzzle`
 2. Copy Quick Start code above
 3. Run it
 
@@ -447,7 +447,7 @@ Ready to Build?
 3. Explore other examples
 4. Copy what you need
 
-**Link:** [View Examples](https://github.com/llm-exe/llm-exe-php/tree/main/examples)
+**Link:** [View Examples](https://github.com/helgesverre/synapse/tree/main/examples)
 
 #### Path 3: Deep Dive
 **For:** Developers who want to understand everything
@@ -457,17 +457,17 @@ Ready to Build?
 3. Build complex workflows
 4. Contribute back
 
-**Link:** [Full Documentation](https://github.com/llm-exe/llm-exe-php)
+**Link:** [Full Documentation](https://github.com/helgesverre/synapse)
 
 ---
 
 ## Footer
 
 ### Quick Links
-- [GitHub Repository](https://github.com/llm-exe/llm-exe-php)
-- [Packagist Package](https://packagist.org/packages/llm-exe/llm-exe)
-- [Issue Tracker](https://github.com/llm-exe/llm-exe-php/issues)
-- [Examples Directory](https://github.com/llm-exe/llm-exe-php/tree/main/examples)
+- [GitHub Repository](https://github.com/helgesverre/synapse)
+- [Packagist Package](https://packagist.org/packages/helgesverre/synapse)
+- [Issue Tracker](https://github.com/helgesverre/synapse/issues)
+- [Examples Directory](https://github.com/helgesverre/synapse/tree/main/examples)
 
 ### Credits
 PHP adaptation of [llm-exe](https://github.com/gregreindel/llm-exe) by Greg Reindel
@@ -531,7 +531,7 @@ Once users adopt, add quotes about:
 - Streaming UX improvements
 
 ### Comparison Table (Optional)
-Show llm-exe vs other PHP LLM libraries:
+Show Synapse vs other PHP LLM libraries:
 - Streaming support
 - Multi-provider
 - Composability

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Hooks\Events;
+namespace HelgeSverre\Synapse\Hooks\Events;
 
-use LlmExe\Prompt\PromptInterface;
+use HelgeSverre\Synapse\Prompt\PromptInterface;
 
 final readonly class BeforePromptRender
 {

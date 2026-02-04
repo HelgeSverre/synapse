@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Parser\JsonSchema;
+namespace HelgeSverre\Synapse\Parser\JsonSchema;
 
 final class NullValidator implements JsonSchemaValidatorInterface
 {

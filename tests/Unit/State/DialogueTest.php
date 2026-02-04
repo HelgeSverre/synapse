@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\State;
+namespace HelgeSverre\Synapse\Tests\Unit\State;
 
-use LlmExe\Provider\Response\GenerationResponse;
-use LlmExe\State\Dialogue;
-use LlmExe\State\Message;
-use LlmExe\State\Role;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\State\Dialogue;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\State\Role;
 use PHPUnit\Framework\TestCase;
 
 final class DialogueTest extends TestCase
@@ -175,7 +175,7 @@ final class DialogueTest extends TestCase
     public function test_add_tool_result(): void
     {
         $dialogue = new Dialogue;
-        $toolCall = new \LlmExe\Provider\Request\ToolCall(
+        $toolCall = new \HelgeSverre\Synapse\Provider\Request\ToolCall(
             id: 'call_abc',
             name: 'get_weather',
             arguments: ['city' => 'Oslo'],
@@ -194,7 +194,7 @@ final class DialogueTest extends TestCase
     public function test_add_tool_result_with_string(): void
     {
         $dialogue = new Dialogue;
-        $toolCall = new \LlmExe\Provider\Request\ToolCall(
+        $toolCall = new \HelgeSverre\Synapse\Provider\Request\ToolCall(
             id: 'call_xyz',
             name: 'echo',
             arguments: [],
@@ -208,12 +208,12 @@ final class DialogueTest extends TestCase
     public function test_add_tool_results(): void
     {
         $dialogue = new Dialogue;
-        $response = new \LlmExe\Provider\Response\GenerationResponse(
+        $response = new \HelgeSverre\Synapse\Provider\Response\GenerationResponse(
             text: null,
             messages: [],
             toolCalls: [
-                new \LlmExe\Provider\Request\ToolCall('call_1', 'func_a', []),
-                new \LlmExe\Provider\Request\ToolCall('call_2', 'func_b', []),
+                new \HelgeSverre\Synapse\Provider\Request\ToolCall('call_1', 'func_a', []),
+                new \HelgeSverre\Synapse\Provider\Request\ToolCall('call_2', 'func_b', []),
             ],
             model: 'test',
         );
@@ -232,12 +232,12 @@ final class DialogueTest extends TestCase
     public function test_add_tool_results_skips_missing(): void
     {
         $dialogue = new Dialogue;
-        $response = new \LlmExe\Provider\Response\GenerationResponse(
+        $response = new \HelgeSverre\Synapse\Provider\Response\GenerationResponse(
             text: null,
             messages: [],
             toolCalls: [
-                new \LlmExe\Provider\Request\ToolCall('call_1', 'func_a', []),
-                new \LlmExe\Provider\Request\ToolCall('call_2', 'func_b', []),
+                new \HelgeSverre\Synapse\Provider\Request\ToolCall('call_1', 'func_a', []),
+                new \HelgeSverre\Synapse\Provider\Request\ToolCall('call_2', 'func_b', []),
             ],
             model: 'test',
         );
@@ -250,12 +250,12 @@ final class DialogueTest extends TestCase
     public function test_execute_tool_calls(): void
     {
         $dialogue = new Dialogue;
-        $response = new \LlmExe\Provider\Response\GenerationResponse(
+        $response = new \HelgeSverre\Synapse\Provider\Response\GenerationResponse(
             text: null,
             messages: [],
             toolCalls: [
-                new \LlmExe\Provider\Request\ToolCall('call_1', 'double', ['n' => 5]),
-                new \LlmExe\Provider\Request\ToolCall('call_2', 'double', ['n' => 10]),
+                new \HelgeSverre\Synapse\Provider\Request\ToolCall('call_1', 'double', ['n' => 5]),
+                new \HelgeSverre\Synapse\Provider\Request\ToolCall('call_2', 'double', ['n' => 10]),
             ],
             model: 'test',
         );

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Streaming;
+namespace HelgeSverre\Synapse\Tests\Unit\Streaming;
 
-use LlmExe\Streaming\SseParser;
+use HelgeSverre\Synapse\Streaming\SseParser;
 use PHPUnit\Framework\TestCase;
 
 final class SseParserTest extends TestCase

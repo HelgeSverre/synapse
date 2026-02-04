@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Streaming;
+namespace HelgeSverre\Synapse\Streaming;
 
 use Generator;
-use LlmExe\Provider\LlmProviderInterface;
-use LlmExe\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
 
 /**
  * Interface for providers that support streaming responses.

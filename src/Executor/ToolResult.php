@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
 final readonly class ToolResult
 {

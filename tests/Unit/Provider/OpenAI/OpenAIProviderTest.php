@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Provider\OpenAI;
+namespace HelgeSverre\Synapse\Tests\Unit\Provider\OpenAI;
 
-use LlmExe\Provider\Http\TransportInterface;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\Message;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\Message;
 use PHPUnit\Framework\TestCase;
 
 final class MockTransport implements TransportInterface

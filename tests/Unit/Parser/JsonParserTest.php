@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Parser;
+namespace HelgeSverre\Synapse\Tests\Unit\Parser;
 
-use LlmExe\Parser\JsonParser;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Parser\JsonParser;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 use PHPUnit\Framework\TestCase;
 
 final class JsonParserTest extends TestCase

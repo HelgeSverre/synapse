@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Embeddings;
+namespace HelgeSverre\Synapse\Embeddings;
 
 final readonly class EmbeddingResponse
 {

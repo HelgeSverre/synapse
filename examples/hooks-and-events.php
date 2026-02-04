@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use function LlmExe\createChatPrompt;
-use function LlmExe\createLlmExecutor;
-use function LlmExe\createParser;
+use function HelgeSverre\Synapse\createChatPrompt;
+use function HelgeSverre\Synapse\createLlmExecutor;
+use function HelgeSverre\Synapse\createParser;
 
-use LlmExe\Hooks\Events\AfterProviderCall;
-use LlmExe\Hooks\Events\BeforeProviderCall;
-use LlmExe\Hooks\Events\OnComplete;
-use LlmExe\Hooks\Events\OnError;
-use LlmExe\Hooks\Events\OnSuccess;
+use HelgeSverre\Synapse\Hooks\Events\AfterProviderCall;
+use HelgeSverre\Synapse\Hooks\Events\BeforeProviderCall;
+use HelgeSverre\Synapse\Hooks\Events\OnComplete;
+use HelgeSverre\Synapse\Hooks\Events\OnError;
+use HelgeSverre\Synapse\Hooks\Events\OnSuccess;
 
-use function LlmExe\useLlm;
+use function HelgeSverre\Synapse\useLlm;
 
 // Assume transport is configured...
 

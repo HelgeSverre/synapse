@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Embeddings\Voyage;
+namespace HelgeSverre\Synapse\Embeddings\Voyage;
 
-use LlmExe\Embeddings\EmbeddingProviderInterface;
-use LlmExe\Embeddings\EmbeddingResponse;
-use LlmExe\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Embeddings\EmbeddingProviderInterface;
+use HelgeSverre\Synapse\Embeddings\EmbeddingResponse;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
 
 final readonly class VoyageEmbeddingProvider implements EmbeddingProviderInterface
 {

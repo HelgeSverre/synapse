@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Integration\Embeddings;
+namespace HelgeSverre\Synapse\Tests\Integration\Embeddings;
 
 use GuzzleHttp\Client;
-use LlmExe\Embeddings\Mistral\MistralEmbeddingProvider;
-use LlmExe\Provider\Http\Psr18Transport;
-use LlmExe\Tests\IntegrationTestCase;
-use LlmExe\Tests\RequiresEnv;
+use HelgeSverre\Synapse\Embeddings\Mistral\MistralEmbeddingProvider;
+use HelgeSverre\Synapse\Provider\Http\Psr18Transport;
+use HelgeSverre\Synapse\Tests\IntegrationTestCase;
+use HelgeSverre\Synapse\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Executor;
+namespace HelgeSverre\Synapse\Tests\Unit\Executor;
 
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\ConversationState;
 use PHPUnit\Framework\TestCase;
 
 final class UseExecutorsTest extends TestCase

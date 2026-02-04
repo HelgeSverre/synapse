@@ -3,7 +3,7 @@
 // examples/approval-agent/ApprovalRequest.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 /**
  * Represents a request for human approval before tool execution.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Prompt;
+namespace HelgeSverre\Synapse\Tests\Unit\Prompt;
 
-use LlmExe\Prompt\Template\Template;
+use HelgeSverre\Synapse\Prompt\Template\Template;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

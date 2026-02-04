@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Executor;
+namespace HelgeSverre\Synapse\Tests\Unit\Executor;
 
 use Generator;
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Executor\StreamingResult;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Hooks\Events\OnStreamChunk;
-use LlmExe\Hooks\Events\OnToolCall;
-use LlmExe\Hooks\HookDispatcher;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\ProviderCapabilities;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Response\GenerationResponse;
-use LlmExe\Provider\Response\UsageInfo;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamableProviderInterface;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\StreamContext;
-use LlmExe\Streaming\StreamEvent;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\StreamingResult;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Hooks\Events\OnStreamChunk;
+use HelgeSverre\Synapse\Hooks\Events\OnToolCall;
+use HelgeSverre\Synapse\Hooks\HookDispatcher;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\ProviderCapabilities;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Response\UsageInfo;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\StreamContext;
+use HelgeSverre\Synapse\Streaming\StreamEvent;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 use PHPUnit\Framework\TestCase;
 
 /**

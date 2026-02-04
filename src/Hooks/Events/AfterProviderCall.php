@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Hooks\Events;
+namespace HelgeSverre\Synapse\Hooks\Events;
 
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 
 final readonly class AfterProviderCall
 {

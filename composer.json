@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "name": "llm-exe/llm-exe",
+  "name": "helgesverre/synapse",
   "description": "A modern PHP library for LLM orchestration with executors, prompts, parsers, and tool calling",
   "type": "library",
   "license": "MIT",
@@ -31,7 +31,7 @@
   },
   "autoload": {
     "psr-4": {
-      "LlmExe\\": "src/"
+      "HelgeSverre\\Synapse\\": "src/"
     },
     "files": [
       "src/functions.php"
@@ -39,7 +39,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "LlmExe\\Tests\\": "tests/"
+      "HelgeSverre\\Synapse\\Tests\\": "tests/"
     }
   },
   "scripts": {

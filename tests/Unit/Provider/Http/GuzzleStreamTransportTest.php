@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Provider\Http;
+namespace HelgeSverre\Synapse\Tests\Unit\Provider\Http;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\Http\StreamTransportInterface;
-use LlmExe\Provider\Http\TransportInterface;
-use LlmExe\Streaming\StreamContext;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\Http\StreamTransportInterface;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Streaming\StreamContext;
 use PHPUnit\Framework\TestCase;
 
 final class GuzzleStreamTransportTest extends TestCase

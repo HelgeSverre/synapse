@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Prompt\Template;
+namespace HelgeSverre\Synapse\Prompt\Template;
 
 final class Template
 {

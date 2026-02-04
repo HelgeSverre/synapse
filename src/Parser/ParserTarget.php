@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Parser;
+namespace HelgeSverre\Synapse\Parser;
 
 enum ParserTarget: string
 {

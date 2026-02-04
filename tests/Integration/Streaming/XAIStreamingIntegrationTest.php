@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Integration\Streaming;
+namespace HelgeSverre\Synapse\Tests\Integration\Streaming;
 
 use GuzzleHttp\Client;
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\StreamingLlmExecutor;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\XAI\XAIProvider;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\StreamContext;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallsReady;
-use LlmExe\Tests\IntegrationTestCase;
-use LlmExe\Tests\RequiresEnv;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\StreamContext;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Tests\IntegrationTestCase;
+use HelgeSverre\Synapse\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
@@ -74,7 +74,7 @@ final class XAIStreamingIntegrationTest extends IntegrationTestCase
             messages: [Message::user('What is 2 + 2? Use the calculator tool.')],
             maxTokens: 100,
             tools: [
-                new \LlmExe\Provider\Request\ToolDefinition(
+                new \HelgeSverre\Synapse\Provider\Request\ToolDefinition(
                     name: 'calculator',
                     description: 'Performs arithmetic calculations',
                     parameters: [

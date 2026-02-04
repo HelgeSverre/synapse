@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Streaming;
+namespace HelgeSverre\Synapse\Tests\Unit\Streaming;
 
-use LlmExe\Provider\Request\ToolCall;
-use LlmExe\Provider\Response\UsageInfo;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\StreamEvent;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\Provider\Response\UsageInfo;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\StreamEvent;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 use PHPUnit\Framework\TestCase;
 
 final class StreamEventTest extends TestCase

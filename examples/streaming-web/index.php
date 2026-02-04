@@ -21,18 +21,18 @@ declare(strict_types=1);
 require_once __DIR__.'/../../vendor/autoload.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Google\GoogleProvider;
-use LlmExe\Provider\Groq\GroqProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\Mistral\MistralProvider;
-use LlmExe\Provider\Moonshot\MoonshotProvider;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\XAI\XAIProvider;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
+use HelgeSverre\Synapse\Provider\Groq\GroqProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
+use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
 
 // Serve the HTML page for GET requests
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && ! isset($_GET['api'])) {

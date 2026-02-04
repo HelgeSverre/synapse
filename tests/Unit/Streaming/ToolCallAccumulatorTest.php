@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Streaming;
+namespace HelgeSverre\Synapse\Tests\Unit\Streaming;
 
-use LlmExe\Streaming\ToolCallAccumulator;
-use LlmExe\Streaming\ToolCallDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallAccumulator;
+use HelgeSverre\Synapse\Streaming\ToolCallDelta;
 use PHPUnit\Framework\TestCase;
 
 final class ToolCallAccumulatorTest extends TestCase

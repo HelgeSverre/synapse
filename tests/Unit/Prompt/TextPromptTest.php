@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Prompt;
+namespace HelgeSverre\Synapse\Tests\Unit\Prompt;
 
-use LlmExe\Prompt\PromptType;
-use LlmExe\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Prompt\PromptType;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
 use PHPUnit\Framework\TestCase;
 
 final class TextPromptTest extends TestCase

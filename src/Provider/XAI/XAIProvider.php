@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\XAI;
+namespace HelgeSverre\Synapse\Provider\XAI;
 
 use Generator;
-use LlmExe\Provider\Http\StreamTransportInterface;
-use LlmExe\Provider\Http\TransportInterface;
-use LlmExe\Provider\LlmProviderInterface;
-use LlmExe\Provider\ProviderCapabilities;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Request\ToolCall;
-use LlmExe\Provider\Response\GenerationResponse;
-use LlmExe\Provider\Response\UsageInfo;
-use LlmExe\State\Message;
-use LlmExe\Streaming\SseParser;
-use LlmExe\Streaming\StreamableProviderInterface;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\StreamContext;
-use LlmExe\Streaming\StreamEvent;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Provider\Http\StreamTransportInterface;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Provider\ProviderCapabilities;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Response\UsageInfo;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\SseParser;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\StreamContext;
+use HelgeSverre\Synapse\Streaming\StreamEvent;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 
 /**
  * xAI (Grok) API provider.
@@ -123,7 +123,7 @@ final readonly class XAIProvider implements LlmProviderInterface, StreamableProv
 
         if (count($request->tools) > 0) {
             $body['tools'] = array_map(
-                fn (\LlmExe\Provider\Request\ToolDefinition $tool): array => $tool->toOpenAIFormat(),
+                fn (\HelgeSverre\Synapse\Provider\Request\ToolDefinition $tool): array => $tool->toOpenAIFormat(),
                 $request->tools,
             );
 

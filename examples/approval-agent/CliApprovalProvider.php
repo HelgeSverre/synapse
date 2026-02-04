@@ -3,7 +3,7 @@
 // examples/approval-agent/CliApprovalProvider.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 /**
  * CLI-based approval provider that prompts via STDIN.

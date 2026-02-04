@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Streaming;
+namespace HelgeSverre\Synapse\Streaming;
 
-use LlmExe\Provider\Response\UsageInfo;
+use HelgeSverre\Synapse\Provider\Response\UsageInfo;
 
 /**
  * Emitted when the stream is complete.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Streaming;
+namespace HelgeSverre\Synapse\Streaming;
 
 use Generator;
 use Psr\Http\Message\StreamInterface;

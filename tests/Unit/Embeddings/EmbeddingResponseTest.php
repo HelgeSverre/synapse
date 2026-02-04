@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Embeddings;
+namespace HelgeSverre\Synapse\Tests\Unit\Embeddings;
 
-use LlmExe\Embeddings\EmbeddingResponse;
+use HelgeSverre\Synapse\Embeddings\EmbeddingResponse;
 use PHPUnit\Framework\TestCase;
 
 final class EmbeddingResponseTest extends TestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Prompt;
+namespace HelgeSverre\Synapse\Prompt;
 
 final class TextPrompt extends BasePrompt
 {

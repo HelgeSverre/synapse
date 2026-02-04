@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\Response;
+namespace HelgeSverre\Synapse\Provider\Response;
 
-use LlmExe\Provider\Request\ToolCall;
-use LlmExe\State\Message;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\State\Message;
 
 final readonly class GenerationResponse
 {
@@ -43,7 +43,7 @@ final readonly class GenerationResponse
     public function getAssistantMessage(): ?Message
     {
         foreach ($this->messages as $message) {
-            if ($message->role === \LlmExe\State\Role::Assistant) {
+            if ($message->role === \HelgeSverre\Synapse\State\Role::Assistant) {
                 return $message;
             }
         }

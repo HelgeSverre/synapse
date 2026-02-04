@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Integration;
+namespace HelgeSverre\Synapse\Tests\Integration;
 
 use GuzzleHttp\Client;
-use LlmExe\Provider\Google\GoogleProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallsReady;
-use LlmExe\Tests\IntegrationTestCase;
-use LlmExe\Tests\RequiresEnv;
+use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Tests\IntegrationTestCase;
+use HelgeSverre\Synapse\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]

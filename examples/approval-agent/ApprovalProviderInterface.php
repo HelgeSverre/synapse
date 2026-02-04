@@ -3,7 +3,7 @@
 // examples/approval-agent/ApprovalProviderInterface.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 /**
  * Interface for requesting human approval.

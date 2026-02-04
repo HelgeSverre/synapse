@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * Interface for tool executors that can be used with LLM executors.

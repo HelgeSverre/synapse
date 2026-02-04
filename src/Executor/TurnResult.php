@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Provider\Request\ToolCall;
-use LlmExe\Provider\Response\UsageInfo;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\Provider\Response\UsageInfo;
 
 /**
  * Result from a single streaming turn (model call).

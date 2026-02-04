@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Parser;
+namespace HelgeSverre\Synapse\Parser;
 
-use LlmExe\Prompt\Template\Template;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Prompt\Template\Template;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 
 /**
  * Parses the response and replaces template variables in it.

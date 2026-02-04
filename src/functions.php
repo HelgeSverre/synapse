@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace LlmExe;
+namespace HelgeSverre\Synapse;
 
-use LlmExe\Embeddings\EmbeddingProviderInterface;
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\CoreExecutor;
-use LlmExe\Executor\LlmExecutor;
-use LlmExe\Executor\LlmExecutorWithFunctions;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Parser\ParserInterface;
-use LlmExe\Prompt\ChatPrompt;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\LlmProviderInterface;
-use LlmExe\State\ConversationState;
-use LlmExe\State\Dialogue;
+use HelgeSverre\Synapse\Embeddings\EmbeddingProviderInterface;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CoreExecutor;
+use HelgeSverre\Synapse\Executor\LlmExecutor;
+use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Parser\ParserInterface;
+use HelgeSverre\Synapse\Prompt\ChatPrompt;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\State\ConversationState;
+use HelgeSverre\Synapse\State\Dialogue;
 
 /**
  * Create an LLM provider instance.

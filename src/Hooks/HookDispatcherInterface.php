@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Hooks;
+namespace HelgeSverre\Synapse\Hooks;
 
 interface HookDispatcherInterface
 {

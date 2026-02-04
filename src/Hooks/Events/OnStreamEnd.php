@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Hooks\Events;
+namespace HelgeSverre\Synapse\Hooks\Events;
 
-use LlmExe\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
 
 /**
  * Dispatched when streaming completes.

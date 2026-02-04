@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Examples\AgenticTools;
+namespace HelgeSverre\Synapse\Examples\AgenticTools;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class CalculatorTool
 {

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Integration;
+namespace HelgeSverre\Synapse\Tests\Integration;
 
 use GuzzleHttp\Client;
-use LlmExe\Provider\Groq\GroqProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Tests\IntegrationTestCase;
-use LlmExe\Tests\RequiresEnv;
+use HelgeSverre\Synapse\Provider\Groq\GroqProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Tests\IntegrationTestCase;
+use HelgeSverre\Synapse\Tests\RequiresEnv;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]

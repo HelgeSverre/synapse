@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Hooks\Events\AfterPromptRender;
-use LlmExe\Hooks\Events\AfterProviderCall;
-use LlmExe\Hooks\Events\BeforePromptRender;
-use LlmExe\Hooks\Events\BeforeProviderCall;
-use LlmExe\Hooks\HookDispatcherInterface;
-use LlmExe\Parser\ParserInterface;
-use LlmExe\Prompt\ChatPrompt;
-use LlmExe\Prompt\PromptInterface;
-use LlmExe\Provider\LlmProviderInterface;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\State\ConversationState;
-use LlmExe\State\Message;
+use HelgeSverre\Synapse\Hooks\Events\AfterPromptRender;
+use HelgeSverre\Synapse\Hooks\Events\AfterProviderCall;
+use HelgeSverre\Synapse\Hooks\Events\BeforePromptRender;
+use HelgeSverre\Synapse\Hooks\Events\BeforeProviderCall;
+use HelgeSverre\Synapse\Hooks\HookDispatcherInterface;
+use HelgeSverre\Synapse\Parser\ParserInterface;
+use HelgeSverre\Synapse\Prompt\ChatPrompt;
+use HelgeSverre\Synapse\Prompt\PromptInterface;
+use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\State\ConversationState;
+use HelgeSverre\Synapse\State\Message;
 
 /**
  * Orchestrates the full LLM pipeline: Prompt → Provider → Parser.
@@ -75,7 +75,7 @@ class LlmExecutor extends BaseExecutor
 
         // Update state with assistant message
         $newState = $this->state;
-        if ($response->getAssistantMessage() instanceof \LlmExe\State\Message) {
+        if ($response->getAssistantMessage() instanceof \HelgeSverre\Synapse\State\Message) {
             $newState = $newState->withMessage($response->getAssistantMessage());
         }
         $this->state = $newState;

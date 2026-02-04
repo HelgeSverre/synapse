@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * Registry/manager for multiple CallableExecutors (tools).
@@ -99,7 +99,7 @@ final class UseExecutors implements ToolExecutorInterface
     public function getToolDefinitions(): array
     {
         return array_map(
-            fn (CallableExecutor $e): \LlmExe\Provider\Request\ToolDefinition => $e->toToolDefinition(),
+            fn (CallableExecutor $e): \HelgeSverre\Synapse\Provider\Request\ToolDefinition => $e->toToolDefinition(),
             array_values($this->executors),
         );
     }
@@ -111,7 +111,7 @@ final class UseExecutors implements ToolExecutorInterface
     public function getVisibleToolDefinitions(array $input = [], ?ConversationState $state = null): array
     {
         return array_map(
-            fn (CallableExecutor $e): \LlmExe\Provider\Request\ToolDefinition => $e->toToolDefinition(),
+            fn (CallableExecutor $e): \HelgeSverre\Synapse\Provider\Request\ToolDefinition => $e->toToolDefinition(),
             $this->getVisibleFunctions($input, $state),
         );
     }

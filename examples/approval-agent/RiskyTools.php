@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class RiskyTools
 {

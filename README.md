@@ -16,7 +16,7 @@ A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers
 ## Installation
 
 ```bash
-composer require llm-exe/llm-exe
+composer require helgesverre/synapse
 ```
 
 You'll also need an HTTP client (PSR-18) and HTTP factories (PSR-17):
@@ -30,8 +30,8 @@ composer require guzzlehttp/guzzle
 ```php
 <?php
 
-use LlmExe\Factory;
-use function LlmExe\{createChatPrompt, createLlmExecutor, createParser, useLlm};
+use HelgeSverre\Synapse\Factory;
+use function HelgeSverre\Synapse\{createChatPrompt, createLlmExecutor, createParser, useLlm};
 
 // Configure HTTP transport
 $client = new \GuzzleHttp\Client();
@@ -68,7 +68,7 @@ echo $result->getValue(); // "Paris"
 Executors are the core building blocks that orchestrate the LLM pipeline.
 
 ```php
-use function LlmExe\{createCoreExecutor, createLlmExecutor};
+use function HelgeSverre\Synapse\{createCoreExecutor, createLlmExecutor};
 
 // CoreExecutor - wrap any function
 $calc = createCoreExecutor(fn($input) => $input['a'] + $input['b']);
@@ -88,7 +88,7 @@ $executor = createLlmExecutor([
 Prompts use `{{variable}}` syntax for template replacement.
 
 ```php
-use function LlmExe\{createChatPrompt, createTextPrompt};
+use function HelgeSverre\Synapse\{createChatPrompt, createTextPrompt};
 
 // Chat prompt (recommended)
 $prompt = createChatPrompt()
@@ -129,7 +129,7 @@ $prompt->strict(true);
 Extract structured data from LLM responses.
 
 ```php
-use function LlmExe\createParser;
+use function HelgeSverre\Synapse\createParser;
 
 // String (default)
 $parser = createParser('string');
@@ -171,7 +171,7 @@ $parser = createParser('custom', [
 ### Tool/Function Calling
 
 ```php
-use function LlmExe\{createLlmExecutorWithFunctions, useExecutors};
+use function HelgeSverre\Synapse\{createLlmExecutorWithFunctions, useExecutors};
 
 $tools = useExecutors([
     [
@@ -201,7 +201,7 @@ $executor = createLlmExecutorWithFunctions([
 ### State Management
 
 ```php
-use LlmExe\State\{ConversationState, Message, ContextItem};
+use HelgeSverre\Synapse\State\{ConversationState, Message, ContextItem};
 
 // Create state
 $state = new ConversationState();
@@ -232,7 +232,7 @@ $result = $executor->execute([
 ### Event Hooks
 
 ```php
-use LlmExe\Hooks\Events\{BeforeProviderCall, AfterProviderCall, OnSuccess, OnError};
+use HelgeSverre\Synapse\Hooks\Events\{BeforeProviderCall, AfterProviderCall, OnSuccess, OnError};
 
 $executor
     ->on(BeforeProviderCall::class, fn($e) => logger("Calling {$e->request->model}"))
@@ -265,9 +265,9 @@ $llm = useLlm('anthropic.claude-3-sonnet', [
 Implement `LlmProviderInterface`:
 
 ```php
-use LlmExe\Provider\{LlmProviderInterface, ProviderCapabilities};
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\{LlmProviderInterface, ProviderCapabilities};
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 
 class MyProvider implements LlmProviderInterface
 {

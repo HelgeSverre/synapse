@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests;
+namespace HelgeSverre\Synapse\Tests;
 
 use Attribute;
 

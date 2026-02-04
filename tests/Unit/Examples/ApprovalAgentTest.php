@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Examples;
+namespace HelgeSverre\Synapse\Tests\Unit\Examples;
 
 require_once __DIR__.'/../../../examples/approval-agent/ApprovalRequest.php';
 require_once __DIR__.'/../../../examples/approval-agent/ApprovalDecision.php';
@@ -10,12 +10,12 @@ require_once __DIR__.'/../../../examples/approval-agent/ApprovalProviderInterfac
 require_once __DIR__.'/../../../examples/approval-agent/ApprovingUseExecutors.php';
 require_once __DIR__.'/../../../examples/approval-agent/RiskyTools.php';
 
-use LlmExe\Examples\ApprovalAgent\ApprovalAction;
-use LlmExe\Examples\ApprovalAgent\ApprovalDecision;
-use LlmExe\Examples\ApprovalAgent\ApprovalProviderInterface;
-use LlmExe\Examples\ApprovalAgent\ApprovalRequest;
-use LlmExe\Examples\ApprovalAgent\ApprovingUseExecutors;
-use LlmExe\Examples\ApprovalAgent\RiskyTools;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalAction;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalDecision;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalProviderInterface;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalRequest;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingUseExecutors;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\RiskyTools;
 use PHPUnit\Framework\TestCase;
 
 final class ApprovalAgentTest extends TestCase

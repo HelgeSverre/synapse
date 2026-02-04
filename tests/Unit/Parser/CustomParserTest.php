@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Parser;
+namespace HelgeSverre\Synapse\Tests\Unit\Parser;
 
-use LlmExe\Parser\CustomParser;
-use LlmExe\Parser\ParserTarget;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Parser\CustomParser;
+use HelgeSverre\Synapse\Parser\ParserTarget;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 use PHPUnit\Framework\TestCase;
 
 final class CustomParserTest extends TestCase

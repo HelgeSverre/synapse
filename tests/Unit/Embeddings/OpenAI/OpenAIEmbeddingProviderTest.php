@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Embeddings\OpenAI;
+namespace HelgeSverre\Synapse\Tests\Unit\Embeddings\OpenAI;
 
-use LlmExe\Embeddings\EmbeddingResponse;
-use LlmExe\Embeddings\OpenAI\OpenAIEmbeddingProvider;
-use LlmExe\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Embeddings\EmbeddingResponse;
+use HelgeSverre\Synapse\Embeddings\OpenAI\OpenAIEmbeddingProvider;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
 use PHPUnit\Framework\TestCase;
 
 final class OpenAIEmbeddingProviderTest extends TestCase

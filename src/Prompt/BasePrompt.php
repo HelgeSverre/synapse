@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Prompt;
+namespace HelgeSverre\Synapse\Prompt;
 
-use LlmExe\Prompt\Template\Template;
+use HelgeSverre\Synapse\Prompt\Template\Template;
 
 abstract class BasePrompt implements PromptInterface
 {

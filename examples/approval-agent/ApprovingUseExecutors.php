@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\ToolExecutorInterface;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\ToolExecutorInterface;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * Decorator that intercepts tool calls and requires approval for risky tools.

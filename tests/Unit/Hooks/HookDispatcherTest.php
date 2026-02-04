@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Hooks;
+namespace HelgeSverre\Synapse\Tests\Unit\Hooks;
 
-use LlmExe\Hooks\HookDispatcher;
+use HelgeSverre\Synapse\Hooks\HookDispatcher;
 use PHPUnit\Framework\TestCase;
 
 final class HookDispatcherTest extends TestCase

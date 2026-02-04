@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Hooks\Events;
+namespace HelgeSverre\Synapse\Hooks\Events;
 
-use LlmExe\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
 
 final readonly class OnToolCall
 {

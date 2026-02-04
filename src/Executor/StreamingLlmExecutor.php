@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
 use Generator;
-use LlmExe\Hooks\Events\AfterPromptRender;
-use LlmExe\Hooks\Events\BeforePromptRender;
-use LlmExe\Hooks\Events\OnComplete;
-use LlmExe\Hooks\Events\OnError;
-use LlmExe\Hooks\Events\OnStreamChunk;
-use LlmExe\Hooks\Events\OnStreamEnd;
-use LlmExe\Hooks\Events\OnStreamStart;
-use LlmExe\Hooks\Events\OnStreamSuccess;
-use LlmExe\Hooks\HookDispatcher;
-use LlmExe\Hooks\HookDispatcherInterface;
-use LlmExe\Prompt\PromptInterface;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\State\ConversationState;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamableProviderInterface;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\StreamContext;
-use LlmExe\Streaming\StreamEvent;
-use LlmExe\Streaming\TextDelta;
+use HelgeSverre\Synapse\Hooks\Events\AfterPromptRender;
+use HelgeSverre\Synapse\Hooks\Events\BeforePromptRender;
+use HelgeSverre\Synapse\Hooks\Events\OnComplete;
+use HelgeSverre\Synapse\Hooks\Events\OnError;
+use HelgeSverre\Synapse\Hooks\Events\OnStreamChunk;
+use HelgeSverre\Synapse\Hooks\Events\OnStreamEnd;
+use HelgeSverre\Synapse\Hooks\Events\OnStreamStart;
+use HelgeSverre\Synapse\Hooks\Events\OnStreamSuccess;
+use HelgeSverre\Synapse\Hooks\HookDispatcher;
+use HelgeSverre\Synapse\Hooks\HookDispatcherInterface;
+use HelgeSverre\Synapse\Prompt\PromptInterface;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\State\ConversationState;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\StreamContext;
+use HelgeSverre\Synapse\Streaming\StreamEvent;
+use HelgeSverre\Synapse\Streaming\TextDelta;
 
 /**
  * Executor that streams LLM responses.

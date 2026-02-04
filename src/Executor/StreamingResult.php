@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Provider\Response\UsageInfo;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Provider\Response\UsageInfo;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * Result from a streaming execution after collecting all events.

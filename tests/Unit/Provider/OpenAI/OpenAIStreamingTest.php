@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Provider\OpenAI;
+namespace HelgeSverre\Synapse\Tests\Unit\Provider\OpenAI;
 
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
-use LlmExe\Provider\Http\StreamTransportInterface;
-use LlmExe\Provider\Http\TransportInterface;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamableProviderInterface;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\StreamContext;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Provider\Http\StreamTransportInterface;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\StreamContext;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 

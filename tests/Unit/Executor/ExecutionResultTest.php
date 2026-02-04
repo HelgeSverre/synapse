@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Executor;
+namespace HelgeSverre\Synapse\Tests\Unit\Executor;
 
-use LlmExe\Executor\ExecutionResult;
-use LlmExe\Provider\Response\GenerationResponse;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Executor\ExecutionResult;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\State\ConversationState;
 use PHPUnit\Framework\TestCase;
 
 final class ExecutionResultTest extends TestCase

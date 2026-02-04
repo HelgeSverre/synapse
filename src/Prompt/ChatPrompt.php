@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Prompt;
+namespace HelgeSverre\Synapse\Prompt;
 
-use LlmExe\State\Message;
-use LlmExe\State\Role;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\State\Role;
 
 final class ChatPrompt extends BasePrompt
 {

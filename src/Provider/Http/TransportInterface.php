@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\Http;
+namespace HelgeSverre\Synapse\Provider\Http;
 
 interface TransportInterface
 {

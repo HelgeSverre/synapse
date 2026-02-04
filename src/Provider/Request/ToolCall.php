@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\Request;
+namespace HelgeSverre\Synapse\Provider\Request;
 
 final readonly class ToolCall
 {

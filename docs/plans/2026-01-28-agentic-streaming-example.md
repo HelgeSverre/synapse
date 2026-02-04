@@ -6,7 +6,7 @@
 
 **Architecture:** An interactive CLI agent with multiple tools (weather, calculator, file system, web search mock, note-taking) that maintains conversation state, streams responses in real-time, shows tool execution progress, and handles multi-step reasoning. Uses hooks to show timing and token usage.
 
-**Tech Stack:** PHP 8.2+, LlmExe streaming executors, GuzzleStreamTransport, multiple providers (OpenAI/Anthropic/XAI)
+**Tech Stack:** PHP 8.2+, Synapse streaming executors, GuzzleStreamTransport, multiple providers (OpenAI/Anthropic/XAI)
 
 ---
 
@@ -39,9 +39,9 @@ The example will demonstrate:
 // examples/agentic-tools/WeatherTool.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\AgenticTools;
+namespace HelgeSverre\Synapse\Examples\AgenticTools;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class WeatherTool
 {
@@ -103,9 +103,9 @@ final class WeatherTool
 // examples/agentic-tools/CalculatorTool.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\AgenticTools;
+namespace HelgeSverre\Synapse\Examples\AgenticTools;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class CalculatorTool
 {
@@ -170,9 +170,9 @@ final class CalculatorTool
 // examples/agentic-tools/NotesTool.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\AgenticTools;
+namespace HelgeSverre\Synapse\Examples\AgenticTools;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class NotesTool
 {
@@ -269,9 +269,9 @@ final class NotesTool
 // examples/agentic-tools/WebSearchTool.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\AgenticTools;
+namespace HelgeSverre\Synapse\Examples\AgenticTools;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class WebSearchTool
 {
@@ -343,9 +343,9 @@ final class WebSearchTool
 // examples/agentic-tools/DateTimeTool.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\AgenticTools;
+namespace HelgeSverre\Synapse\Examples\AgenticTools;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class DateTimeTool
 {
@@ -490,26 +490,26 @@ require_once __DIR__ . '/agentic-tools/WebSearchTool.php';
 require_once __DIR__ . '/agentic-tools/DateTimeTool.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Examples\AgenticTools\CalculatorTool;
-use LlmExe\Examples\AgenticTools\DateTimeTool;
-use LlmExe\Examples\AgenticTools\NotesTool;
-use LlmExe\Examples\AgenticTools\WeatherTool;
-use LlmExe\Examples\AgenticTools\WebSearchTool;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Hooks\Events\OnStreamChunk;
-use LlmExe\Hooks\Events\OnToolCall;
-use LlmExe\Hooks\HookDispatcher;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\Provider\XAI\XAIProvider;
-use LlmExe\State\ConversationState;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Examples\AgenticTools\CalculatorTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\DateTimeTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\NotesTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\WeatherTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\WebSearchTool;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Hooks\Events\OnStreamChunk;
+use HelgeSverre\Synapse\Hooks\Events\OnToolCall;
+use HelgeSverre\Synapse\Hooks\HookDispatcher;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
+use HelgeSverre\Synapse\State\ConversationState;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 
 // ANSI color codes
 const CYAN = "\033[36m";
@@ -778,7 +778,7 @@ Run: `php examples/agentic-agent-cli.php --help 2>&1 || echo "Check if it starts
 // tests/Unit/Examples/AgenticToolsTest.php
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Examples;
+namespace HelgeSverre\Synapse\Tests\Unit\Examples;
 
 require_once __DIR__ . '/../../../examples/agentic-tools/WeatherTool.php';
 require_once __DIR__ . '/../../../examples/agentic-tools/CalculatorTool.php';
@@ -786,12 +786,12 @@ require_once __DIR__ . '/../../../examples/agentic-tools/NotesTool.php';
 require_once __DIR__ . '/../../../examples/agentic-tools/WebSearchTool.php';
 require_once __DIR__ . '/../../../examples/agentic-tools/DateTimeTool.php';
 
-use LlmExe\Examples\AgenticTools\CalculatorTool;
-use LlmExe\Examples\AgenticTools\DateTimeTool;
-use LlmExe\Examples\AgenticTools\NotesTool;
-use LlmExe\Examples\AgenticTools\WeatherTool;
-use LlmExe\Examples\AgenticTools\WebSearchTool;
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Examples\AgenticTools\CalculatorTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\DateTimeTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\NotesTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\WeatherTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\WebSearchTool;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 use PHPUnit\Framework\TestCase;
 
 final class AgenticToolsTest extends TestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider;
+namespace HelgeSverre\Synapse\Provider;
 
 final readonly class ProviderCapabilities
 {

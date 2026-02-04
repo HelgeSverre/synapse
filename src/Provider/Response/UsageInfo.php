@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\Response;
+namespace HelgeSverre\Synapse\Provider\Response;
 
 final readonly class UsageInfo
 {

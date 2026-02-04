@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Hooks\HookDispatcherInterface;
-use LlmExe\Provider\Response\GenerationResponse;
-use LlmExe\Provider\Response\UsageInfo;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Hooks\HookDispatcherInterface;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Response\UsageInfo;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * Wraps a simple function as an executor.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Provider\Response\GenerationResponse;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * @template T

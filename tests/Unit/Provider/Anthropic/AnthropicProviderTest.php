@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Provider\Anthropic;
+namespace HelgeSverre\Synapse\Tests\Unit\Provider\Anthropic;
 
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Http\TransportInterface;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\Message;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\Message;
 use PHPUnit\Framework\TestCase;
 
 final class AnthropicProviderTest extends TestCase

@@ -21,19 +21,19 @@ declare(strict_types=1);
 require_once __DIR__.'/../vendor/autoload.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\StreamingLlmExecutor;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\Mistral\MistralProvider;
-use LlmExe\Provider\Moonshot\MoonshotProvider;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
+use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 
 // ANSI colors for terminal output
 const CYAN = "\033[36m";

@@ -23,7 +23,7 @@
 // examples/approval-agent/ApprovalRequest.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 /**
  * Represents a request for human approval before tool execution.
@@ -61,7 +61,7 @@ final readonly class ApprovalRequest
 // examples/approval-agent/ApprovalDecision.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 enum ApprovalAction: string
 {
@@ -123,7 +123,7 @@ Run: `php -l examples/approval-agent/ApprovalRequest.php && php -l examples/appr
 // examples/approval-agent/ApprovalProviderInterface.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 /**
  * Interface for requesting human approval.
@@ -145,7 +145,7 @@ interface ApprovalProviderInterface
 // examples/approval-agent/CliApprovalProvider.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 /**
  * CLI-based approval provider that prompts via STDIN.
@@ -240,10 +240,10 @@ Run: `php -l examples/approval-agent/CliApprovalProvider.php`
 // examples/approval-agent/ApprovingUseExecutors.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
 
 /**
  * Decorator that intercepts tool calls and requires approval for risky tools.
@@ -337,9 +337,9 @@ Run: `php -l examples/approval-agent/ApprovingUseExecutors.php`
 // examples/approval-agent/RiskyTools.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\ApprovalAgent;
+namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 
 final class RiskyTools
 {
@@ -508,17 +508,17 @@ require_once __DIR__ . '/approval-agent/ApprovingUseExecutors.php';
 require_once __DIR__ . '/approval-agent/RiskyTools.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Examples\ApprovalAgent\ApprovingUseExecutors;
-use LlmExe\Examples\ApprovalAgent\CliApprovalProvider;
-use LlmExe\Examples\ApprovalAgent\RiskyTools;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingUseExecutors;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\CliApprovalProvider;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\RiskyTools;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
 
 const CYAN = "\033[36m";
 const GREEN = "\033[32m";
@@ -692,7 +692,7 @@ Run: `./vendor/bin/phpstan analyse src/Executor/CallableExecutor.php`
 <?php
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Examples;
+namespace HelgeSverre\Synapse\Tests\Unit\Examples;
 
 require_once __DIR__ . '/../../../examples/approval-agent/ApprovalRequest.php';
 require_once __DIR__ . '/../../../examples/approval-agent/ApprovalDecision.php';
@@ -700,12 +700,12 @@ require_once __DIR__ . '/../../../examples/approval-agent/ApprovalProviderInterf
 require_once __DIR__ . '/../../../examples/approval-agent/ApprovingUseExecutors.php';
 require_once __DIR__ . '/../../../examples/approval-agent/RiskyTools.php';
 
-use LlmExe\Examples\ApprovalAgent\ApprovalAction;
-use LlmExe\Examples\ApprovalAgent\ApprovalDecision;
-use LlmExe\Examples\ApprovalAgent\ApprovalProviderInterface;
-use LlmExe\Examples\ApprovalAgent\ApprovalRequest;
-use LlmExe\Examples\ApprovalAgent\ApprovingUseExecutors;
-use LlmExe\Examples\ApprovalAgent\RiskyTools;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalAction;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalDecision;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalProviderInterface;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalRequest;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingUseExecutors;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\RiskyTools;
 use PHPUnit\Framework\TestCase;
 
 final class ApprovalAgentTest extends TestCase

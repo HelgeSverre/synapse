@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider;
+namespace HelgeSverre\Synapse\Provider;
 
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 
 interface LlmProviderInterface
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Parser;
+namespace HelgeSverre\Synapse\Parser;
 
-use LlmExe\Provider\Request\ToolCall;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 
 /**
  * Wraps another parser to handle function/tool call responses.

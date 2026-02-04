@@ -23,9 +23,9 @@
 // examples/router-agent/AgentDefinition.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\RouterAgent;
+namespace HelgeSverre\Synapse\Examples\RouterAgent;
 
-use LlmExe\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\UseExecutors;
 
 /**
  * Definition of a specialist agent.
@@ -58,10 +58,10 @@ final readonly class AgentDefinition
 // examples/router-agent/AgentRegistry.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\RouterAgent;
+namespace HelgeSverre\Synapse\Examples\RouterAgent;
 
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\UseExecutors;
 
 /**
  * Registry of available specialist agents.
@@ -204,15 +204,15 @@ Run: `php -l examples/router-agent/AgentDefinition.php && php -l examples/router
 // examples/router-agent/AgentRunner.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\RouterAgent;
+namespace HelgeSverre\Synapse\Examples\RouterAgent;
 
 use Generator;
-use LlmExe\Executor\StreamingLlmExecutor;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Streaming\StreamableProviderInterface;
-use LlmExe\Streaming\StreamEvent;
-use LlmExe\Streaming\TextDelta;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Streaming\StreamEvent;
+use HelgeSverre\Synapse\Streaming\TextDelta;
 
 /**
  * Runs a specialist agent and collects/yields results.
@@ -316,10 +316,10 @@ final readonly class AgentStreamEvent
 // examples/router-agent/DelegateTool.php
 declare(strict_types=1);
 
-namespace LlmExe\Examples\RouterAgent;
+namespace HelgeSverre\Synapse\Examples\RouterAgent;
 
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 
 /**
  * Creates a delegate tool that the manager can use to invoke specialist agents.
@@ -452,19 +452,19 @@ require_once __DIR__ . '/router-agent/AgentRunner.php';
 require_once __DIR__ . '/router-agent/DelegateTool.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Examples\RouterAgent\AgentRegistry;
-use LlmExe\Examples\RouterAgent\AgentStreamEvent;
-use LlmExe\Examples\RouterAgent\DelegateTool;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
-use LlmExe\Streaming\ToolCallsReady;
+use HelgeSverre\Synapse\Examples\RouterAgent\AgentRegistry;
+use HelgeSverre\Synapse\Examples\RouterAgent\AgentStreamEvent;
+use HelgeSverre\Synapse\Examples\RouterAgent\DelegateTool;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
+use HelgeSverre\Synapse\Streaming\ToolCallsReady;
 
 const CYAN = "\033[36m";
 const GREEN = "\033[32m";
@@ -648,13 +648,13 @@ Run: `php -l examples/router-agent-cli.php`
 <?php
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Examples;
+namespace HelgeSverre\Synapse\Tests\Unit\Examples;
 
 require_once __DIR__ . '/../../../examples/router-agent/AgentDefinition.php';
 require_once __DIR__ . '/../../../examples/router-agent/AgentRegistry.php';
 
-use LlmExe\Examples\RouterAgent\AgentDefinition;
-use LlmExe\Examples\RouterAgent\AgentRegistry;
+use HelgeSverre\Synapse\Examples\RouterAgent\AgentDefinition;
+use HelgeSverre\Synapse\Examples\RouterAgent\AgentRegistry;
 use PHPUnit\Framework\TestCase;
 
 final class RouterAgentTest extends TestCase

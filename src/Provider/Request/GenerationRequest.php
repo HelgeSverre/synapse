@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\Request;
+namespace HelgeSverre\Synapse\Provider\Request;
 
-use LlmExe\State\Message;
+use HelgeSverre\Synapse\State\Message;
 
 final readonly class GenerationRequest
 {

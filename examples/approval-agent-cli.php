@@ -24,17 +24,17 @@ require_once __DIR__.'/approval-agent/ApprovingUseExecutors.php';
 require_once __DIR__.'/approval-agent/RiskyTools.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Examples\ApprovalAgent\ApprovingUseExecutors;
-use LlmExe\Examples\ApprovalAgent\CliApprovalProvider;
-use LlmExe\Examples\ApprovalAgent\RiskyTools;
-use LlmExe\Executor\StreamingLlmExecutorWithFunctions;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Http\GuzzleStreamTransport;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\State\Message;
-use LlmExe\Streaming\StreamCompleted;
-use LlmExe\Streaming\TextDelta;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingUseExecutors;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\CliApprovalProvider;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\RiskyTools;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Streaming\StreamCompleted;
+use HelgeSverre\Synapse\Streaming\TextDelta;
 
 const CYAN = "\033[36m";
 const GREEN = "\033[32m";

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Hooks\Events\AfterProviderCall;
-use LlmExe\Hooks\Events\BeforeProviderCall;
-use LlmExe\Hooks\Events\OnToolCall;
-use LlmExe\Hooks\HookDispatcherInterface;
-use LlmExe\Parser\ParserInterface;
-use LlmExe\Prompt\PromptInterface;
-use LlmExe\Provider\LlmProviderInterface;
-use LlmExe\Provider\Request\GenerationRequest;
-use LlmExe\Provider\Request\ToolDefinition;
-use LlmExe\State\ConversationState;
-use LlmExe\State\Message;
+use HelgeSverre\Synapse\Hooks\Events\AfterProviderCall;
+use HelgeSverre\Synapse\Hooks\Events\BeforeProviderCall;
+use HelgeSverre\Synapse\Hooks\Events\OnToolCall;
+use HelgeSverre\Synapse\Hooks\HookDispatcherInterface;
+use HelgeSverre\Synapse\Parser\ParserInterface;
+use HelgeSverre\Synapse\Prompt\PromptInterface;
+use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\ConversationState;
+use HelgeSverre\Synapse\State\Message;
 
 /**
  * LLM executor with tool/function calling support.
@@ -87,7 +87,7 @@ final class LlmExecutorWithFunctions extends LlmExecutor
                 $parsed = $this->parser->parse($response);
 
                 $newState = $this->state;
-                if ($response->getAssistantMessage() instanceof \LlmExe\State\Message) {
+                if ($response->getAssistantMessage() instanceof \HelgeSverre\Synapse\State\Message) {
                     $newState = $newState->withMessage($response->getAssistantMessage());
                 }
                 $this->state = $newState;
@@ -101,7 +101,7 @@ final class LlmExecutorWithFunctions extends LlmExecutor
 
             // Handle tool calls
             $assistantMessage = $response->getAssistantMessage();
-            if ($assistantMessage instanceof \LlmExe\State\Message) {
+            if ($assistantMessage instanceof \HelgeSverre\Synapse\State\Message) {
                 $messages[] = $assistantMessage;
             }
 

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Examples;
+namespace HelgeSverre\Synapse\Tests\Unit\Examples;
 
-use LlmExe\Examples\AgenticTools\CalculatorTool;
-use LlmExe\Examples\AgenticTools\DateTimeTool;
-use LlmExe\Examples\AgenticTools\NotesTool;
-use LlmExe\Examples\AgenticTools\WeatherTool;
-use LlmExe\Examples\AgenticTools\WebSearchTool;
-use LlmExe\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Examples\AgenticTools\CalculatorTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\DateTimeTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\NotesTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\WeatherTool;
+use HelgeSverre\Synapse\Examples\AgenticTools\WebSearchTool;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__.'/../../../examples/agentic-tools/WeatherTool.php';

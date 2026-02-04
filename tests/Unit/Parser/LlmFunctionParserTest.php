@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Parser;
+namespace HelgeSverre\Synapse\Tests\Unit\Parser;
 
-use LlmExe\Parser\LlmFunctionParser;
-use LlmExe\Parser\ParserTarget;
-use LlmExe\Parser\StringParser;
-use LlmExe\Provider\Request\ToolCall;
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Parser\LlmFunctionParser;
+use HelgeSverre\Synapse\Parser\ParserTarget;
+use HelgeSverre\Synapse\Parser\StringParser;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 use PHPUnit\Framework\TestCase;
 
 final class LlmFunctionParserTest extends TestCase

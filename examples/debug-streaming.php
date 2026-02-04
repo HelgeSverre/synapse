@@ -13,7 +13,7 @@ declare(strict_types=1);
 require_once __DIR__.'/../vendor/autoload.php';
 
 use GuzzleHttp\Client;
-use LlmExe\Streaming\SseParser;
+use HelgeSverre\Synapse\Streaming\SseParser;
 
 $provider = $argv[1] ?? 'mistral';
 

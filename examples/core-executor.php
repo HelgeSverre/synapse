@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use function LlmExe\createCoreExecutor;
+use function HelgeSverre\Synapse\createCoreExecutor;
 
 // Create a simple executor from a function
 $calculator = createCoreExecutor(function (array $input): int {

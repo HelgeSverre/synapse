@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Executor;
+namespace HelgeSverre\Synapse\Executor;
 
-use LlmExe\Hooks\Events\OnComplete;
-use LlmExe\Hooks\Events\OnError;
-use LlmExe\Hooks\Events\OnSuccess;
-use LlmExe\Hooks\HookDispatcher;
-use LlmExe\Hooks\HookDispatcherInterface;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Hooks\Events\OnComplete;
+use HelgeSverre\Synapse\Hooks\Events\OnError;
+use HelgeSverre\Synapse\Hooks\Events\OnSuccess;
+use HelgeSverre\Synapse\Hooks\HookDispatcher;
+use HelgeSverre\Synapse\Hooks\HookDispatcherInterface;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * @template I of array<string, mixed>

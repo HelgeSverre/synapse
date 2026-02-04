@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\State;
+namespace HelgeSverre\Synapse\State;
 
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 
 /**
  * Manages conversation history for multi-turn dialogues.
@@ -56,7 +56,7 @@ final class Dialogue
      * Add a tool result from a ToolCall object.
      * Automatically extracts ID and name from the ToolCall.
      */
-    public function addToolResult(\LlmExe\Provider\Request\ToolCall $toolCall, mixed $result): self
+    public function addToolResult(\HelgeSverre\Synapse\Provider\Request\ToolCall $toolCall, mixed $result): self
     {
         $content = is_string($result) ? $result : (json_encode($result) ?: '');
         $this->messages[] = Message::tool($content, $toolCall->id, $toolCall->name);
@@ -69,7 +69,7 @@ final class Dialogue
      *
      * @param  array<string, mixed>  $results  Map of tool call ID to result
      */
-    public function addToolResults(\LlmExe\Provider\Response\GenerationResponse $response, array $results): self
+    public function addToolResults(\HelgeSverre\Synapse\Provider\Response\GenerationResponse $response, array $results): self
     {
         foreach ($response->getToolCalls() as $toolCall) {
             if (array_key_exists($toolCall->id, $results)) {
@@ -84,9 +84,9 @@ final class Dialogue
      * Add tool results using a callable executor.
      * The callable receives the ToolCall and should return the result.
      *
-     * @param  callable(\LlmExe\Provider\Request\ToolCall): mixed  $executor
+     * @param  callable(\HelgeSverre\Synapse\Provider\Request\ToolCall): mixed  $executor
      */
-    public function executeToolCalls(\LlmExe\Provider\Response\GenerationResponse $response, callable $executor): self
+    public function executeToolCalls(\HelgeSverre\Synapse\Provider\Response\GenerationResponse $response, callable $executor): self
     {
         foreach ($response->getToolCalls() as $toolCall) {
             $result = $executor($toolCall);
@@ -131,7 +131,7 @@ final class Dialogue
     public function addFromOutput(GenerationResponse $output): self
     {
         $assistantMessage = $output->getAssistantMessage();
-        if ($assistantMessage instanceof \LlmExe\State\Message) {
+        if ($assistantMessage instanceof \HelgeSverre\Synapse\State\Message) {
             $this->messages[] = $assistantMessage;
         }
 

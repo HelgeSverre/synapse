@@ -2,36 +2,36 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit;
+namespace HelgeSverre\Synapse\Tests\Unit;
 
-use LlmExe\Executor\CallableExecutor;
-use LlmExe\Executor\CoreExecutor;
-use LlmExe\Executor\LlmExecutor;
-use LlmExe\Executor\LlmExecutorWithFunctions;
-use LlmExe\Executor\UseExecutors;
-use LlmExe\Factory;
-use LlmExe\Parser\BooleanParser;
-use LlmExe\Parser\CustomParser;
-use LlmExe\Parser\EnumParser;
-use LlmExe\Parser\JsonParser;
-use LlmExe\Parser\ListParser;
-use LlmExe\Parser\ListToJsonParser;
-use LlmExe\Parser\ListToKeyValueParser;
-use LlmExe\Parser\LlmFunctionParser;
-use LlmExe\Parser\MarkdownCodeBlockParser;
-use LlmExe\Parser\MarkdownCodeBlocksParser;
-use LlmExe\Parser\NumberParser;
-use LlmExe\Parser\ReplaceStringTemplateParser;
-use LlmExe\Parser\StringParser;
-use LlmExe\Prompt\ChatPrompt;
-use LlmExe\Prompt\TextPrompt;
-use LlmExe\Provider\Anthropic\AnthropicProvider;
-use LlmExe\Provider\Google\GoogleProvider;
-use LlmExe\Provider\Http\TransportInterface;
-use LlmExe\Provider\OpenAI\OpenAIProvider;
-use LlmExe\Provider\XAI\XAIProvider;
-use LlmExe\State\ConversationState;
-use LlmExe\State\Dialogue;
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\CoreExecutor;
+use HelgeSverre\Synapse\Executor\LlmExecutor;
+use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Factory;
+use HelgeSverre\Synapse\Parser\BooleanParser;
+use HelgeSverre\Synapse\Parser\CustomParser;
+use HelgeSverre\Synapse\Parser\EnumParser;
+use HelgeSverre\Synapse\Parser\JsonParser;
+use HelgeSverre\Synapse\Parser\ListParser;
+use HelgeSverre\Synapse\Parser\ListToJsonParser;
+use HelgeSverre\Synapse\Parser\ListToKeyValueParser;
+use HelgeSverre\Synapse\Parser\LlmFunctionParser;
+use HelgeSverre\Synapse\Parser\MarkdownCodeBlockParser;
+use HelgeSverre\Synapse\Parser\MarkdownCodeBlocksParser;
+use HelgeSverre\Synapse\Parser\NumberParser;
+use HelgeSverre\Synapse\Parser\ReplaceStringTemplateParser;
+use HelgeSverre\Synapse\Parser\StringParser;
+use HelgeSverre\Synapse\Prompt\ChatPrompt;
+use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
+use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
+use HelgeSverre\Synapse\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
+use HelgeSverre\Synapse\State\ConversationState;
+use HelgeSverre\Synapse\State\Dialogue;
 use PHPUnit\Framework\TestCase;
 
 final class FactoryTest extends TestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\State;
+namespace HelgeSverre\Synapse\State;
 
 final readonly class ConversationState
 {

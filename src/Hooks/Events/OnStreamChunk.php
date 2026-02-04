@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Hooks\Events;
+namespace HelgeSverre\Synapse\Hooks\Events;
 
-use LlmExe\Streaming\StreamEvent;
+use HelgeSverre\Synapse\Streaming\StreamEvent;
 
 /**
  * Dispatched for each stream event (TextDelta, ToolCallDelta, etc.).

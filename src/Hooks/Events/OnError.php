@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Hooks\Events;
+namespace HelgeSverre\Synapse\Hooks\Events;
 
-use LlmExe\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
 
 final readonly class OnError
 {

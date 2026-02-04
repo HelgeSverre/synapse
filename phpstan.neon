@@ -16,4 +16,4 @@ parameters:
         - '#PHPDoc tag @var with type#'
         - '#array.+ might not be a list#'
         - '#Parameter \$tools of class#'
-        - '#Parameter \#1 \$executors of static method LlmExe\\Factory::useExecutors#'
+        - '#Parameter \#1 \$executors of static method HelgeSverre\\Synapse\\Factory::useExecutors#'

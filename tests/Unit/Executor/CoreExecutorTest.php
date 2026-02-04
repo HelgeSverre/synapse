@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Executor;
+namespace HelgeSverre\Synapse\Tests\Unit\Executor;
 
-use LlmExe\Executor\CoreExecutor;
-use LlmExe\Hooks\HookDispatcher;
-use LlmExe\State\ConversationState;
+use HelgeSverre\Synapse\Executor\CoreExecutor;
+use HelgeSverre\Synapse\Hooks\HookDispatcher;
+use HelgeSverre\Synapse\State\ConversationState;
 use PHPUnit\Framework\TestCase;
 
 final class CoreExecutorTest extends TestCase

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Streaming;
+namespace HelgeSverre\Synapse\Streaming;
 
-use LlmExe\Provider\Request\ToolCall;
+use HelgeSverre\Synapse\Provider\Request\ToolCall;
 
 /**
  * Accumulates partial tool call deltas into complete ToolCall objects.

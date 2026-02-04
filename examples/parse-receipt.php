@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-use LlmExe\Factory;
+use HelgeSverre\Synapse\Factory;
 use Spatie\PdfToText\Pdf;
 
 // Load environment variables

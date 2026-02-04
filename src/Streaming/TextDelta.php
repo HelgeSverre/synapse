@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Streaming;
+namespace HelgeSverre\Synapse\Streaming;
 
 /**
  * A chunk of text content from the stream.

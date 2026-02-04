@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\State;
+namespace HelgeSverre\Synapse\State;
 
 final readonly class Message
 {
@@ -26,7 +26,7 @@ final readonly class Message
     }
 
     /**
-     * @param  list<\LlmExe\Provider\Request\ToolCall>  $toolCalls
+     * @param  list<\HelgeSverre\Synapse\Provider\Request\ToolCall>  $toolCalls
      */
     public static function assistant(string $content, array $toolCalls = []): self
     {
@@ -39,7 +39,7 @@ final readonly class Message
     }
 
     /**
-     * @return list<\LlmExe\Provider\Request\ToolCall>
+     * @return list<\HelgeSverre\Synapse\Provider\Request\ToolCall>
      */
     public function getToolCalls(): array
     {

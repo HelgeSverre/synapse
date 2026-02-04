@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Provider\Http;
+namespace HelgeSverre\Synapse\Provider\Http;
 
-use LlmExe\Streaming\StreamContext;
+use HelgeSverre\Synapse\Streaming\StreamContext;
 use Psr\Http\Message\ResponseInterface;
 
 /**

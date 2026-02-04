@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Parser;
+namespace HelgeSverre\Synapse\Parser;
 
-use LlmExe\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
 
 /**
  * Parses numbered or bulleted lists into an array.

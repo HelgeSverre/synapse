@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace LlmExe\Tests\Unit\Prompt;
+namespace HelgeSverre\Synapse\Tests\Unit\Prompt;
 
-use LlmExe\Prompt\ChatPrompt;
-use LlmExe\Prompt\PromptType;
-use LlmExe\State\Message;
-use LlmExe\State\Role;
+use HelgeSverre\Synapse\Prompt\ChatPrompt;
+use HelgeSverre\Synapse\Prompt\PromptType;
+use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\State\Role;
 use PHPUnit\Framework\TestCase;
 
 final class ChatPromptTest extends TestCase
