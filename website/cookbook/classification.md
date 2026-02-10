@@ -27,7 +27,6 @@ $executor = createLlmExecutor([
     'parser' => createParser('enum', [
         'values' => ['greeting', 'question', 'complaint', 'request', 'other'],
     ]),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['message' => 'Your product broke after one day!']);
@@ -58,7 +57,6 @@ $executor = createLlmExecutor([
             ],
         ],
     ]),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['text' => 'I absolutely love this product!']);
@@ -78,7 +76,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('boolean'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['message' => 'BUY NOW! Limited time offer!!!']);

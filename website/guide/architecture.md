@@ -77,7 +77,7 @@ Template syntax uses <code v-pre>{{variable}}</code> notation with support for n
 
 Here's what happens when you call `$executor->execute($input)`:
 
-1. `BaseExecutor::execute()` starts timing and calls `handler()`
+1. `BaseExecutor::execute()` starts timing, transforms input via `getHandlerInput()`, and calls `handler()`
 2. `LlmExecutor::handler()` dispatches `BeforePromptRender` event
 3. The prompt's `render($input)` replaces template variables
 4. `AfterPromptRender` event fires with rendered messages

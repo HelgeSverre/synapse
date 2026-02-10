@@ -39,7 +39,6 @@ $executor = createLlmExecutorWithFunctions([
         ->addSystemMessage('You are a weather assistant.')
         ->addUserMessage('{{question}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
     'tools' => $tools,
 ]);
 

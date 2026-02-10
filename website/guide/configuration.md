@@ -137,10 +137,10 @@ XAI_API_KEY=...
 
 ```php
 $executor = createLlmExecutor([
-    'llm' => $provider,          // Required: LlmProviderInterface
+    'llm' => $provider,          // Required: LlmProviderInterface or Llm
     'prompt' => $prompt,         // Required: PromptInterface
     'parser' => $parser,         // Optional: ParserInterface (defaults to StringParser)
-    'model' => 'gpt-4o-mini',   // Required: model name string
+    'model' => 'gpt-4o-mini',   // Optional when using useLlm('provider.model')
     'temperature' => 0.7,       // Optional: sampling temperature
     'maxTokens' => 1000,        // Optional: max output tokens
     'responseFormat' => null,    // Optional: response format hint
@@ -154,10 +154,10 @@ $executor = createLlmExecutor([
 
 ```php
 $executor = createLlmExecutorWithFunctions([
-    'llm' => $provider,          // Required
+    'llm' => $provider,          // Required: LlmProviderInterface or Llm
     'prompt' => $prompt,         // Required
     'parser' => $parser,         // Optional
-    'model' => 'gpt-4o-mini',   // Required
+    'model' => 'gpt-4o-mini',   // Optional when using useLlm('provider.model')
     'tools' => $tools,           // Required: UseExecutors or array of tool configs
     'maxIterations' => 10,       // Optional: max tool calling loops (default: 10)
     'temperature' => 0.7,       // Optional

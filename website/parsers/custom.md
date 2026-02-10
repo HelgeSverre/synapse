@@ -103,6 +103,5 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => new MarkdownTableParser(),
-    'model' => 'gpt-4o-mini',
 ]);
 ```

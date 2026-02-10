@@ -30,7 +30,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 function validateProfile(array $data): array

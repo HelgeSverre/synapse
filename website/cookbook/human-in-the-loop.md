@@ -79,7 +79,6 @@ $executor = createLlmExecutorWithFunctions([
         )
         ->addUserMessage('{{request}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
     'tools' => $tools,
 ]);
 

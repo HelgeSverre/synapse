@@ -55,12 +55,11 @@ $prompt = createChatPrompt()
 // 3. Choose a parser for the response format
 $parser = createParser('string');
 
-// 4. Wire it all together in an executor
+// 4. Wire it all together in an executor (model comes from useLlm)
 $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => $parser,
-    'model' => 'gpt-4o-mini',
 ]);
 
 // 5. Execute with input variables
@@ -134,7 +133,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => $parser,
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute([

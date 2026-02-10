@@ -73,7 +73,6 @@ $executor = createLlmExecutorWithFunctions([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
     'tools' => $tools,
     'maxIterations' => 10,
 ]);
@@ -93,7 +92,7 @@ while (true) {
     ]);
 
     echo "Agent: " . $result->getValue() . "\n\n";
-    $dialogue->addFromOutput($result);
+    $dialogue->addFromOutput($result->response);
 }
 ```
 

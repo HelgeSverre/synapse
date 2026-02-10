@@ -15,7 +15,6 @@ use HelgeSverre\Synapse\Executor\UseExecutors;
 use HelgeSverre\Synapse\Parser\ParserInterface;
 use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
-use HelgeSverre\Synapse\Provider\LlmProviderInterface;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
 
@@ -24,7 +23,7 @@ use HelgeSverre\Synapse\State\Dialogue;
  *
  * @param  array<string, mixed>  $options
  */
-function useLlm(string $provider, array $options = []): LlmProviderInterface
+function useLlm(string $provider, array $options = []): Llm
 {
     return Factory::useLlm($provider, $options);
 }

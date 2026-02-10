@@ -5,15 +5,14 @@
 ## Usage
 
 ```php
-use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Streaming\{TextDelta, ToolCallDelta, ToolCallsReady, StreamCompleted};
+use function HelgeSverre\Synapse\createStreamingLlmExecutorWithFunctions;
 
-$executor = new StreamingLlmExecutorWithFunctions(
-    provider: $streamableProvider,
-    prompt: $prompt,
-    model: 'gpt-4o-mini',
-    tools: $tools,
-);
+$executor = createStreamingLlmExecutorWithFunctions([
+    'llm' => $llm,
+    'prompt' => $prompt,
+    'tools' => $tools,
+]);
 
 foreach ($executor->stream(['question' => 'Check the weather']) as $event) {
     match (true) {
@@ -52,7 +51,7 @@ Fires when all tool calls for the current round are assembled:
 ```php
 if ($event instanceof ToolCallsReady) {
     foreach ($event->toolCalls as $call) {
-        echo "Will execute: {$call->name}({$call->arguments})\n";
+        echo "Will execute: {$call->name}(" . json_encode($call->arguments) . ")\n";
     }
 }
 ```

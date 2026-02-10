@@ -17,7 +17,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['question' => 'What is PHP?']);
@@ -28,10 +27,10 @@ echo $result->getValue();
 
 | Option | Type | Required | Default | Description |
 |--------|------|----------|---------|-------------|
-| `llm` | `LlmProviderInterface` | Yes | — | The LLM provider |
+| `llm` | `Llm` or `LlmProviderInterface` | Yes | — | The LLM provider (from `useLlm()`) |
 | `prompt` | `PromptInterface` | Yes | — | The prompt template |
 | `parser` | `ParserInterface` | No | `StringParser` | Response parser |
-| `model` | `string` | Yes | — | Model name |
+| `model` | `string` | No | from `useLlm()` | Model name (auto-set if using `useLlm('provider.model')`) |
 | `temperature` | `float` | No | `null` | Sampling temperature |
 | `maxTokens` | `int` | No | `null` | Max output tokens |
 | `responseFormat` | `array` | No | `null` | Response format hint |
@@ -66,7 +65,6 @@ $executor = createLlmExecutor([
             ],
         ],
     ]),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['text' => 'Contact John at john@example.com']);

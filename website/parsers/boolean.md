@@ -26,7 +26,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('boolean'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['text' => 'The weather is lovely today.']);

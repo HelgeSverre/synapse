@@ -35,7 +35,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('keyvalue'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['text' => 'The book "1984" by George Orwell, published 1949']);

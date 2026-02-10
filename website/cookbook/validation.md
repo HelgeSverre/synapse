@@ -31,7 +31,6 @@ $validator = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('boolean'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $validator->execute([
@@ -63,7 +62,6 @@ $validator = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $validator->execute(['email' => 'not-an-email']);

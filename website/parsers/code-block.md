@@ -35,7 +35,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('code', ['language' => 'php']),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute([]);
@@ -64,7 +63,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('codeblocks'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute([]);

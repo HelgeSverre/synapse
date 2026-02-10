@@ -29,11 +29,10 @@ $prompt = createChatPrompt()
     ->addSystemMessage('You are a helpful assistant.')
     ->addUserMessage('{{question}}', parseTemplate: true);
 
-// Via factory
+// Via factory (model comes from useLlm)
 $executor = createStreamingLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
-    'model' => 'gpt-4o-mini',
 ]);
 
 // Or direct instantiation

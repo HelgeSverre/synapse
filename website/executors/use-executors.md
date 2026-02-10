@@ -35,7 +35,6 @@ $executor = createLlmExecutorWithFunctions([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
     'tools' => $tools,
 ]);
 ```

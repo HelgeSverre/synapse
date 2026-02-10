@@ -10,7 +10,26 @@ use function HelgeSverre\Synapse\useLlm;
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 ```
 
-The format is `prefix.model`. Only the prefix is used for provider selection — the model portion is for readability and is not passed to the provider. Specify the actual model in the executor's `model` option.
+The format is `prefix.model`. The prefix selects the provider and the model is carried on the returned `Llm` object. Executors created with this `Llm` instance automatically use the model — no need to specify it again.
+
+```php
+$llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
+
+// Model 'gpt-4o-mini' is used automatically
+$executor = createLlmExecutor([
+    'llm' => $llm,
+    'prompt' => $prompt,
+]);
+
+// You can override the model if needed
+$executor = createLlmExecutor([
+    'llm' => $llm,
+    'prompt' => $prompt,
+    'model' => 'gpt-4-turbo', // overrides 'gpt-4o-mini'
+]);
+```
+
+If you omit the model from the string (e.g. `useLlm('openai', [...])`), you must provide it in the executor options.
 
 ::: tip Streaming
 All providers require `GuzzleStreamTransport` for streaming. See [Stream Transport](/streaming/transport) for setup.

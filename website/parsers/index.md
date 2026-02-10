@@ -48,7 +48,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json'),  // Parse response as JSON
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['text' => 'John, age 34']);

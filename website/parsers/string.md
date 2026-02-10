@@ -29,7 +29,6 @@ $executor = createLlmExecutor([
         ->addSystemMessage('Respond concisely.')
         ->addUserMessage('{{question}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['question' => 'What is PHP?']);

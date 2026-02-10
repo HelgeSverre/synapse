@@ -43,7 +43,6 @@ $executor = createLlmExecutor([
         ->addSystemMessage('You are a helpful assistant.')
         ->addUserMessage('{{question}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'claude-3-5-sonnet-latest',
 ]);
 
 $result = $executor->execute(['question' => 'What is Rust?']);

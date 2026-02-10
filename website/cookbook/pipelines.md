@@ -24,7 +24,6 @@ $summarizer = createLlmExecutor([
         ->addSystemMessage('Summarize the following text in 2-3 sentences.')
         ->addUserMessage('{{text}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 // Step 2: Extract keywords
@@ -34,7 +33,6 @@ $keywordExtractor = createLlmExecutor([
         ->addSystemMessage('Extract the top 5 keywords from this text. One per line.')
         ->addUserMessage('{{text}}', parseTemplate: true),
     'parser' => createParser('list'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 // Step 3: Classify topic
@@ -50,7 +48,6 @@ $classifier = createLlmExecutor([
     'parser' => createParser('enum', [
         'values' => ['technology', 'science', 'business', 'sports', 'entertainment', 'other'],
     ]),
-    'model' => 'gpt-4o-mini',
 ]);
 
 // Run the pipeline

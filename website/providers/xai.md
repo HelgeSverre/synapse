@@ -41,6 +41,5 @@ $executor = createLlmExecutor([
         ->addSystemMessage('You are helpful.')
         ->addUserMessage('{{question}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'grok-beta',
 ]);
 ```

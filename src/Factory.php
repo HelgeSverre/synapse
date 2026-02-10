@@ -97,13 +97,15 @@ final class Factory
         return new Psr18Transport($client, $requestFactory, $streamFactory);
     }
 
-    public static function useLlm(string $provider, array $options = []): LlmProviderInterface
+    public static function useLlm(string $provider, array $options = []): Llm
     {
         $transport = $options['transport'] ?? self::getDefaultTransport();
 
-        [$providerName, $model] = explode('.', $provider, 2) + [null, null];
+        $parts = explode('.', $provider, 2);
+        $providerName = $parts[0];
+        $model = $parts[1] ?? null;
 
-        return match ($providerName) {
+        $providerInstance = match ($providerName) {
             'openai' => new OpenAIProvider(
                 transport: $transport,
                 apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
@@ -131,6 +133,31 @@ final class Factory
             ),
             default => throw new \InvalidArgumentException("Unknown provider: {$providerName}"),
         };
+
+        return new Llm($providerInstance, $model);
+    }
+
+    /**
+     * Resolve the provider and model from executor options.
+     *
+     * Unwraps Llm instances to extract the inner provider and default model.
+     * Explicit 'model' option always takes precedence over the Llm default.
+     *
+     * @return array{0: LlmProviderInterface, 1: string}
+     */
+    private static function resolveProviderAndModel(array $options): array
+    {
+        $llm = $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required');
+
+        if ($llm instanceof Llm) {
+            $provider = $llm->provider;
+            $model = $options['model'] ?? $llm->model ?? throw new \InvalidArgumentException('model is required');
+        } else {
+            $provider = $llm;
+            $model = $options['model'] ?? throw new \InvalidArgumentException('model is required');
+        }
+
+        return [$provider, $model];
     }
 
     public static function createTextPrompt(): TextPrompt
@@ -204,11 +231,13 @@ final class Factory
      */
     public static function createLlmExecutor(array $options): LlmExecutor
     {
+        [$provider, $model] = self::resolveProviderAndModel($options);
+
         return new LlmExecutor(
-            provider: $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required'),
+            provider: $provider,
             prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
             parser: $options['parser'] ?? new StringParser,
-            model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
+            model: $model,
             temperature: $options['temperature'] ?? null,
             maxTokens: $options['maxTokens'] ?? null,
             responseFormat: $options['responseFormat'] ?? null,
@@ -223,6 +252,8 @@ final class Factory
      */
     public static function createLlmExecutorWithFunctions(array $options): LlmExecutorWithFunctions
     {
+        [$provider, $model] = self::resolveProviderAndModel($options);
+
         $tools = $options['tools'] ?? null;
         if (! $tools instanceof UseExecutors) {
             if (is_array($tools)) {
@@ -234,10 +265,10 @@ final class Factory
         }
 
         return new LlmExecutorWithFunctions(
-            provider: $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required'),
+            provider: $provider,
             prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
             parser: $options['parser'] ?? new StringParser,
-            model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
+            model: $model,
             tools: $tools,
             maxIterations: $options['maxIterations'] ?? 10,
             temperature: $options['temperature'] ?? null,
@@ -253,7 +284,7 @@ final class Factory
      */
     public static function createStreamingLlmExecutor(array $options): StreamingLlmExecutor
     {
-        $provider = $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required');
+        [$provider, $model] = self::resolveProviderAndModel($options);
 
         if (! $provider instanceof StreamableProviderInterface) {
             throw new \InvalidArgumentException('Provider must implement StreamableProviderInterface for streaming');
@@ -262,7 +293,7 @@ final class Factory
         return new StreamingLlmExecutor(
             provider: $provider,
             prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
-            model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
+            model: $model,
             temperature: $options['temperature'] ?? null,
             maxTokens: $options['maxTokens'] ?? null,
             name: $options['name'] ?? null,
@@ -276,7 +307,7 @@ final class Factory
      */
     public static function createStreamingLlmExecutorWithFunctions(array $options): StreamingLlmExecutorWithFunctions
     {
-        $provider = $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required');
+        [$provider, $model] = self::resolveProviderAndModel($options);
 
         if (! $provider instanceof StreamableProviderInterface) {
             throw new \InvalidArgumentException('Provider must implement StreamableProviderInterface for streaming');
@@ -295,7 +326,7 @@ final class Factory
         return new StreamingLlmExecutorWithFunctions(
             provider: $provider,
             prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
-            model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
+            model: $model,
             tools: $tools,
             maxIterations: $options['maxIterations'] ?? 10,
             temperature: $options['temperature'] ?? null,
@@ -318,6 +349,8 @@ final class Factory
                 $callables[] = $executor;
             } elseif (is_array($executor)) {
                 $callables[] = self::createCallableExecutor($executor);
+            } else {
+                throw new \InvalidArgumentException('Each executor must be a CallableExecutor or array');
             }
         }
 

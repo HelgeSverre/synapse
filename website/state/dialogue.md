@@ -22,7 +22,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $dialogue = createDialogue('chat');

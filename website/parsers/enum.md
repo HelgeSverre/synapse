@@ -35,7 +35,6 @@ $executor = createLlmExecutor([
     'parser' => createParser('enum', [
         'values' => ['low', 'medium', 'high'],
     ]),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute(['message' => 'The server is on fire!']);

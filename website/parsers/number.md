@@ -28,7 +28,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('number'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 $result = $executor->execute([]);

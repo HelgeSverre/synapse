@@ -8,11 +8,10 @@ Combines streaming with tool calling. Streams the LLM response in real-time and 
 use function HelgeSverre\Synapse\createStreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Streaming\{TextDelta, ToolCallsReady, StreamCompleted};
 
-// Via factory
+// Via factory (model comes from useLlm)
 $executor = createStreamingLlmExecutorWithFunctions([
-    'llm' => $streamableProvider,
+    'llm' => $llm,
     'prompt' => $prompt,
-    'model' => 'gpt-4o-mini',
     'tools' => $tools,
     'maxIterations' => 10,
 ]);

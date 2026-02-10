@@ -42,7 +42,6 @@ $executor = createLlmExecutor([
         ->addSystemMessage('You are helpful.')
         ->addUserMessage('{{question}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'gemini-1.5-flash',
 ]);
 
 $result = $executor->execute(['question' => 'Explain quantum computing']);

@@ -41,7 +41,6 @@ $executor = createLlmExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
-    'model' => 'gpt-4o-mini',
 ]);
 
 // Step 4: Generate with context

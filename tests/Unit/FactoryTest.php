@@ -12,6 +12,7 @@ use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\UseExecutors;
 use HelgeSverre\Synapse\Factory;
+use HelgeSverre\Synapse\Llm;
 use HelgeSverre\Synapse\Parser\BooleanParser;
 use HelgeSverre\Synapse\Parser\CustomParser;
 use HelgeSverre\Synapse\Parser\EnumParser;
@@ -34,6 +35,12 @@ use HelgeSverre\Synapse\Provider\LlmProviderInterface;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
 use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
+use HelgeSverre\Synapse\Embeddings\Cohere\CohereEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\Jina\JinaEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\Mistral\MistralEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\OpenAI\OpenAIEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\Voyage\VoyageEmbeddingProvider;
+use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
 use PHPUnit\Framework\TestCase;
@@ -68,64 +75,77 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(TransportInterface::class, $transport);
     }
 
-    public function test_use_llm_creates_openai_provider(): void
+    public function test_use_llm_returns_llm_wrapper(): void
     {
-        $provider = Factory::useLlm('openai.gpt-4', [
+        $llm = Factory::useLlm('openai.gpt-4', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(OpenAIProvider::class, $provider);
+        $this->assertInstanceOf(Llm::class, $llm);
+        $this->assertInstanceOf(OpenAIProvider::class, $llm->provider);
+        $this->assertSame('gpt-4', $llm->model);
+    }
+
+    public function test_use_llm_creates_openai_provider(): void
+    {
+        $llm = Factory::useLlm('openai.gpt-4', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(OpenAIProvider::class, $llm->provider);
     }
 
     public function test_use_llm_creates_anthropic_provider(): void
     {
-        $provider = Factory::useLlm('anthropic.claude-3', [
+        $llm = Factory::useLlm('anthropic.claude-3', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(AnthropicProvider::class, $provider);
+        $this->assertInstanceOf(AnthropicProvider::class, $llm->provider);
     }
 
     public function test_use_llm_creates_google_provider(): void
     {
-        $provider = Factory::useLlm('google.gemini-pro', [
+        $llm = Factory::useLlm('google.gemini-pro', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(GoogleProvider::class, $provider);
+        $this->assertInstanceOf(GoogleProvider::class, $llm->provider);
+        $this->assertSame('gemini-pro', $llm->model);
     }
 
     public function test_use_llm_creates_google_provider_with_gemini_alias(): void
     {
-        $provider = Factory::useLlm('gemini.gemini-pro', [
+        $llm = Factory::useLlm('gemini.gemini-pro', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(GoogleProvider::class, $provider);
+        $this->assertInstanceOf(GoogleProvider::class, $llm->provider);
     }
 
     public function test_use_llm_creates_xai_provider(): void
     {
-        $provider = Factory::useLlm('xai.grok-1', [
+        $llm = Factory::useLlm('xai.grok-1', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(XAIProvider::class, $provider);
+        $this->assertInstanceOf(XAIProvider::class, $llm->provider);
     }
 
     public function test_use_llm_creates_xai_provider_with_grok_alias(): void
     {
-        $provider = Factory::useLlm('grok.grok-1', [
+        $llm = Factory::useLlm('grok.grok-1', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(XAIProvider::class, $provider);
+        $this->assertInstanceOf(XAIProvider::class, $llm->provider);
     }
 
     public function test_use_llm_throws_for_missing_api_key(): void
@@ -151,13 +171,73 @@ final class FactoryTest extends TestCase
 
     public function test_use_llm_accepts_custom_base_url(): void
     {
-        $provider = Factory::useLlm('openai.gpt-4', [
+        $llm = Factory::useLlm('openai.gpt-4', [
             'apiKey' => 'test-key',
             'baseUrl' => 'https://custom.api.com/v1',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(OpenAIProvider::class, $provider);
+        $this->assertInstanceOf(OpenAIProvider::class, $llm->provider);
+    }
+
+    public function test_use_llm_without_model_has_null_model(): void
+    {
+        $llm = Factory::useLlm('openai', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(OpenAIProvider::class, $llm->provider);
+        $this->assertNull($llm->model);
+    }
+
+    public function test_use_llm_model_used_by_executor(): void
+    {
+        $llm = Factory::useLlm('openai.gpt-4o', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        // Model from useLlm should be used automatically — no need to specify 'model'
+        $executor = Factory::createLlmExecutor([
+            'llm' => $llm,
+            'prompt' => Factory::createChatPrompt(),
+        ]);
+
+        $this->assertInstanceOf(LlmExecutor::class, $executor);
+    }
+
+    public function test_use_llm_model_can_be_overridden_by_executor(): void
+    {
+        $llm = Factory::useLlm('openai.gpt-4o', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        // Explicit model overrides the one from useLlm
+        $executor = Factory::createLlmExecutor([
+            'llm' => $llm,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4-turbo',
+        ]);
+
+        $this->assertInstanceOf(LlmExecutor::class, $executor);
+    }
+
+    public function test_use_llm_without_model_requires_model_in_executor(): void
+    {
+        $llm = Factory::useLlm('openai', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('model is required');
+
+        Factory::createLlmExecutor([
+            'llm' => $llm,
+            'prompt' => Factory::createChatPrompt(),
+        ]);
     }
 
     public function test_create_text_prompt(): void
@@ -541,7 +621,7 @@ final class FactoryTest extends TestCase
 
     public function test_create_llm_executor_throws_without_model(): void
     {
-        $provider = Factory::useLlm('openai.gpt-4', [
+        $llm = Factory::useLlm('openai', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
@@ -550,7 +630,7 @@ final class FactoryTest extends TestCase
         $this->expectExceptionMessage('model is required');
 
         Factory::createLlmExecutor([
-            'llm' => $provider,
+            'llm' => $llm,
             'prompt' => Factory::createChatPrompt(),
         ]);
     }
@@ -970,5 +1050,156 @@ final class FactoryTest extends TestCase
         $transport = Factory::createTransport($client, $requestFactory, $streamFactory);
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
+    }
+
+    public function test_use_embeddings_creates_openai_provider(): void
+    {
+        $provider = Factory::useEmbeddings('openai', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(OpenAIEmbeddingProvider::class, $provider);
+    }
+
+    public function test_use_embeddings_creates_mistral_provider(): void
+    {
+        $provider = Factory::useEmbeddings('mistral', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(MistralEmbeddingProvider::class, $provider);
+    }
+
+    public function test_use_embeddings_creates_voyage_provider(): void
+    {
+        $provider = Factory::useEmbeddings('voyage', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(VoyageEmbeddingProvider::class, $provider);
+    }
+
+    public function test_use_embeddings_creates_cohere_provider(): void
+    {
+        $provider = Factory::useEmbeddings('cohere', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(CohereEmbeddingProvider::class, $provider);
+    }
+
+    public function test_use_embeddings_creates_jina_provider(): void
+    {
+        $provider = Factory::useEmbeddings('jina', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(JinaEmbeddingProvider::class, $provider);
+    }
+
+    public function test_use_embeddings_throws_for_missing_api_key(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('apiKey is required');
+
+        Factory::useEmbeddings('openai', [
+            'transport' => $this->mockTransport,
+        ]);
+    }
+
+    public function test_use_embeddings_throws_for_unknown_provider(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown embedding provider: unknown');
+
+        Factory::useEmbeddings('unknown', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+    }
+
+    public function test_use_embeddings_accepts_custom_base_url(): void
+    {
+        $provider = Factory::useEmbeddings('openai', [
+            'apiKey' => 'test-key',
+            'baseUrl' => 'https://custom.api.com/v1',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(OpenAIEmbeddingProvider::class, $provider);
+    }
+
+    public function test_use_llm_creates_mistral_provider(): void
+    {
+        $llm = Factory::useLlm('mistral.mistral-large', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(MistralProvider::class, $llm->provider);
+        $this->assertSame('mistral-large', $llm->model);
+    }
+
+    public function test_use_executors_throws_for_invalid_entry(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each executor must be a CallableExecutor or array');
+
+        Factory::useExecutors(['invalid_string']);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions_throws_without_prompt(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('prompt is required');
+
+        Factory::createStreamingLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'model' => 'gpt-4o-mini',
+            'tools' => [],
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions_throws_without_model(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('model is required');
+
+        Factory::createStreamingLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'tools' => [],
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions_with_provider_key(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $tools = Factory::useExecutors([
+            [
+                'name' => 'calculator',
+                'description' => 'Performs calculations',
+                'handler' => fn ($input): float|int|array => $input['a'] + $input['b'],
+            ],
+        ]);
+
+        $executor = Factory::createStreamingLlmExecutorWithFunctions([
+            'provider' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+            'tools' => $tools,
+        ]);
+
+        $this->assertInstanceOf(StreamingLlmExecutorWithFunctions::class, $executor);
     }
 }
