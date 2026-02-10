@@ -8,6 +8,8 @@ use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\UseExecutors;
 use HelgeSverre\Synapse\Factory;
 use HelgeSverre\Synapse\Parser\BooleanParser;
@@ -28,7 +30,9 @@ use HelgeSverre\Synapse\Prompt\TextPrompt;
 use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
 use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
 use HelgeSverre\Synapse\Provider\Http\TransportInterface;
+use HelgeSverre\Synapse\Provider\LlmProviderInterface;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
@@ -625,6 +629,183 @@ final class FactoryTest extends TestCase
         Factory::createLlmExecutorWithFunctions([
             'prompt' => Factory::createChatPrompt(),
             'model' => 'gpt-4',
+            'tools' => [],
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $executor = Factory::createStreamingLlmExecutor([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+        ]);
+
+        $this->assertInstanceOf(StreamingLlmExecutor::class, $executor);
+    }
+
+    public function test_create_streaming_llm_executor_with_provider_key(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $executor = Factory::createStreamingLlmExecutor([
+            'provider' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+        ]);
+
+        $this->assertInstanceOf(StreamingLlmExecutor::class, $executor);
+    }
+
+    public function test_create_streaming_llm_executor_with_all_options(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $executor = Factory::createStreamingLlmExecutor([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+            'temperature' => 0.7,
+            'maxTokens' => 1000,
+            'name' => 'test-streaming',
+        ]);
+
+        $this->assertInstanceOf(StreamingLlmExecutor::class, $executor);
+    }
+
+    public function test_create_streaming_llm_executor_throws_without_provider(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('llm/provider is required');
+
+        Factory::createStreamingLlmExecutor([
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_throws_without_prompt(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('prompt is required');
+
+        Factory::createStreamingLlmExecutor([
+            'llm' => $provider,
+            'model' => 'gpt-4o-mini',
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_throws_without_model(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('model is required');
+
+        Factory::createStreamingLlmExecutor([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_throws_for_non_streamable_provider(): void
+    {
+        $provider = $this->createMock(LlmProviderInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Provider must implement StreamableProviderInterface for streaming');
+
+        Factory::createStreamingLlmExecutor([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $tools = Factory::useExecutors([
+            [
+                'name' => 'calculator',
+                'description' => 'Performs calculations',
+                'handler' => fn ($input): float|int|array => $input['a'] + $input['b'],
+            ],
+        ]);
+
+        $executor = Factory::createStreamingLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+            'tools' => $tools,
+        ]);
+
+        $this->assertInstanceOf(StreamingLlmExecutorWithFunctions::class, $executor);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions_from_array(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $executor = Factory::createStreamingLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+            'tools' => [
+                [
+                    'name' => 'calculator',
+                    'description' => 'Performs calculations',
+                    'handler' => fn ($input): float|int|array => $input['a'] + $input['b'],
+                ],
+            ],
+        ]);
+
+        $this->assertInstanceOf(StreamingLlmExecutorWithFunctions::class, $executor);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions_throws_for_invalid_tools(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('tools must be UseExecutors or array of CallableExecutor');
+
+        Factory::createStreamingLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+            'tools' => 'invalid',
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions_throws_without_provider(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('llm/provider is required');
+
+        Factory::createStreamingLlmExecutorWithFunctions([
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+            'tools' => [],
+        ]);
+    }
+
+    public function test_create_streaming_llm_executor_with_functions_throws_for_non_streamable_provider(): void
+    {
+        $provider = $this->createMock(LlmProviderInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Provider must implement StreamableProviderInterface for streaming');
+
+        Factory::createStreamingLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
             'tools' => [],
         ]);
     }

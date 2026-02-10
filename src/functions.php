@@ -9,6 +9,8 @@ use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\UseExecutors;
 use HelgeSverre\Synapse\Parser\ParserInterface;
 use HelgeSverre\Synapse\Prompt\ChatPrompt;
@@ -96,6 +98,26 @@ function createLlmExecutor(array $options): LlmExecutor
 function createLlmExecutorWithFunctions(array $options): LlmExecutorWithFunctions
 {
     return Factory::createLlmExecutorWithFunctions($options);
+}
+
+/**
+ * Create a streaming LLM executor.
+ *
+ * @param  array<string, mixed>  $options
+ */
+function createStreamingLlmExecutor(array $options): StreamingLlmExecutor
+{
+    return Factory::createStreamingLlmExecutor($options);
+}
+
+/**
+ * Create a streaming LLM executor with function calling support.
+ *
+ * @param  array<string, mixed>  $options
+ */
+function createStreamingLlmExecutorWithFunctions(array $options): StreamingLlmExecutorWithFunctions
+{
+    return Factory::createStreamingLlmExecutorWithFunctions($options);
 }
 
 /**

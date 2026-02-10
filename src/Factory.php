@@ -14,6 +14,8 @@ use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\UseExecutors;
 use HelgeSverre\Synapse\Parser\BooleanParser;
 use HelgeSverre\Synapse\Parser\CustomParser;
@@ -36,6 +38,7 @@ use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
 use HelgeSverre\Synapse\Provider\Http\Psr18Transport;
 use HelgeSverre\Synapse\Provider\Http\TransportInterface;
 use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
@@ -234,6 +237,64 @@ final class Factory
             provider: $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required'),
             prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
             parser: $options['parser'] ?? new StringParser,
+            model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
+            tools: $tools,
+            maxIterations: $options['maxIterations'] ?? 10,
+            temperature: $options['temperature'] ?? null,
+            maxTokens: $options['maxTokens'] ?? null,
+            name: $options['name'] ?? null,
+            hooks: $options['hooks'] ?? null,
+            state: $options['state'] ?? null,
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    public static function createStreamingLlmExecutor(array $options): StreamingLlmExecutor
+    {
+        $provider = $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required');
+
+        if (! $provider instanceof StreamableProviderInterface) {
+            throw new \InvalidArgumentException('Provider must implement StreamableProviderInterface for streaming');
+        }
+
+        return new StreamingLlmExecutor(
+            provider: $provider,
+            prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
+            model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
+            temperature: $options['temperature'] ?? null,
+            maxTokens: $options['maxTokens'] ?? null,
+            name: $options['name'] ?? null,
+            hooks: $options['hooks'] ?? null,
+            state: $options['state'] ?? null,
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    public static function createStreamingLlmExecutorWithFunctions(array $options): StreamingLlmExecutorWithFunctions
+    {
+        $provider = $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required');
+
+        if (! $provider instanceof StreamableProviderInterface) {
+            throw new \InvalidArgumentException('Provider must implement StreamableProviderInterface for streaming');
+        }
+
+        $tools = $options['tools'] ?? null;
+        if (! $tools instanceof UseExecutors) {
+            if (is_array($tools)) {
+                /** @var list<CallableExecutor|array<string, mixed>> $tools */
+                $tools = self::useExecutors($tools);
+            } else {
+                throw new \InvalidArgumentException('tools must be UseExecutors or array of CallableExecutor');
+            }
+        }
+
+        return new StreamingLlmExecutorWithFunctions(
+            provider: $provider,
+            prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
             model: $options['model'] ?? throw new \InvalidArgumentException('model is required'),
             tools: $tools,
             maxIterations: $options['maxIterations'] ?? 10,
