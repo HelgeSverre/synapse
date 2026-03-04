@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Synapse\Tests\Unit;
 
+use HelgeSverre\Synapse\Embeddings\Cohere\CohereEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\Jina\JinaEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\Mistral\MistralEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\OpenAI\OpenAIEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\Voyage\VoyageEmbeddingProvider;
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
@@ -34,16 +39,11 @@ use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
 use HelgeSverre\Synapse\Provider\Groq\GroqProvider;
 use HelgeSverre\Synapse\Provider\Http\TransportInterface;
 use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
 use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
 use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
-use HelgeSverre\Synapse\Embeddings\Cohere\CohereEmbeddingProvider;
-use HelgeSverre\Synapse\Embeddings\Jina\JinaEmbeddingProvider;
-use HelgeSverre\Synapse\Embeddings\Mistral\MistralEmbeddingProvider;
-use HelgeSverre\Synapse\Embeddings\OpenAI\OpenAIEmbeddingProvider;
-use HelgeSverre\Synapse\Embeddings\Voyage\VoyageEmbeddingProvider;
-use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
 use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
@@ -154,22 +154,22 @@ final class FactoryTest extends TestCase
 
     public function test_use_llm_creates_groq_provider(): void
     {
-        $provider = Factory::useLlm('groq.llama-3.3-70b', [
+        $llm = Factory::useLlm('groq.llama-3.3-70b', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(GroqProvider::class, $provider);
+        $this->assertInstanceOf(GroqProvider::class, $llm->provider);
     }
 
     public function test_use_llm_creates_moonshot_provider(): void
     {
-        $provider = Factory::useLlm('moonshot.moonshot-v1-8k', [
+        $llm = Factory::useLlm('moonshot.moonshot-v1-8k', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $this->assertInstanceOf(MoonshotProvider::class, $provider);
+        $this->assertInstanceOf(MoonshotProvider::class, $llm->provider);
     }
 
     public function test_use_llm_throws_for_missing_api_key(): void
@@ -1271,14 +1271,6 @@ final class FactoryTest extends TestCase
         $this->assertSame('mistral-large', $llm->model);
     }
 
-    public function test_use_executors_throws_for_invalid_entry(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Each executor must be a CallableExecutor or array');
-
-        Factory::useExecutors(['invalid_string']);
-    }
-
     public function test_create_streaming_llm_executor_with_functions_throws_without_prompt(): void
     {
         $provider = $this->createMock(StreamableProviderInterface::class);
@@ -1311,7 +1303,7 @@ final class FactoryTest extends TestCase
     {
         $provider = $this->createMock(StreamableProviderInterface::class);
 
-        $tools = Factory::useExecutors([
+        $tools = Factory::createToolRegistry([
             [
                 'name' => 'calculator',
                 'description' => 'Performs calculations',

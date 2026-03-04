@@ -14,7 +14,7 @@ final class ConversationStateTest extends TestCase
 {
     public function test_it_can_be_created_with_defaults(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
 
         $this->assertSame([], $state->messages);
         $this->assertSame([], $state->context);
@@ -39,7 +39,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_message_appends_a_message(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
         $message = Message::user('Hello');
 
         $newState = $state->withMessage($message);
@@ -53,7 +53,7 @@ final class ConversationStateTest extends TestCase
         $first = Message::system('System prompt');
         $second = Message::user('Hello');
 
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage($first)
             ->withMessage($second);
 
@@ -64,7 +64,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_message_returns_new_instance(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
         $newState = $state->withMessage(Message::user('Hello'));
 
         $this->assertNotSame($state, $newState);
@@ -74,7 +74,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_message_preserves_context_and_attributes(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withContext(new ContextItem('ctx', 'val'))
             ->withAttribute('attr', 123);
 
@@ -88,7 +88,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_messages_appends_multiple_messages(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
         $messages = [
             Message::system('Be helpful'),
             Message::user('Hi'),
@@ -103,7 +103,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_messages_merges_with_existing_messages(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::system('System'));
 
         $newState = $state->withMessages([
@@ -119,7 +119,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_messages_returns_new_instance(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
         $newState = $state->withMessages([Message::user('Hi')]);
 
         $this->assertNotSame($state, $newState);
@@ -128,7 +128,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_messages_preserves_context_and_attributes(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withContext(new ContextItem('ctx', 'val'))
             ->withAttribute('attr', 'x');
 
@@ -143,7 +143,7 @@ final class ConversationStateTest extends TestCase
     public function test_with_context_adds_a_context_item_keyed_by_its_key(): void
     {
         $item = new ContextItem('user_id', 42, ['source' => 'auth']);
-        $state = (new ConversationState())->withContext($item);
+        $state = (new ConversationState)->withContext($item);
 
         $this->assertSame($item, $state->getContext('user_id'));
     }
@@ -153,7 +153,7 @@ final class ConversationStateTest extends TestCase
         $first = new ContextItem('key', 'old');
         $second = new ContextItem('key', 'new');
 
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withContext($first)
             ->withContext($second);
 
@@ -162,7 +162,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_context_returns_new_instance(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
         $newState = $state->withContext(new ContextItem('k', 'v'));
 
         $this->assertNotSame($state, $newState);
@@ -171,7 +171,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_context_preserves_messages_and_attributes(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::user('Hi'))
             ->withAttribute('attr', true);
 
@@ -185,14 +185,14 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_attribute_adds_an_attribute(): void
     {
-        $state = (new ConversationState())->withAttribute('temperature', 0.7);
+        $state = (new ConversationState)->withAttribute('temperature', 0.7);
 
         $this->assertSame(0.7, $state->getAttribute('temperature'));
     }
 
     public function test_with_attribute_overwrites_existing_key(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withAttribute('key', 'old')
             ->withAttribute('key', 'new');
 
@@ -201,7 +201,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_attribute_returns_new_instance(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
         $newState = $state->withAttribute('k', 'v');
 
         $this->assertNotSame($state, $newState);
@@ -210,7 +210,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_with_attribute_preserves_messages_and_context(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::user('Hi'))
             ->withContext(new ContextItem('c', 'val'));
 
@@ -225,7 +225,7 @@ final class ConversationStateTest extends TestCase
     public function test_get_context_returns_item_when_found(): void
     {
         $item = new ContextItem('key', 'value', ['meta' => true]);
-        $state = (new ConversationState())->withContext($item);
+        $state = (new ConversationState)->withContext($item);
 
         $result = $state->getContext('key');
 
@@ -237,7 +237,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_context_returns_null_when_not_found(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
 
         $this->assertNull($state->getContext('nonexistent'));
     }
@@ -246,7 +246,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_context_value_returns_value_when_found(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withContext(new ContextItem('key', ['nested' => 'data']));
 
         $this->assertSame(['nested' => 'data'], $state->getContextValue('key'));
@@ -254,14 +254,14 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_context_value_returns_default_when_not_found(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
 
         $this->assertSame('fallback', $state->getContextValue('missing', 'fallback'));
     }
 
     public function test_get_context_value_returns_null_by_default_when_not_found(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
 
         $this->assertNull($state->getContextValue('missing'));
     }
@@ -270,21 +270,21 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_attribute_returns_value_when_found(): void
     {
-        $state = (new ConversationState())->withAttribute('model', 'gpt-4');
+        $state = (new ConversationState)->withAttribute('model', 'gpt-4');
 
         $this->assertSame('gpt-4', $state->getAttribute('model'));
     }
 
     public function test_get_attribute_returns_default_when_not_found(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
 
         $this->assertSame(0.5, $state->getAttribute('temperature', 0.5));
     }
 
     public function test_get_attribute_returns_null_by_default_when_not_found(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
 
         $this->assertNull($state->getAttribute('missing'));
     }
@@ -293,7 +293,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_messages_by_role_returns_matching_messages(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::system('System prompt'))
             ->withMessage(Message::user('Hello'))
             ->withMessage(Message::assistant('Hi there'))
@@ -308,7 +308,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_messages_by_role_returns_empty_array_when_none_match(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::user('Hello'));
 
         $this->assertSame([], $state->getMessagesByRole(Role::Tool));
@@ -316,7 +316,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_messages_by_role_returns_re_indexed_array(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::system('System'))
             ->withMessage(Message::user('User'))
             ->withMessage(Message::assistant('Assistant'));
@@ -332,7 +332,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_last_message_returns_last_message(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::user('First'))
             ->withMessage(Message::assistant('Second'))
             ->withMessage(Message::user('Third'));
@@ -346,7 +346,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_get_last_message_returns_null_when_empty(): void
     {
-        $state = new ConversationState();
+        $state = new ConversationState;
 
         $this->assertNull($state->getLastMessage());
     }
@@ -355,7 +355,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_clear_removes_all_messages(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::user('Hello'))
             ->withMessage(Message::assistant('Hi'));
 
@@ -366,7 +366,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_clear_preserves_context(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withContext(new ContextItem('key', 'value'))
             ->withMessage(Message::user('Hello'));
 
@@ -377,7 +377,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_clear_preserves_attributes(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withAttribute('model', 'gpt-4')
             ->withMessage(Message::user('Hello'));
 
@@ -388,7 +388,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_clear_returns_new_instance(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::user('Hello'));
 
         $cleared = $state->clear();
@@ -402,7 +402,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_original_state_is_never_mutated(): void
     {
-        $original = new ConversationState();
+        $original = new ConversationState;
 
         $afterMessage = $original->withMessage(Message::user('Hello'));
         $afterMessages = $original->withMessages([Message::user('A'), Message::user('B')]);
@@ -425,7 +425,7 @@ final class ConversationStateTest extends TestCase
 
     public function test_chained_mutations_produce_correct_cumulative_state(): void
     {
-        $state = (new ConversationState())
+        $state = (new ConversationState)
             ->withMessage(Message::system('System'))
             ->withContext(new ContextItem('user_id', 42))
             ->withAttribute('model', 'gpt-4')
