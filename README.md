@@ -191,9 +191,9 @@ $parser = createParser('custom', [
 ### Tool/Function Calling
 
 ```php
-use function HelgeSverre\Synapse\{createLlmExecutorWithFunctions, useExecutors};
+use function HelgeSverre\Synapse\{createLlmExecutorWithFunctions, createToolRegistry};
 
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'get_weather',
         'description' => 'Get weather for a location',
@@ -217,6 +217,8 @@ $executor = createLlmExecutorWithFunctions([
     'maxIterations' => 10,
 ]);
 ```
+
+Use `createToolRegistry()` to register tools for function calling.
 
 ### Streaming
 
@@ -316,6 +318,8 @@ $vector = $response->getEmbedding();
 - `google.*` / `gemini.*`
 - `mistral.*`
 - `xai.*` / `grok.*`
+- `groq.*`
+- `moonshot.*`
 
 Additional providers exist as classes (e.g. Groq, Moonshot) and can be instantiated directly if needed.
 
@@ -356,6 +360,22 @@ $llm = useLlm('mistral.mistral-small-latest', [
 
 ```php
 $llm = useLlm('xai.grok-beta', [
+    'apiKey' => '...',
+]);
+```
+
+### Groq
+
+```php
+$llm = useLlm('groq.llama-3.3-70b-versatile', [
+    'apiKey' => '...',
+]);
+```
+
+### Moonshot
+
+```php
+$llm = useLlm('moonshot.moonshot-v1-8k', [
     'apiKey' => '...',
 ]);
 ```

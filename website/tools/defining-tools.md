@@ -1,11 +1,11 @@
 # Defining Tools
 
-Tools are defined as arrays and wrapped by `useExecutors()`.
+Tools are defined as arrays and wrapped by `createToolRegistry()`.
 
 ## Tool Config
 
 ```php
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'tool_name',         // Required: unique identifier
         'description' => 'What it does', // Required: helps LLM decide when to use it
@@ -94,7 +94,7 @@ Validate arguments before the handler runs:
 ## Multiple Tools Example
 
 ```php
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'search_web',
         'description' => 'Search the web for information',

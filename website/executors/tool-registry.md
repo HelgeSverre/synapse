@@ -1,13 +1,13 @@
-# UseExecutors
+# ToolRegistry
 
 A registry that manages multiple [CallableExecutors](/executors/callable-executor) (tools). Used as the `tools` parameter in [LlmExecutorWithFunctions](/executors/llm-executor-with-functions).
 
 ## Usage
 
 ```php
-use function HelgeSverre\Synapse\useExecutors;
+use function HelgeSverre\Synapse\createToolRegistry;
 
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'get_weather',
         'description' => 'Get weather for a location',

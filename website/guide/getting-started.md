@@ -93,7 +93,7 @@ use function HelgeSverre\Synapse\{
     createStreamingLlmExecutorWithFunctions,
     createCoreExecutor,
     createCallableExecutor,
-    useExecutors,
+    createToolRegistry,
     useEmbeddings,
     createState,
     createDialogue,

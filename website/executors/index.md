@@ -24,7 +24,7 @@ $result->metadata;      // Additional metadata
 | [StreamingLlmExecutorWithFunctions](/executors/streaming-executor-with-functions) | Streaming with tool calling |
 | [CoreExecutor](/executors/core-executor) | Wrap a plain PHP function |
 | [CallableExecutor](/executors/callable-executor) | Define a tool for LLM function calling |
-| [UseExecutors](/executors/use-executors) | Tool registry for multiple tools |
+| [ToolRegistry](/executors/tool-registry) | Tool registry for multiple tools |
 
 ## Shared Features
 

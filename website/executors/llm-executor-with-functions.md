@@ -7,12 +7,12 @@ An executor that supports tool/function calling. When the LLM responds with tool
 ```php
 use function HelgeSverre\Synapse\{
     useLlm, createChatPrompt, createParser,
-    createLlmExecutorWithFunctions, useExecutors,
+    createLlmExecutorWithFunctions, createToolRegistry,
 };
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'get_weather',
         'description' => 'Get weather for a location',
@@ -72,13 +72,13 @@ Same as [LlmExecutor](/executors/llm-executor), plus:
 
 | Option | Type | Required | Default | Description |
 |--------|------|----------|---------|-------------|
-| `tools` | `UseExecutors` or `array` | Yes | — | Tool registry or array of tool configs |
+| `tools` | `ToolRegistry` or `array` | Yes | — | Tool registry or array of tool configs |
 | `maxIterations` | `int` | No | `10` | Max tool calling rounds before throwing |
 
 ## Multiple Tools
 
 ```php
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'search',
         'description' => 'Search the web',

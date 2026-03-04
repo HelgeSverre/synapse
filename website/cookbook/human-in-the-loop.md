@@ -13,7 +13,7 @@ Define tools that require user confirmation before performing side effects. The 
 
 use function HelgeSverre\Synapse\{
     useLlm, createChatPrompt, createParser,
-    createLlmExecutorWithFunctions, useExecutors,
+    createLlmExecutorWithFunctions, createToolRegistry,
 };
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
@@ -29,7 +29,7 @@ function requireApproval(string $action, array $details): bool
     return strtolower(trim($response)) === 'yes';
 }
 
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'send_email',
         'description' => 'Send an email to a recipient',

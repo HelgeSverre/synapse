@@ -37,7 +37,7 @@ Executors orchestrate the pipeline. Each executor type serves a different use ca
 | [StreamingLlmExecutorWithFunctions](/executors/streaming-executor-with-functions) | Streaming with tool calling |
 | [CoreExecutor](/executors/core-executor) | Wrap a plain PHP function as an executor |
 | [CallableExecutor](/executors/callable-executor) | Define a tool/function for LLM tool calling |
-| [UseExecutors](/executors/use-executors) | Registry of multiple tools |
+| [ToolRegistry](/executors/tool-registry) | Registry of multiple tools |
 
 ### Prompts
 

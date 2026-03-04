@@ -34,7 +34,7 @@ If the LLM keeps calling tools beyond `maxIterations`, a `RuntimeException` is t
 The LLM might call multiple tools in sequence to gather information:
 
 ```php
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'search',
         'description' => 'Search for information',

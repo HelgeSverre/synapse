@@ -15,10 +15,10 @@ Tool calling (also called function calling) lets the LLM request execution of PH
 ```php
 use function HelgeSverre\Synapse\{
     useLlm, createChatPrompt, createParser,
-    createLlmExecutorWithFunctions, useExecutors,
+    createLlmExecutorWithFunctions, createToolRegistry,
 };
 
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'get_weather',
         'description' => 'Get the current weather for a city',

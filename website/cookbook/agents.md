@@ -13,12 +13,12 @@ An agent is an `LlmExecutorWithFunctions` with a set of tools. The LLM decides w
 
 use function HelgeSverre\Synapse\{
     useLlm, createChatPrompt, createParser, createDialogue,
-    createLlmExecutorWithFunctions, useExecutors,
+    createLlmExecutorWithFunctions, createToolRegistry,
 };
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'search',
         'description' => 'Search for information on a topic',
