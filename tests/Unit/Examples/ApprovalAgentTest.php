@@ -7,14 +7,14 @@ namespace HelgeSverre\Synapse\Tests\Unit\Examples;
 require_once __DIR__.'/../../../examples/approval-agent/ApprovalRequest.php';
 require_once __DIR__.'/../../../examples/approval-agent/ApprovalDecision.php';
 require_once __DIR__.'/../../../examples/approval-agent/ApprovalProviderInterface.php';
-require_once __DIR__.'/../../../examples/approval-agent/ApprovingUseExecutors.php';
+require_once __DIR__.'/../../../examples/approval-agent/ApprovingToolRegistry.php';
 require_once __DIR__.'/../../../examples/approval-agent/RiskyTools.php';
 
 use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalAction;
 use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalDecision;
 use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalProviderInterface;
 use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovalRequest;
-use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingUseExecutors;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingToolRegistry;
 use HelgeSverre\Synapse\Examples\ApprovalAgent\RiskyTools;
 use PHPUnit\Framework\TestCase;
 
@@ -62,7 +62,7 @@ final class ApprovalAgentTest extends TestCase
             }
         };
 
-        $tools = new ApprovingUseExecutors(
+        $tools = new ApprovingToolRegistry(
             [RiskyTools::readFile()],
             $mockProvider,
             minimumRiskForApproval: 'medium',
@@ -88,7 +88,7 @@ final class ApprovalAgentTest extends TestCase
             }
         };
 
-        $tools = new ApprovingUseExecutors(
+        $tools = new ApprovingToolRegistry(
             [RiskyTools::deleteFiles()],
             $mockProvider,
             minimumRiskForApproval: 'medium',
@@ -109,7 +109,7 @@ final class ApprovalAgentTest extends TestCase
             }
         };
 
-        $tools = new ApprovingUseExecutors(
+        $tools = new ApprovingToolRegistry(
             [RiskyTools::deleteFiles()],
             $mockProvider,
         );
@@ -117,8 +117,9 @@ final class ApprovalAgentTest extends TestCase
         $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
         $decoded = json_decode($result, true);
 
-        $this->assertSame('Action rejected by user', $decoded['error']);
-        $this->assertSame('Not allowed', $decoded['reason']);
+        $this->assertArrayHasKey('error', $decoded);
+        $this->assertStringContainsString('Action rejected by user', $decoded['error']);
+        $this->assertStringContainsString('Not allowed', $decoded['error']);
     }
 
     public function test_edited_tool_uses_new_arguments(): void
@@ -131,7 +132,7 @@ final class ApprovalAgentTest extends TestCase
             }
         };
 
-        $tools = new ApprovingUseExecutors(
+        $tools = new ApprovingToolRegistry(
             [RiskyTools::deleteFiles()],
             $mockProvider,
         );

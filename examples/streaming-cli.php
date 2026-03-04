@@ -24,7 +24,7 @@ use GuzzleHttp\Client;
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
 use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
 use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
@@ -138,7 +138,7 @@ echo ']'.RESET."\n";
 if ($providerName !== 'moonshot') { // Moonshot tool support varies by model
     printHeader('Demo 3: Streaming with Tool Calls');
 
-    $tools = new UseExecutors([
+    $tools = new ToolRegistry([
         new CallableExecutor(
             name: 'get_weather',
             description: 'Get current weather for a city',

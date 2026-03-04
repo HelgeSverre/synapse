@@ -41,7 +41,7 @@ PROMPT);
         'model' => 'gpt-4o-mini',
     ]);
 
-    return $executor->execute()->getValue();
+    return $executor->execute([])->getValue();
 }
 
 /**
@@ -76,9 +76,9 @@ PROMPT);
         'model' => 'gpt-4o-mini',
     ]);
 
-    $result = $executor->execute()->getValue();
+    $result = $executor->execute([])->getValue();
 
-    return $result['code'] ?? null;
+    return $result !== '' ? $result : null;
 }
 
 /**

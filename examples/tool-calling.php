@@ -7,7 +7,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 use function HelgeSverre\Synapse\createChatPrompt;
 use function HelgeSverre\Synapse\createLlmExecutorWithFunctions;
 use function HelgeSverre\Synapse\createParser;
-use function HelgeSverre\Synapse\useExecutors;
+use function HelgeSverre\Synapse\createToolRegistry;
 use function HelgeSverre\Synapse\useLlm;
 
 // Assume transport is configured...
@@ -17,7 +17,7 @@ $llm = useLlm('openai.gpt-4o-mini', [
 ]);
 
 // Define tools
-$tools = useExecutors([
+$tools = createToolRegistry([
     [
         'name' => 'get_weather',
         'description' => 'Get the current weather for a location',
@@ -64,10 +64,30 @@ $tools = useExecutors([
             'required' => ['expression'],
         ],
         'handler' => function (array $args) {
-            // Simple and safe expression evaluator
             $expression = $args['expression'];
-            // In production, use a proper math parser
-            $result = eval("return {$expression};");
+            // Intentionally constrained example: "<number> <op> <number>"
+            if (! preg_match('/^\s*(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*$/', $expression, $matches)) {
+                return ['error' => 'Unsupported expression format. Use: <number> <op> <number>'];
+            }
+
+            $left = (float) $matches[1];
+            $operator = $matches[2];
+            $right = (float) $matches[3];
+
+            if ($operator === '/' && $right === 0.0) {
+                return ['error' => 'Division by zero'];
+            }
+
+            $result = match ($operator) {
+                '+' => $left + $right,
+                '-' => $left - $right,
+                '*' => $left * $right,
+                '/' => $left / $right,
+            };
+
+            if (floor($result) === $result) {
+                $result = (int) $result;
+            }
 
             return ['result' => $result];
         },

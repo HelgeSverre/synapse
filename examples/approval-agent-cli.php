@@ -20,11 +20,11 @@ require_once __DIR__.'/approval-agent/ApprovalRequest.php';
 require_once __DIR__.'/approval-agent/ApprovalDecision.php';
 require_once __DIR__.'/approval-agent/ApprovalProviderInterface.php';
 require_once __DIR__.'/approval-agent/CliApprovalProvider.php';
-require_once __DIR__.'/approval-agent/ApprovingUseExecutors.php';
+require_once __DIR__.'/approval-agent/ApprovingToolRegistry.php';
 require_once __DIR__.'/approval-agent/RiskyTools.php';
 
 use GuzzleHttp\Client;
-use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingUseExecutors;
+use HelgeSverre\Synapse\Examples\ApprovalAgent\ApprovingToolRegistry;
 use HelgeSverre\Synapse\Examples\ApprovalAgent\CliApprovalProvider;
 use HelgeSverre\Synapse\Examples\ApprovalAgent\RiskyTools;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
@@ -93,7 +93,7 @@ $baseTools = [
 ];
 
 $approvalProvider = new CliApprovalProvider;
-$tools = new ApprovingUseExecutors($baseTools, $approvalProvider, minimumRiskForApproval: 'medium');
+$tools = new ApprovingToolRegistry($baseTools, $approvalProvider, minimumRiskForApproval: 'medium');
 
 // System prompt
 $systemPrompt = "You are a helpful assistant with access to file system and command tools.

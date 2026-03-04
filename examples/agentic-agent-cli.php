@@ -38,7 +38,7 @@ use HelgeSverre\Synapse\Examples\AgenticTools\NotesTool;
 use HelgeSverre\Synapse\Examples\AgenticTools\WeatherTool;
 use HelgeSverre\Synapse\Examples\AgenticTools\WebSearchTool;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Hooks\Events\OnToolCall;
 use HelgeSverre\Synapse\Hooks\HookDispatcher;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
@@ -168,7 +168,7 @@ $providerName = $argv[1] ?? 'openai';
 printBanner($modelDisplayName);
 
 // Create tools
-$tools = new UseExecutors([
+$tools = new ToolRegistry([
     CalculatorTool::create(),
     DateTimeTool::create(),
     NotesTool::create(),

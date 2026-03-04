@@ -6,7 +6,8 @@ namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\ToolExecutorInterface;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
+use HelgeSverre\Synapse\Executor\ToolResult;
 use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
 use HelgeSverre\Synapse\State\ConversationState;
 
@@ -18,9 +19,9 @@ use HelgeSverre\Synapse\State\ConversationState;
  * - 'risk' => 'medium': approval requested
  * - 'risk' => 'high' or 'critical': approval required
  */
-final class ApprovingUseExecutors implements ToolExecutorInterface
+final class ApprovingToolRegistry implements ToolExecutorInterface
 {
-    private UseExecutors $inner;
+    private ToolRegistry $inner;
 
     /** @var array<string, string> Tool name => risk level */
     private array $riskLevels = [];
@@ -36,7 +37,7 @@ final class ApprovingUseExecutors implements ToolExecutorInterface
         private readonly ApprovalProviderInterface $approvalProvider,
         private readonly string $minimumRiskForApproval = 'medium',
     ) {
-        $this->inner = new UseExecutors($executors);
+        $this->inner = new ToolRegistry($executors);
 
         // Extract risk levels from executor attributes
         foreach ($executors as $executor) {
@@ -50,7 +51,7 @@ final class ApprovingUseExecutors implements ToolExecutorInterface
     /**
      * @param  array<string, mixed>  $input
      */
-    public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
+    public function callFunctionResult(string $name, array $input, ?ConversationState $state = null): ToolResult
     {
         $riskLevel = $this->riskLevels[$name] ?? 'low';
 
@@ -65,17 +66,28 @@ final class ApprovingUseExecutors implements ToolExecutorInterface
             $decision = $this->approvalProvider->requestApproval($request);
 
             return match ($decision->action) {
-                ApprovalAction::Approve => $this->inner->callFunction($name, $input, $state),
-                ApprovalAction::Edit => $this->inner->callFunction($name, $decision->editedArguments ?? $input, $state),
-                ApprovalAction::Reject => json_encode([
-                    'error' => 'Action rejected by user',
-                    'reason' => $decision->reason,
-                    'tool' => $name,
-                ]),
+                ApprovalAction::Approve => $this->inner->callFunctionResult($name, $input, $state),
+                ApprovalAction::Edit => $this->inner->callFunctionResult($name, $decision->editedArguments ?? $input, $state),
+                ApprovalAction::Reject => ToolResult::failure(
+                    errors: ['Action rejected by user', $decision->reason ?? 'No reason provided'],
+                    attributes: ['tool' => $name, 'risk' => $riskLevel],
+                ),
             };
         }
 
-        return $this->inner->callFunction($name, $input, $state);
+        return $this->inner->callFunctionResult($name, $input, $state);
+    }
+
+    /**
+     * @deprecated Use callFunctionResult() for predictable, structured output.
+     *
+     * @param  array<string, mixed>  $input
+     */
+    public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
+    {
+        $result = $this->callFunctionResult($name, $input, $state);
+
+        return $result->success ? $result->result : $result->toJson();
     }
 
     private function requiresApproval(string $riskLevel): bool

@@ -14,8 +14,6 @@ final class CliApprovalProvider implements ApprovalProviderInterface
 
     private const RED = "\033[31m";
 
-    private const GREEN = "\033[32m";
-
     private const CYAN = "\033[36m";
 
     private const RESET = "\033[0m";
@@ -38,7 +36,7 @@ final class CliApprovalProvider implements ApprovalProviderInterface
         echo self::CYAN.'Description: '.self::RESET.$request->description."\n";
         echo self::CYAN.'Arguments: '.self::RESET."\n";
 
-        $argsJson = json_encode($request->arguments, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $argsJson = json_encode($request->arguments, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '{}';
         foreach (explode("\n", $argsJson) as $line) {
             echo '  '.$line."\n";
         }
