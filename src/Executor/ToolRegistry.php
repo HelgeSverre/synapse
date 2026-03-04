@@ -10,7 +10,7 @@ use HelgeSverre\Synapse\State\ConversationState;
 /**
  * Registry/manager for multiple CallableExecutors (tools).
  */
-final class UseExecutors implements ToolExecutorInterface
+final class ToolRegistry implements ToolExecutorInterface
 {
     /** @var array<string, CallableExecutor> */
     private array $executors = [];
@@ -67,6 +67,22 @@ final class UseExecutors implements ToolExecutorInterface
     /**
      * @param  array<string, mixed>  $input
      */
+    public function callFunctionResult(string $name, array $input, ?ConversationState $state = null): ToolResult
+    {
+        $executor = $this->executors[$name] ?? null;
+
+        if ($executor === null) {
+            return ToolResult::failure(["Unknown function: {$name}"]);
+        }
+
+        return $executor->execute($input, $state);
+    }
+
+    /**
+     * @deprecated Use callFunctionResult() for predictable, structured output.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
     {
         $executor = $this->executors[$name] ?? null;
@@ -75,7 +91,7 @@ final class UseExecutors implements ToolExecutorInterface
             throw new \InvalidArgumentException("Unknown function: {$name}");
         }
 
-        $result = $executor->execute($input, $state);
+        $result = $this->callFunctionResult($name, $input, $state);
 
         return $result->success ? $result->result : $result->toJson();
     }
@@ -99,7 +115,7 @@ final class UseExecutors implements ToolExecutorInterface
     public function getToolDefinitions(): array
     {
         return array_map(
-            fn (CallableExecutor $e): \HelgeSverre\Synapse\Provider\Request\ToolDefinition => $e->toToolDefinition(),
+            fn (CallableExecutor $e): ToolDefinition => $e->toToolDefinition(),
             array_values($this->executors),
         );
     }
@@ -111,7 +127,7 @@ final class UseExecutors implements ToolExecutorInterface
     public function getVisibleToolDefinitions(array $input = [], ?ConversationState $state = null): array
     {
         return array_map(
-            fn (CallableExecutor $e): \HelgeSverre\Synapse\Provider\Request\ToolDefinition => $e->toToolDefinition(),
+            fn (CallableExecutor $e): ToolDefinition => $e->toToolDefinition(),
             $this->getVisibleFunctions($input, $state),
         );
     }

@@ -20,5 +20,12 @@ interface ToolExecutorInterface
     /**
      * @param  array<string, mixed>  $input
      */
+    public function callFunctionResult(string $name, array $input, ?ConversationState $state = null): ToolResult;
+
+    /**
+     * @deprecated Use callFunctionResult() for predictable, structured output.
+     *
+     * @param  array<string, mixed>  $input
+     */
     public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed;
 }

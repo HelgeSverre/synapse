@@ -11,7 +11,7 @@ use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Parser\ParserInterface;
 use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
@@ -52,7 +52,7 @@ function createPrompt(string $type = 'chat'): TextPrompt|ChatPrompt
     return match ($type) {
         'text' => Factory::createTextPrompt(),
         'chat' => Factory::createChatPrompt(),
-        default => Factory::createChatPrompt(),
+        default => throw new \InvalidArgumentException("Unknown prompt type: {$type}. Expected 'chat' or 'text'."),
     };
 }
 
@@ -124,9 +124,9 @@ function createStreamingLlmExecutorWithFunctions(array $options): StreamingLlmEx
  *
  * @param  list<CallableExecutor|array<string, mixed>>  $executors
  */
-function useExecutors(array $executors): UseExecutors
+function createToolRegistry(array $executors): ToolRegistry
 {
-    return Factory::useExecutors($executors);
+    return Factory::createToolRegistry($executors);
 }
 
 /**

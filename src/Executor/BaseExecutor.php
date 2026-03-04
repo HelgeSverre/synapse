@@ -37,7 +37,7 @@ abstract class BaseExecutor
      * @param  I  $input
      * @return ExecutionResult<O>
      */
-    public function execute(array $input): ExecutionResult
+    public function execute(array $input = []): ExecutionResult
     {
         $start = hrtime(true);
         $this->metadata = $this->metadata->withExecution();
@@ -119,7 +119,12 @@ abstract class BaseExecutor
         return $this->hooks;
     }
 
-    /** @param callable(object): void $listener */
+    /**
+     * @template TEvent of object
+     *
+     * @param  class-string<TEvent>  $eventClass
+     * @param  callable(TEvent): void  $listener
+     */
     public function on(string $eventClass, callable $listener): static
     {
         $this->hooks->addListener($eventClass, $listener);
@@ -127,6 +132,12 @@ abstract class BaseExecutor
         return $this;
     }
 
+    /**
+     * @template TEvent of object
+     *
+     * @param  class-string<TEvent>  $eventClass
+     * @param  callable(TEvent): void  $listener
+     */
     public function off(string $eventClass, callable $listener): static
     {
         $this->hooks->removeListener($eventClass, $listener);

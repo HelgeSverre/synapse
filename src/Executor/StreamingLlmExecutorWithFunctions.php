@@ -160,10 +160,10 @@ final class StreamingLlmExecutorWithFunctions
 
                     $this->hooks->dispatch(new OnToolCall($toolCall));
 
-                    $toolResult = $this->tools->callFunction($toolCall->name, $toolCall->arguments);
+                    $toolResult = $this->tools->callFunctionResult($toolCall->name, $toolCall->arguments, $this->state);
 
                     $messages[] = Message::tool(
-                        content: is_string($toolResult) ? $toolResult : (json_encode($toolResult) ?: ''),
+                        content: $toolResult->toPayloadJson(),
                         toolCallId: $toolCall->id,
                         name: $toolCall->name,
                     );
@@ -346,7 +346,12 @@ final class StreamingLlmExecutorWithFunctions
         return $this->hooks;
     }
 
-    /** @param callable(object): void $listener */
+    /**
+     * @template TEvent of object
+     *
+     * @param  class-string<TEvent>  $eventClass
+     * @param  callable(TEvent): void  $listener
+     */
     public function on(string $eventClass, callable $listener): self
     {
         $this->hooks->addListener($eventClass, $listener);
@@ -354,6 +359,12 @@ final class StreamingLlmExecutorWithFunctions
         return $this;
     }
 
+    /**
+     * @template TEvent of object
+     *
+     * @param  class-string<TEvent>  $eventClass
+     * @param  callable(TEvent): void  $listener
+     */
     public function off(string $eventClass, callable $listener): self
     {
         $this->hooks->removeListener($eventClass, $listener);

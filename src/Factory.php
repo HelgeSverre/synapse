@@ -16,7 +16,8 @@ use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolExecutorInterface;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Parser\BooleanParser;
 use HelgeSverre\Synapse\Parser\CustomParser;
 use HelgeSverre\Synapse\Parser\EnumParser;
@@ -35,15 +36,17 @@ use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
 use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
 use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
+use HelgeSverre\Synapse\Provider\Groq\GroqProvider;
 use HelgeSverre\Synapse\Provider\Http\Psr18Transport;
 use HelgeSverre\Synapse\Provider\Http\TransportInterface;
 use HelgeSverre\Synapse\Provider\LlmProviderInterface;
-use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
+use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -130,6 +133,16 @@ final class Factory
                 transport: $transport,
                 apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
                 baseUrl: $options['baseUrl'] ?? 'https://api.mistral.ai/v1',
+            ),
+            'groq' => new GroqProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.groq.com/openai/v1',
+            ),
+            'moonshot' => new MoonshotProvider(
+                transport: $transport,
+                apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
+                baseUrl: $options['baseUrl'] ?? 'https://api.moonshot.ai/v1',
             ),
             default => throw new \InvalidArgumentException("Unknown provider: {$providerName}"),
         };
@@ -255,12 +268,17 @@ final class Factory
         [$provider, $model] = self::resolveProviderAndModel($options);
 
         $tools = $options['tools'] ?? null;
-        if (! $tools instanceof UseExecutors) {
+        if (! $tools instanceof ToolExecutorInterface) {
             if (is_array($tools)) {
-                /** @var list<CallableExecutor|array<string, mixed>> $tools */
-                $tools = self::useExecutors($tools);
+                if (! array_is_list($tools)) {
+                    throw new \InvalidArgumentException('tools array must be a list of CallableExecutor instances or config arrays');
+                }
+
+                /** @var list<CallableExecutor|array<string, mixed>> $toolList */
+                $toolList = $tools;
+                $tools = self::createToolRegistry($toolList);
             } else {
-                throw new \InvalidArgumentException('tools must be UseExecutors or array of CallableExecutor');
+                throw new \InvalidArgumentException('tools must implement ToolExecutorInterface or be an array of CallableExecutor configs');
             }
         }
 
@@ -314,12 +332,17 @@ final class Factory
         }
 
         $tools = $options['tools'] ?? null;
-        if (! $tools instanceof UseExecutors) {
+        if (! $tools instanceof ToolExecutorInterface) {
             if (is_array($tools)) {
-                /** @var list<CallableExecutor|array<string, mixed>> $tools */
-                $tools = self::useExecutors($tools);
+                if (! array_is_list($tools)) {
+                    throw new \InvalidArgumentException('tools array must be a list of CallableExecutor instances or config arrays');
+                }
+
+                /** @var list<CallableExecutor|array<string, mixed>> $toolList */
+                $toolList = $tools;
+                $tools = self::createToolRegistry($toolList);
             } else {
-                throw new \InvalidArgumentException('tools must be UseExecutors or array of CallableExecutor');
+                throw new \InvalidArgumentException('tools must implement ToolExecutorInterface or be an array of CallableExecutor configs');
             }
         }
 
@@ -340,7 +363,7 @@ final class Factory
     /**
      * @param  list<CallableExecutor|array<string, mixed>>  $executors
      */
-    public static function useExecutors(array $executors): UseExecutors
+    public static function createToolRegistry(array $executors): ToolRegistry
     {
         $callables = [];
 
@@ -350,11 +373,11 @@ final class Factory
             } elseif (is_array($executor)) {
                 $callables[] = self::createCallableExecutor($executor);
             } else {
-                throw new \InvalidArgumentException('Each executor must be a CallableExecutor or array');
+                throw new \InvalidArgumentException('Executor must be CallableExecutor or config array');
             }
         }
 
-        return new UseExecutors($callables);
+        return new ToolRegistry($callables);
     }
 
     /**

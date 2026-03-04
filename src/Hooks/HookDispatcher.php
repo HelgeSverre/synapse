@@ -6,10 +6,10 @@ namespace HelgeSverre\Synapse\Hooks;
 
 final class HookDispatcher implements HookDispatcherInterface
 {
-    /** @var array<string, list<callable(object): void>> */
+    /** @var array<string, list<callable>> */
     private array $listeners = [];
 
-    /** @var array<string, list<callable(object): void>> */
+    /** @var array<string, list<callable>> */
     private array $onceListeners = [];
 
     public function dispatch(object $event): void
@@ -30,19 +30,36 @@ final class HookDispatcher implements HookDispatcherInterface
         }
     }
 
+    /**
+     * @template TEvent of object
+     *
+     * @param  class-string<TEvent>  $eventClass
+     * @param  callable(TEvent): void  $listener
+     */
     public function addListener(string $eventClass, callable $listener): void
     {
         $this->listeners[$eventClass] ??= [];
         $this->listeners[$eventClass][] = $listener;
     }
 
-    /** @param callable(object): void $listener */
+    /**
+     * @template TEvent of object
+     *
+     * @param  class-string<TEvent>  $eventClass
+     * @param  callable(TEvent): void  $listener
+     */
     public function once(string $eventClass, callable $listener): void
     {
         $this->onceListeners[$eventClass] ??= [];
         $this->onceListeners[$eventClass][] = $listener;
     }
 
+    /**
+     * @template TEvent of object
+     *
+     * @param  class-string<TEvent>  $eventClass
+     * @param  callable(TEvent): void  $listener
+     */
     public function removeListener(string $eventClass, callable $listener): void
     {
         if (! isset($this->listeners[$eventClass])) {

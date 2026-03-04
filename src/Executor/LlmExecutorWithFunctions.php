@@ -12,7 +12,6 @@ use HelgeSverre\Synapse\Parser\ParserInterface;
 use HelgeSverre\Synapse\Prompt\PromptInterface;
 use HelgeSverre\Synapse\Provider\LlmProviderInterface;
 use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
-use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Message;
 
@@ -25,15 +24,12 @@ use HelgeSverre\Synapse\State\Message;
  */
 final class LlmExecutorWithFunctions extends LlmExecutor
 {
-    /**
-     * @param  list<ToolDefinition>  $toolDefinitions
-     */
     public function __construct(
         LlmProviderInterface $provider,
         PromptInterface $prompt,
         ParserInterface $parser,
         string $model,
-        private readonly UseExecutors $tools,
+        private readonly ToolExecutorInterface $tools,
         private readonly int $maxIterations = 10,
         ?float $temperature = null,
         ?int $maxTokens = null,
@@ -109,11 +105,11 @@ final class LlmExecutorWithFunctions extends LlmExecutor
                 $this->hooks->dispatch(new OnToolCall($toolCall));
 
                 // Execute the tool
-                $toolResult = $this->tools->callFunction($toolCall->name, $toolCall->arguments);
+                $toolResult = $this->tools->callFunctionResult($toolCall->name, $toolCall->arguments, $this->state);
 
                 // Add tool result message
                 $messages[] = Message::tool(
-                    content: is_string($toolResult) ? $toolResult : (json_encode($toolResult) ?: ''),
+                    content: $toolResult->toPayloadJson(),
                     toolCallId: $toolCall->id,
                     name: $toolCall->name,
                 );
@@ -123,7 +119,7 @@ final class LlmExecutorWithFunctions extends LlmExecutor
         throw new \RuntimeException("Max tool iterations ({$this->maxIterations}) exceeded");
     }
 
-    public function getTools(): UseExecutors
+    public function getTools(): ToolExecutorInterface
     {
         return $this->tools;
     }
