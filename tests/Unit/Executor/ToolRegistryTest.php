@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace HelgeSverre\Synapse\Tests\Unit\Executor;
 
 use HelgeSverre\Synapse\Executor\CallableExecutor;
-use HelgeSverre\Synapse\Executor\UseExecutors;
-use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\State\ConversationState;
 use PHPUnit\Framework\TestCase;
 
-final class UseExecutorsTest extends TestCase
+final class ToolRegistryTest extends TestCase
 {
     private function createExecutor(string $name, string $description = 'Test executor'): CallableExecutor
     {
@@ -23,9 +22,9 @@ final class UseExecutorsTest extends TestCase
 
     public function test_constructor_with_empty_array(): void
     {
-        $useExecutors = new UseExecutors([]);
+        $registry = new ToolRegistry([]);
 
-        $this->assertSame([], $useExecutors->getFunctions());
+        $this->assertSame([], $registry->getFunctions());
     }
 
     public function test_constructor_with_array_of_executors(): void
@@ -33,22 +32,22 @@ final class UseExecutorsTest extends TestCase
         $executor1 = $this->createExecutor('func1');
         $executor2 = $this->createExecutor('func2');
 
-        $useExecutors = new UseExecutors([$executor1, $executor2]);
+        $registry = new ToolRegistry([$executor1, $executor2]);
 
-        $this->assertCount(2, $useExecutors->getFunctions());
-        $this->assertTrue($useExecutors->hasFunction('func1'));
-        $this->assertTrue($useExecutors->hasFunction('func2'));
+        $this->assertCount(2, $registry->getFunctions());
+        $this->assertTrue($registry->hasFunction('func1'));
+        $this->assertTrue($registry->hasFunction('func2'));
     }
 
     public function test_register_adds_executor(): void
     {
-        $useExecutors = new UseExecutors;
+        $registry = new ToolRegistry;
         $executor = $this->createExecutor('test');
 
-        $result = $useExecutors->register($executor);
+        $result = $registry->register($executor);
 
-        $this->assertSame($useExecutors, $result);
-        $this->assertTrue($useExecutors->hasFunction('test'));
+        $this->assertSame($registry, $result);
+        $this->assertTrue($registry->hasFunction('test'));
     }
 
     public function test_register_overwrites_executor_with_same_name(): void
@@ -64,42 +63,42 @@ final class UseExecutorsTest extends TestCase
             handler: fn (): string => 'second',
         );
 
-        $useExecutors = new UseExecutors([$executor1]);
-        $useExecutors->register($executor2);
+        $registry = new ToolRegistry([$executor1]);
+        $registry->register($executor2);
 
-        $this->assertCount(1, $useExecutors->getFunctions());
-        $this->assertSame('Second', $useExecutors->getFunction('duplicate')?->getDescription());
+        $this->assertCount(1, $registry->getFunctions());
+        $this->assertSame('Second', $registry->getFunction('duplicate')?->getDescription());
     }
 
     public function test_has_function_returns_true_for_existing(): void
     {
-        $useExecutors = new UseExecutors([$this->createExecutor('exists')]);
+        $registry = new ToolRegistry([$this->createExecutor('exists')]);
 
-        $this->assertTrue($useExecutors->hasFunction('exists'));
+        $this->assertTrue($registry->hasFunction('exists'));
     }
 
     public function test_has_function_returns_false_for_non_existing(): void
     {
-        $useExecutors = new UseExecutors;
+        $registry = new ToolRegistry;
 
-        $this->assertFalse($useExecutors->hasFunction('nonexistent'));
+        $this->assertFalse($registry->hasFunction('nonexistent'));
     }
 
     public function test_get_function_returns_executor_by_name(): void
     {
         $executor = $this->createExecutor('myFunc');
-        $useExecutors = new UseExecutors([$executor]);
+        $registry = new ToolRegistry([$executor]);
 
-        $result = $useExecutors->getFunction('myFunc');
+        $result = $registry->getFunction('myFunc');
 
         $this->assertSame($executor, $result);
     }
 
     public function test_get_function_returns_null_for_non_existing(): void
     {
-        $useExecutors = new UseExecutors;
+        $registry = new ToolRegistry;
 
-        $result = $useExecutors->getFunction('nonexistent');
+        $result = $registry->getFunction('nonexistent');
 
         $this->assertNull($result);
     }
@@ -108,9 +107,9 @@ final class UseExecutorsTest extends TestCase
     {
         $executor1 = $this->createExecutor('func1');
         $executor2 = $this->createExecutor('func2');
-        $useExecutors = new UseExecutors([$executor1, $executor2]);
+        $registry = new ToolRegistry([$executor1, $executor2]);
 
-        $result = $useExecutors->getFunctions();
+        $result = $registry->getFunctions();
 
         $this->assertCount(2, $result);
         $this->assertContains($executor1, $result);
@@ -121,9 +120,9 @@ final class UseExecutorsTest extends TestCase
     {
         $executor1 = $this->createExecutor('a');
         $executor2 = $this->createExecutor('b');
-        $useExecutors = new UseExecutors([$executor1, $executor2]);
+        $registry = new ToolRegistry([$executor1, $executor2]);
 
-        $result = $useExecutors->getFunctions();
+        $result = $registry->getFunctions();
 
         $this->assertSame([0, 1], array_keys($result));
     }
@@ -142,21 +141,20 @@ final class UseExecutorsTest extends TestCase
             handler: fn ($input): string => "Hello, {$input['name']}!",
         );
 
-        $useExecutors = new UseExecutors([$executor1, $executor2]);
+        $registry = new ToolRegistry([$executor1, $executor2]);
 
-        $definitions = $useExecutors->getToolDefinitions();
+        $definitions = $registry->getToolDefinitions();
 
         $this->assertCount(2, $definitions);
-        $this->assertContainsOnlyInstancesOf(ToolDefinition::class, $definitions);
         $this->assertSame('add', $definitions[0]->name);
         $this->assertSame('greet', $definitions[1]->name);
     }
 
     public function test_get_tool_definitions_returns_empty_array_when_no_executors(): void
     {
-        $useExecutors = new UseExecutors;
+        $registry = new ToolRegistry;
 
-        $definitions = $useExecutors->getToolDefinitions();
+        $definitions = $registry->getToolDefinitions();
 
         $this->assertSame([], $definitions);
     }
@@ -168,21 +166,47 @@ final class UseExecutorsTest extends TestCase
             description: 'Multiply',
             handler: fn ($input): int|float => $input['a'] * $input['b'],
         );
-        $useExecutors = new UseExecutors([$executor]);
+        $registry = new ToolRegistry([$executor]);
 
-        $result = $useExecutors->callFunction('multiply', ['a' => 3, 'b' => 4]);
+        $result = $registry->callFunction('multiply', ['a' => 3, 'b' => 4]);
 
         $this->assertSame(12, $result);
     }
 
+    public function test_call_function_result_returns_structured_success(): void
+    {
+        $executor = new CallableExecutor(
+            name: 'multiply',
+            description: 'Multiply',
+            handler: fn ($input): int|float => $input['a'] * $input['b'],
+        );
+        $registry = new ToolRegistry([$executor]);
+
+        $result = $registry->callFunctionResult('multiply', ['a' => 2, 'b' => 5]);
+
+        $this->assertTrue($result->success);
+        $this->assertSame(10, $result->result);
+        $this->assertSame([], $result->errors);
+    }
+
     public function test_call_function_throws_for_unknown_function(): void
     {
-        $useExecutors = new UseExecutors;
+        $registry = new ToolRegistry;
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown function: unknown');
 
-        $useExecutors->callFunction('unknown', []);
+        $registry->callFunction('unknown', []);
+    }
+
+    public function test_call_function_result_returns_failure_for_unknown_function(): void
+    {
+        $registry = new ToolRegistry;
+
+        $result = $registry->callFunctionResult('unknown', []);
+
+        $this->assertFalse($result->success);
+        $this->assertContains('Unknown function: unknown', $result->errors);
     }
 
     public function test_call_function_returns_error_json_on_failure(): void
@@ -192,9 +216,9 @@ final class UseExecutorsTest extends TestCase
             description: 'Fails',
             handler: fn () => throw new \RuntimeException('Something went wrong'),
         );
-        $useExecutors = new UseExecutors([$executor]);
+        $registry = new ToolRegistry([$executor]);
 
-        $result = $useExecutors->callFunction('failing', []);
+        $result = $registry->callFunction('failing', []);
 
         $this->assertIsString($result);
         $decoded = json_decode($result, true);
@@ -209,9 +233,9 @@ final class UseExecutorsTest extends TestCase
             description: 'Test',
             handler: fn (): string => 'ok',
         );
-        $useExecutors = new UseExecutors([$executor]);
+        $registry = new ToolRegistry([$executor]);
 
-        $result = $useExecutors->validateFunctionInput('test', []);
+        $result = $registry->validateFunctionInput('test', []);
 
         $this->assertTrue($result['valid']);
         $this->assertSame([], $result['errors']);
@@ -219,9 +243,9 @@ final class UseExecutorsTest extends TestCase
 
     public function test_validate_function_input_returns_invalid_for_unknown_function(): void
     {
-        $useExecutors = new UseExecutors;
+        $registry = new ToolRegistry;
 
-        $result = $useExecutors->validateFunctionInput('unknown', []);
+        $result = $registry->validateFunctionInput('unknown', []);
 
         $this->assertFalse($result['valid']);
         $this->assertContains('Unknown function: unknown', $result['errors']);
@@ -237,10 +261,10 @@ final class UseExecutorsTest extends TestCase
                 ? ['valid' => true, 'errors' => []]
                 : ['valid' => false, 'errors' => ['required field missing']],
         );
-        $useExecutors = new UseExecutors([$executor]);
+        $registry = new ToolRegistry([$executor]);
 
-        $validResult = $useExecutors->validateFunctionInput('validated', ['required' => 'value']);
-        $invalidResult = $useExecutors->validateFunctionInput('validated', []);
+        $validResult = $registry->validateFunctionInput('validated', ['required' => 'value']);
+        $invalidResult = $registry->validateFunctionInput('validated', []);
 
         $this->assertTrue($validResult['valid']);
         $this->assertFalse($invalidResult['valid']);
@@ -251,9 +275,9 @@ final class UseExecutorsTest extends TestCase
     {
         $executor1 = $this->createExecutor('func1');
         $executor2 = $this->createExecutor('func2');
-        $useExecutors = new UseExecutors([$executor1, $executor2]);
+        $registry = new ToolRegistry([$executor1, $executor2]);
 
-        $visible = $useExecutors->getVisibleFunctions();
+        $visible = $registry->getVisibleFunctions();
 
         $this->assertCount(2, $visible);
     }
@@ -272,9 +296,9 @@ final class UseExecutorsTest extends TestCase
             handler: fn (): string => 'ok',
             visibilityHandler: fn (): false => false,
         );
-        $useExecutors = new UseExecutors([$visibleExecutor, $hiddenExecutor]);
+        $registry = new ToolRegistry([$visibleExecutor, $hiddenExecutor]);
 
-        $visible = $useExecutors->getVisibleFunctions();
+        $visible = $registry->getVisibleFunctions();
 
         $this->assertCount(1, $visible);
         $this->assertSame('visible', $visible[0]->getName());
@@ -295,10 +319,10 @@ final class UseExecutorsTest extends TestCase
                 return true;
             },
         );
-        $useExecutors = new UseExecutors([$executor]);
+        $registry = new ToolRegistry([$executor]);
         $state = new ConversationState;
 
-        $useExecutors->getVisibleFunctions(['key' => 'value'], $state);
+        $registry->getVisibleFunctions(['key' => 'value'], $state);
 
         $this->assertSame(['key' => 'value'], $receivedInput);
         $this->assertSame($state, $receivedState);
@@ -318,9 +342,9 @@ final class UseExecutorsTest extends TestCase
             handler: fn (): string => 'ok',
             visibilityHandler: fn (): false => false,
         );
-        $useExecutors = new UseExecutors([$visibleExecutor, $hiddenExecutor]);
+        $registry = new ToolRegistry([$visibleExecutor, $hiddenExecutor]);
 
-        $definitions = $useExecutors->getVisibleToolDefinitions();
+        $definitions = $registry->getVisibleToolDefinitions();
 
         $this->assertCount(1, $definitions);
         $this->assertSame('visible', $definitions[0]->name);
@@ -338,10 +362,10 @@ final class UseExecutorsTest extends TestCase
                 return 'ok';
             },
         );
-        $useExecutors = new UseExecutors([$executor]);
+        $registry = new ToolRegistry([$executor]);
         $state = new ConversationState;
 
-        $useExecutors->callFunction('stateful', [], $state);
+        $registry->callFunction('stateful', [], $state);
 
         $this->assertSame($state, $receivedState);
     }

@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
 use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
@@ -161,7 +161,7 @@ final class OpenAIStreamingIntegrationTest extends IntegrationTestCase
 
     public function test_streaming_executor_with_tools(): void
     {
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             new CallableExecutor(
                 name: 'get_weather',
                 description: 'Get the current weather for a city',

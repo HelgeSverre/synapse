@@ -10,7 +10,8 @@ use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolExecutorInterface;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Factory;
 use HelgeSverre\Synapse\Llm;
 use HelgeSverre\Synapse\Parser\BooleanParser;
@@ -30,10 +31,12 @@ use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
 use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
 use HelgeSverre\Synapse\Provider\Google\GoogleProvider;
+use HelgeSverre\Synapse\Provider\Groq\GroqProvider;
 use HelgeSverre\Synapse\Provider\Http\TransportInterface;
 use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
-use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
 use HelgeSverre\Synapse\Embeddings\Cohere\CohereEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\Jina\JinaEmbeddingProvider;
@@ -43,11 +46,12 @@ use HelgeSverre\Synapse\Embeddings\Voyage\VoyageEmbeddingProvider;
 use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
+use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 use PHPUnit\Framework\TestCase;
 
 final class FactoryTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $mockTransport;
+    private TransportInterface $mockTransport;
 
     protected function setUp(): void
     {
@@ -146,6 +150,26 @@ final class FactoryTest extends TestCase
         ]);
 
         $this->assertInstanceOf(XAIProvider::class, $llm->provider);
+    }
+
+    public function test_use_llm_creates_groq_provider(): void
+    {
+        $provider = Factory::useLlm('groq.llama-3.3-70b', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(GroqProvider::class, $provider);
+    }
+
+    public function test_use_llm_creates_moonshot_provider(): void
+    {
+        $provider = Factory::useLlm('moonshot.moonshot-v1-8k', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $this->assertInstanceOf(MoonshotProvider::class, $provider);
     }
 
     public function test_use_llm_throws_for_missing_api_key(): void
@@ -642,7 +666,7 @@ final class FactoryTest extends TestCase
             'transport' => $this->mockTransport,
         ]);
 
-        $tools = Factory::useExecutors([
+        $tools = Factory::createToolRegistry([
             [
                 'name' => 'calculator',
                 'description' => 'Performs calculations',
@@ -683,6 +707,41 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(LlmExecutorWithFunctions::class, $executor);
     }
 
+    public function test_create_llm_executor_with_functions_accepts_tool_executor_interface(): void
+    {
+        $provider = Factory::useLlm('openai.gpt-4', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+        ]);
+
+        $tools = new class implements ToolExecutorInterface
+        {
+            public function getToolDefinitions(): array
+            {
+                return [new ToolDefinition('noop', 'No-op tool')];
+            }
+
+            public function callFunctionResult(string $name, array $input, ?ConversationState $state = null): \HelgeSverre\Synapse\Executor\ToolResult
+            {
+                return \HelgeSverre\Synapse\Executor\ToolResult::success(['ok' => true]);
+            }
+
+            public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
+            {
+                return ['ok' => true];
+            }
+        };
+
+        $executor = Factory::createLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4',
+            'tools' => $tools,
+        ]);
+
+        $this->assertInstanceOf(LlmExecutorWithFunctions::class, $executor);
+    }
+
     public function test_create_llm_executor_with_functions_throws_for_invalid_tools(): void
     {
         $provider = Factory::useLlm('openai.gpt-4', [
@@ -691,7 +750,7 @@ final class FactoryTest extends TestCase
         ]);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('tools must be UseExecutors or array of CallableExecutor');
+        $this->expectExceptionMessage('tools must implement ToolExecutorInterface or be an array of CallableExecutor configs');
 
         Factory::createLlmExecutorWithFunctions([
             'llm' => $provider,
@@ -810,7 +869,7 @@ final class FactoryTest extends TestCase
     {
         $provider = $this->createMock(StreamableProviderInterface::class);
 
-        $tools = Factory::useExecutors([
+        $tools = Factory::createToolRegistry([
             [
                 'name' => 'calculator',
                 'description' => 'Performs calculations',
@@ -848,12 +907,44 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(StreamingLlmExecutorWithFunctions::class, $executor);
     }
 
+    public function test_create_streaming_llm_executor_with_functions_accepts_tool_executor_interface(): void
+    {
+        $provider = $this->createMock(StreamableProviderInterface::class);
+
+        $tools = new class implements ToolExecutorInterface
+        {
+            public function getToolDefinitions(): array
+            {
+                return [new ToolDefinition('noop', 'No-op tool')];
+            }
+
+            public function callFunctionResult(string $name, array $input, ?ConversationState $state = null): \HelgeSverre\Synapse\Executor\ToolResult
+            {
+                return \HelgeSverre\Synapse\Executor\ToolResult::success(['ok' => true]);
+            }
+
+            public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
+            {
+                return ['ok' => true];
+            }
+        };
+
+        $executor = Factory::createStreamingLlmExecutorWithFunctions([
+            'llm' => $provider,
+            'prompt' => Factory::createChatPrompt(),
+            'model' => 'gpt-4o-mini',
+            'tools' => $tools,
+        ]);
+
+        $this->assertInstanceOf(StreamingLlmExecutorWithFunctions::class, $executor);
+    }
+
     public function test_create_streaming_llm_executor_with_functions_throws_for_invalid_tools(): void
     {
         $provider = $this->createMock(StreamableProviderInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('tools must be UseExecutors or array of CallableExecutor');
+        $this->expectExceptionMessage('tools must implement ToolExecutorInterface or be an array of CallableExecutor configs');
 
         Factory::createStreamingLlmExecutorWithFunctions([
             'llm' => $provider,
@@ -890,7 +981,7 @@ final class FactoryTest extends TestCase
         ]);
     }
 
-    public function test_use_executors_creates_from_callable_executors(): void
+    public function test_create_tool_registry_creates_from_callable_executors(): void
     {
         $executor1 = new CallableExecutor(
             name: 'func1',
@@ -903,16 +994,51 @@ final class FactoryTest extends TestCase
             handler: fn (): string => 'result2',
         );
 
-        $useExecutors = Factory::useExecutors([$executor1, $executor2]);
+        $registry = Factory::createToolRegistry([$executor1, $executor2]);
 
-        $this->assertInstanceOf(UseExecutors::class, $useExecutors);
-        $this->assertTrue($useExecutors->hasFunction('func1'));
-        $this->assertTrue($useExecutors->hasFunction('func2'));
+        $this->assertInstanceOf(ToolRegistry::class, $registry);
+        $this->assertTrue($registry->hasFunction('func1'));
+        $this->assertTrue($registry->hasFunction('func2'));
     }
 
-    public function test_use_executors_creates_from_arrays(): void
+    public function test_create_tool_registry_creates_registry_from_mixed_inputs(): void
     {
-        $useExecutors = Factory::useExecutors([
+        $executor = new CallableExecutor(
+            name: 'existing',
+            description: 'Existing executor',
+            handler: fn (): string => 'ok',
+        );
+
+        $registry = Factory::createToolRegistry([
+            $executor,
+            [
+                'name' => 'array_tool',
+                'description' => 'Array tool',
+                'handler' => fn (): string => 'array',
+            ],
+        ]);
+
+        $this->assertInstanceOf(ToolRegistry::class, $registry);
+        $this->assertTrue($registry->hasFunction('existing'));
+        $this->assertTrue($registry->hasFunction('array_tool'));
+    }
+
+    public function test_create_tool_registry_throws_for_invalid_entry(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Executor must be CallableExecutor or config array');
+
+        /** @var mixed $invalid */
+        $invalid = [
+            'invalid',
+        ];
+
+        Factory::createToolRegistry($invalid);
+    }
+
+    public function test_create_tool_registry_creates_from_arrays(): void
+    {
+        $registry = Factory::createToolRegistry([
             [
                 'name' => 'add',
                 'description' => 'Adds numbers',
@@ -925,12 +1051,12 @@ final class FactoryTest extends TestCase
             ],
         ]);
 
-        $this->assertInstanceOf(UseExecutors::class, $useExecutors);
-        $this->assertTrue($useExecutors->hasFunction('add'));
-        $this->assertTrue($useExecutors->hasFunction('multiply'));
+        $this->assertInstanceOf(ToolRegistry::class, $registry);
+        $this->assertTrue($registry->hasFunction('add'));
+        $this->assertTrue($registry->hasFunction('multiply'));
     }
 
-    public function test_use_executors_creates_from_mixed(): void
+    public function test_create_tool_registry_creates_from_mixed(): void
     {
         $executor = new CallableExecutor(
             name: 'existing',
@@ -938,7 +1064,7 @@ final class FactoryTest extends TestCase
             handler: fn (): string => 'existing',
         );
 
-        $useExecutors = Factory::useExecutors([
+        $registry = Factory::createToolRegistry([
             $executor,
             [
                 'name' => 'new',
@@ -947,9 +1073,9 @@ final class FactoryTest extends TestCase
             ],
         ]);
 
-        $this->assertInstanceOf(UseExecutors::class, $useExecutors);
-        $this->assertTrue($useExecutors->hasFunction('existing'));
-        $this->assertTrue($useExecutors->hasFunction('new'));
+        $this->assertInstanceOf(ToolRegistry::class, $registry);
+        $this->assertTrue($registry->hasFunction('existing'));
+        $this->assertTrue($registry->hasFunction('new'));
     }
 
     public function test_create_callable_executor(): void

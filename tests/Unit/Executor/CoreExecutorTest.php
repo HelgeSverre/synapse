@@ -20,6 +20,15 @@ final class CoreExecutorTest extends TestCase
         $this->assertSame(10, $result->getValue());
     }
 
+    public function test_execute_can_be_called_without_input(): void
+    {
+        $executor = new CoreExecutor(fn (): string => 'ok');
+
+        $result = $executor->execute();
+
+        $this->assertSame('ok', $result->getValue());
+    }
+
     public function test_handler_receives_input_correctly(): void
     {
         $receivedInput = null;

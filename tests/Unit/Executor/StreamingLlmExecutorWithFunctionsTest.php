@@ -8,7 +8,7 @@ use Generator;
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\StreamingResult;
-use HelgeSverre\Synapse\Executor\UseExecutors;
+use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Hooks\Events\OnStreamChunk;
 use HelgeSverre\Synapse\Hooks\Events\OnToolCall;
 use HelgeSverre\Synapse\Hooks\HookDispatcher;
@@ -115,7 +115,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             ],
         ];
 
-        $tools = new UseExecutors([$this->createMockTool('test_tool', 'result')]);
+        $tools = new ToolRegistry([$this->createMockTool('test_tool', 'result')]);
         $prompt = $this->createPrompt('Say hi');
         $executor = new StreamingLlmExecutorWithFunctions($provider, $prompt, 'gpt-4', $tools);
 
@@ -147,7 +147,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
         ];
 
         $toolCalls = [];
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createRecordingTool('get_weather', $toolCalls, '{"temperature": 20, "condition": "sunny"}'),
         ]);
 
@@ -193,7 +193,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop'),
         ];
 
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createMockTool('lookup', '{"found": true}'),
         ]);
 
@@ -237,7 +237,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
         ];
 
         $toolCalls = [];
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createRecordingTool('func_a', $toolCalls, 'result_a'),
             $this->createRecordingTool('func_b', $toolCalls, 'result_b'),
         ]);
@@ -270,7 +270,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop'),
         ];
 
-        $tools = new UseExecutors([]);
+        $tools = new ToolRegistry([]);
         $prompt = $this->createPrompt('Count');
         $executor = new StreamingLlmExecutorWithFunctions($provider, $prompt, 'gpt-4', $tools);
 
@@ -311,7 +311,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             },
         );
 
-        $tools = new UseExecutors([$tool]);
+        $tools = new ToolRegistry([$tool]);
         $prompt = $this->createPrompt('Do expensive thing');
         $executor = new StreamingLlmExecutorWithFunctions($provider, $prompt, 'gpt-4', $tools);
 
@@ -343,7 +343,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             ];
         }
 
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createMockTool('infinite_tool', 'still going'),
         ]);
 
@@ -376,7 +376,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop'),
         ];
 
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createMockTool('my_tool', 'result'),
         ]);
 
@@ -411,7 +411,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop'),
         ];
 
-        $tools = new UseExecutors([]);
+        $tools = new ToolRegistry([]);
         $prompt = $this->createPrompt('Say hi');
         $hooks = new HookDispatcher;
 
@@ -444,7 +444,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop'),
         ];
 
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createMockTool('tool_one', 'r1'),
             $this->createMockTool('tool_two', 'r2'),
         ]);
@@ -470,7 +470,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop'),
         ];
 
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createMockTool('my_tool', 'result'),
         ]);
 
@@ -502,7 +502,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop', new UsageInfo(100, 50, 150)),
         ];
 
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createMockTool('tool', 'result'),
         ]);
 
@@ -526,7 +526,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
             new StreamCompleted('stop'),
         ];
 
-        $tools = new UseExecutors([]);
+        $tools = new ToolRegistry([]);
         $prompt = $this->createPrompt('Question');
         $executor = new StreamingLlmExecutorWithFunctions($provider, $prompt, 'gpt-4', $tools);
 
@@ -542,7 +542,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
     public function test_get_tools_returns_tools(): void
     {
         $provider = new MultiTurnMockProvider;
-        $tools = new UseExecutors([
+        $tools = new ToolRegistry([
             $this->createMockTool('a', 'r'),
         ]);
         $prompt = $this->createPrompt('Hi');
@@ -555,7 +555,7 @@ final class StreamingLlmExecutorWithFunctionsTest extends TestCase
     public function test_with_state_returns_clone(): void
     {
         $provider = new MultiTurnMockProvider;
-        $tools = new UseExecutors([]);
+        $tools = new ToolRegistry([]);
         $prompt = $this->createPrompt('Hi');
 
         $executor = new StreamingLlmExecutorWithFunctions($provider, $prompt, 'gpt-4', $tools);
