@@ -88,7 +88,7 @@ use function HelgeSverre\Synapse\{createCoreExecutor, createExecutor};
 
 // CoreExecutor - wrap any function
 $calc = createCoreExecutor(fn($input) => $input['a'] + $input['b']);
-$result = $calc->execute(['a' => 5, 'b' => 3]);
+$result = $calc->run(['a' => 5, 'b' => 3]);
 
 // LlmExecutor - full LLM pipeline
 $executor = createExecutor([
@@ -210,7 +210,7 @@ $tools = createToolRegistry([
     ],
 ]);
 
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $provider,
     'prompt' => $prompt,
     'parser' => createParser('string'),
@@ -296,7 +296,7 @@ $prompt = createChatPrompt()
     ->addHistoryPlaceholder('history')
     ->addUserMessage('{{message}}', parseTemplate: true);
 
-$result = $executor->execute([
+$result = $executor->run([
     'history' => $state->messages,
     'message' => 'What did I say?',
 ]);
