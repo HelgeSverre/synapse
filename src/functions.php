@@ -6,6 +6,11 @@ namespace HelgeSverre\Synapse;
 
 use HelgeSverre\Synapse\Agent\AgentRegistry;
 use HelgeSverre\Synapse\Embeddings\EmbeddingProviderInterface;
+use HelgeSverre\Synapse\Evaluation\EvalCase;
+use HelgeSverre\Synapse\Evaluation\EvaluationSuite;
+use HelgeSverre\Synapse\Evaluation\FilesystemSnapshotStore;
+use HelgeSverre\Synapse\Evaluation\InMemorySnapshotStore;
+use HelgeSverre\Synapse\Evaluation\SnapshotStoreInterface;
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
@@ -20,8 +25,16 @@ use HelgeSverre\Synapse\Options\ExecutorOptions;
 use HelgeSverre\Synapse\Parser\ParserInterface;
 use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Runtime\Checkpoint\RunCheckpointStore;
+use HelgeSverre\Synapse\Runtime\Memory\MemoryStore;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
+use HelgeSverre\Synapse\Trace\HookTraceBridge;
+use HelgeSverre\Synapse\Trace\InMemoryTraceExporter;
+use HelgeSverre\Synapse\Trace\TraceContext;
+use HelgeSverre\Synapse\Trace\TraceExporterInterface;
+use HelgeSverre\Synapse\Workflow\WorkflowEngine;
+use HelgeSverre\Synapse\Workflow\WorkflowStep;
 
 /**
  * Create an LLM provider instance.
@@ -188,6 +201,69 @@ function createDialogue(?string $name = null): Dialogue
 function createAgentRegistry(): AgentRegistry
 {
     return Factory::createAgentRegistry();
+}
+
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createTraceContext(array $attributes = [], ?string $traceId = null, ?string $runId = null): TraceContext
+{
+    return Factory::createTraceContext($attributes, $traceId, $runId);
+}
+
+function createInMemoryTraceExporter(): InMemoryTraceExporter
+{
+    return Factory::createInMemoryTraceExporter();
+}
+
+function createTraceBridge(
+    TraceExporterInterface $exporter,
+    ?TraceContext $context = null,
+    string $runName = 'executor.run',
+): HookTraceBridge {
+    return Factory::createTraceBridge($exporter, $context, $runName);
+}
+
+function createRunCheckpointStore(): RunCheckpointStore
+{
+    return Factory::createRunCheckpointStore();
+}
+
+function createMemoryStore(): MemoryStore
+{
+    return Factory::createMemoryStore();
+}
+
+/**
+ * @param  list<WorkflowStep>  $steps
+ */
+function createWorkflowEngine(array $steps, ?ConversationState $state = null): WorkflowEngine
+{
+    return Factory::createWorkflowEngine($steps, $state);
+}
+
+/**
+ * @param  callable(array<string, mixed>): mixed  $subject
+ * @param  list<EvalCase>  $cases
+ */
+function createEvaluationSuite(
+    string $name,
+    callable $subject,
+    array $cases = [],
+    ?SnapshotStoreInterface $snapshotStore = null,
+    bool $recordSnapshots = false,
+): EvaluationSuite {
+    return Factory::createEvaluationSuite($name, $subject, $cases, $snapshotStore, $recordSnapshots);
+}
+
+function createFilesystemSnapshotStore(string $directory): FilesystemSnapshotStore
+{
+    return Factory::createFilesystemSnapshotStore($directory);
+}
+
+function createInMemorySnapshotStore(): InMemorySnapshotStore
+{
+    return Factory::createInMemorySnapshotStore();
 }
 
 /**

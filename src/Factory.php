@@ -11,6 +11,11 @@ use HelgeSverre\Synapse\Embeddings\Jina\JinaEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\Mistral\MistralEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\OpenAI\OpenAIEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\Voyage\VoyageEmbeddingProvider;
+use HelgeSverre\Synapse\Evaluation\EvalCase;
+use HelgeSverre\Synapse\Evaluation\EvaluationSuite;
+use HelgeSverre\Synapse\Evaluation\FilesystemSnapshotStore;
+use HelgeSverre\Synapse\Evaluation\InMemorySnapshotStore;
+use HelgeSverre\Synapse\Evaluation\SnapshotStoreInterface;
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
@@ -38,9 +43,19 @@ use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
 use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
+use HelgeSverre\Synapse\Runtime\Checkpoint\InMemoryRunCheckpointStore;
+use HelgeSverre\Synapse\Runtime\Checkpoint\RunCheckpointStore;
+use HelgeSverre\Synapse\Runtime\Memory\InMemoryMemoryStore;
+use HelgeSverre\Synapse\Runtime\Memory\MemoryStore;
 use HelgeSverre\Synapse\State\ConversationState;
 use HelgeSverre\Synapse\State\Dialogue;
 use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
+use HelgeSverre\Synapse\Trace\HookTraceBridge;
+use HelgeSverre\Synapse\Trace\InMemoryTraceExporter;
+use HelgeSverre\Synapse\Trace\TraceContext;
+use HelgeSverre\Synapse\Trace\TraceExporterInterface;
+use HelgeSverre\Synapse\Workflow\WorkflowEngine;
+use HelgeSverre\Synapse\Workflow\WorkflowStep;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -470,6 +485,87 @@ final class Factory
     public static function createAgentRegistry(): AgentRegistry
     {
         return new AgentRegistry;
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public static function createTraceContext(array $attributes = [], ?string $traceId = null, ?string $runId = null): TraceContext
+    {
+        return TraceContext::root($attributes, $traceId, $runId);
+    }
+
+    public static function createInMemoryTraceExporter(): InMemoryTraceExporter
+    {
+        return new InMemoryTraceExporter;
+    }
+
+    public static function createTraceBridge(
+        TraceExporterInterface $exporter,
+        ?TraceContext $context = null,
+        string $runName = 'executor.run',
+    ): HookTraceBridge {
+        return new HookTraceBridge($exporter, $context, $runName);
+    }
+
+    public static function createRunCheckpointStore(): RunCheckpointStore
+    {
+        return new InMemoryRunCheckpointStore;
+    }
+
+    public static function createMemoryStore(): MemoryStore
+    {
+        return new InMemoryMemoryStore;
+    }
+
+    /**
+     * @param  list<mixed>  $steps
+     */
+    public static function createWorkflowEngine(array $steps, ?ConversationState $state = null): WorkflowEngine
+    {
+        $validatedSteps = [];
+        foreach ($steps as $step) {
+            if (! $step instanceof WorkflowStep) {
+                throw new \InvalidArgumentException('Workflow steps must be WorkflowStep instances.');
+            }
+
+            $validatedSteps[] = $step;
+        }
+
+        return new WorkflowEngine($validatedSteps, $state);
+    }
+
+    /**
+     * @param  callable(array<string, mixed>): mixed  $subject
+     * @param  list<mixed>  $cases
+     */
+    public static function createEvaluationSuite(
+        string $name,
+        callable $subject,
+        array $cases = [],
+        ?SnapshotStoreInterface $snapshotStore = null,
+        bool $recordSnapshots = false,
+    ): EvaluationSuite {
+        $validatedCases = [];
+        foreach ($cases as $case) {
+            if (! $case instanceof EvalCase) {
+                throw new \InvalidArgumentException('Evaluation cases must be EvalCase instances.');
+            }
+
+            $validatedCases[] = $case;
+        }
+
+        return new EvaluationSuite($name, $subject, $validatedCases, $snapshotStore, $recordSnapshots);
+    }
+
+    public static function createFilesystemSnapshotStore(string $directory): FilesystemSnapshotStore
+    {
+        return new FilesystemSnapshotStore($directory);
+    }
+
+    public static function createInMemorySnapshotStore(): InMemorySnapshotStore
+    {
+        return new InMemorySnapshotStore;
     }
 
     /**

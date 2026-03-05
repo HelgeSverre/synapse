@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Synapse\Tests\Unit;
 
+use function HelgeSverre\Synapse\createEvaluationSuite;
 use function HelgeSverre\Synapse\createExecutor;
+use function HelgeSverre\Synapse\createInMemoryTraceExporter;
+use function HelgeSverre\Synapse\createMemoryStore;
 use function HelgeSverre\Synapse\createPrompt;
+use function HelgeSverre\Synapse\createRunCheckpointStore;
 use function HelgeSverre\Synapse\createToolRegistry;
+use function HelgeSverre\Synapse\createTraceBridge;
+use function HelgeSverre\Synapse\createTraceContext;
+use function HelgeSverre\Synapse\createWorkflowEngine;
 
+use HelgeSverre\Synapse\Evaluation\EvaluationSuite;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Options\ExecutorOptions;
@@ -17,7 +25,13 @@ use HelgeSverre\Synapse\Provider\LlmProviderInterface;
 use HelgeSverre\Synapse\Provider\ProviderCapabilities;
 use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
 use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\Runtime\Checkpoint\RunCheckpointStore;
+use HelgeSverre\Synapse\Runtime\Memory\MemoryStore;
 use HelgeSverre\Synapse\State\Message;
+use HelgeSverre\Synapse\Trace\HookTraceBridge;
+use HelgeSverre\Synapse\Trace\TraceContext;
+use HelgeSverre\Synapse\Workflow\WorkflowEngine;
+use HelgeSverre\Synapse\Workflow\WorkflowStep;
 use PHPUnit\Framework\TestCase;
 
 final class FunctionsTest extends TestCase
@@ -104,5 +118,46 @@ final class FunctionsTest extends TestCase
 
         $this->assertInstanceOf(ToolRegistry::class, $registry);
         $this->assertTrue($registry->hasFunction('noop'));
+    }
+
+    public function test_runtime_and_evaluation_function_helpers_create_expected_types(): void
+    {
+        $context = createTraceContext(['service' => 'test']);
+        $bridge = createTraceBridge(createInMemoryTraceExporter(), $context);
+        $checkpointStore = createRunCheckpointStore();
+        $memoryStore = createMemoryStore();
+        $workflow = createWorkflowEngine([
+            new WorkflowStep('one', static fn (): string => 'ok'),
+        ]);
+        $suite = createEvaluationSuite('suite', static fn (array $input): mixed => $input['value'] ?? null);
+
+        $this->assertInstanceOf(TraceContext::class, $context);
+        $this->assertInstanceOf(HookTraceBridge::class, $bridge);
+        $this->assertInstanceOf(RunCheckpointStore::class, $checkpointStore);
+        $this->assertInstanceOf(MemoryStore::class, $memoryStore);
+        $this->assertInstanceOf(WorkflowEngine::class, $workflow);
+        $this->assertInstanceOf(EvaluationSuite::class, $suite);
+    }
+
+    public function test_runtime_helpers_validate_input_types(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Workflow steps must be WorkflowStep instances.');
+
+        /** @var array<int, mixed> $steps */
+        $steps = ['invalid'];
+        createWorkflowEngine($steps);
+    }
+
+    public function test_create_evaluation_suite_validates_case_types(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Evaluation cases must be EvalCase instances.');
+
+        createEvaluationSuite(
+            name: 'suite',
+            subject: static fn (array $input): mixed => $input,
+            cases: ['invalid'],
+        );
     }
 }
