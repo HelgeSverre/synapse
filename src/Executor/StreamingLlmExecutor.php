@@ -39,6 +39,9 @@ final class StreamingLlmExecutor
 
     protected ConversationState $state;
 
+    /** @var list<Message> */
+    protected array $history = [];
+
     public function __construct(
         private readonly StreamableProviderInterface $provider,
         private readonly PromptInterface $prompt,
@@ -164,16 +167,54 @@ final class StreamingLlmExecutor
             $messages = [Message::user($rendered)];
         }
 
-        $dialogueKey = $input['_dialogueKey'] ?? null;
-        if ($dialogueKey !== null && isset($input[$dialogueKey])) {
-            $history = $input[$dialogueKey];
-            if (is_array($history)) {
-                $historyMessages = array_filter($history, fn ($m): bool => $m instanceof Message);
-                $messages = [...$historyMessages, ...$messages];
-            }
+        $history = $this->resolveHistory($input);
+        if ($history !== [] && ! $this->containsHistoryMessages($messages, $history)) {
+            $messages = [...$history, ...$messages];
         }
 
         return $messages;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @return list<Message>
+     */
+    private function resolveHistory(array $input): array
+    {
+        $history = $this->history;
+
+        if (isset($input['history']) && is_array($input['history'])) {
+            $inputHistory = array_filter($input['history'], fn ($m): bool => $m instanceof Message);
+            /** @var list<Message> $inputHistory */
+            $inputHistory = array_values($inputHistory);
+            $history = [...$history, ...$inputHistory];
+        }
+
+        return $history;
+    }
+
+    /**
+     * @param  list<Message>  $messages
+     * @param  list<Message>  $history
+     */
+    private function containsHistoryMessages(array $messages, array $history): bool
+    {
+        if ($messages === [] || $history === []) {
+            return false;
+        }
+
+        $historyIds = [];
+        foreach ($history as $message) {
+            $historyIds[spl_object_id($message)] = true;
+        }
+
+        foreach ($messages as $message) {
+            if (isset($historyIds[spl_object_id($message)])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getProvider(): StreamableProviderInterface
@@ -199,6 +240,30 @@ final class StreamingLlmExecutor
     public function getState(): ConversationState
     {
         return $this->state;
+    }
+
+    /**
+     * @param  list<Message>  $history
+     */
+    public function withHistory(array $history): self
+    {
+        $clone = clone $this;
+        $clone->history = $history;
+
+        return $clone;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @param  list<Message>  $history
+     */
+    public function run(array $input = [], array $history = [], ?StreamContext $ctx = null): StreamingResult
+    {
+        if ($history !== []) {
+            $input['history'] = $history;
+        }
+
+        return $this->streamAndCollect($input, $ctx);
     }
 
     public function withState(ConversationState $state): self

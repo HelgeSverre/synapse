@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Synapse;
 
+use HelgeSverre\Synapse\Agent\AgentRegistry;
 use HelgeSverre\Synapse\Embeddings\EmbeddingProviderInterface;
 use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\MiddlewareToolExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\ToolMiddleware;
 use HelgeSverre\Synapse\Executor\ToolRegistry;
+use HelgeSverre\Synapse\Options\CallableExecutorOptions;
+use HelgeSverre\Synapse\Options\ExecutorOptions;
 use HelgeSverre\Synapse\Parser\ParserInterface;
 use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
@@ -82,9 +87,9 @@ function createCoreExecutor(callable $handler, ?string $name = null): CoreExecut
 /**
  * Create an LLM executor.
  *
- * @param  array<string, mixed>  $options
+ * @param  array<string, mixed>|ExecutorOptions  $options
  */
-function createLlmExecutor(array $options): LlmExecutor
+function createLlmExecutor(array|ExecutorOptions $options): LlmExecutor
 {
     return Factory::createLlmExecutor($options);
 }
@@ -92,9 +97,9 @@ function createLlmExecutor(array $options): LlmExecutor
 /**
  * Create an LLM executor with function calling support.
  *
- * @param  array<string, mixed>  $options
+ * @param  array<string, mixed>|ExecutorOptions  $options
  */
-function createLlmExecutorWithFunctions(array $options): LlmExecutorWithFunctions
+function createLlmExecutorWithFunctions(array|ExecutorOptions $options): LlmExecutorWithFunctions
 {
     return Factory::createLlmExecutorWithFunctions($options);
 }
@@ -102,9 +107,9 @@ function createLlmExecutorWithFunctions(array $options): LlmExecutorWithFunction
 /**
  * Create a streaming LLM executor.
  *
- * @param  array<string, mixed>  $options
+ * @param  array<string, mixed>|ExecutorOptions  $options
  */
-function createStreamingLlmExecutor(array $options): StreamingLlmExecutor
+function createStreamingLlmExecutor(array|ExecutorOptions $options): StreamingLlmExecutor
 {
     return Factory::createStreamingLlmExecutor($options);
 }
@@ -112,17 +117,32 @@ function createStreamingLlmExecutor(array $options): StreamingLlmExecutor
 /**
  * Create a streaming LLM executor with function calling support.
  *
- * @param  array<string, mixed>  $options
+ * @param  array<string, mixed>|ExecutorOptions  $options
  */
-function createStreamingLlmExecutorWithFunctions(array $options): StreamingLlmExecutorWithFunctions
+function createStreamingLlmExecutorWithFunctions(array|ExecutorOptions $options): StreamingLlmExecutorWithFunctions
 {
     return Factory::createStreamingLlmExecutorWithFunctions($options);
 }
 
 /**
+ * Create an executor using a single, predictable API.
+ *
+ * - `stream: false` + no tools => LlmExecutor
+ * - `stream: false` + tools    => LlmExecutorWithFunctions
+ * - `stream: true`  + no tools => StreamingLlmExecutor
+ * - `stream: true`  + tools    => StreamingLlmExecutorWithFunctions
+ *
+ * @param  array<string, mixed>|ExecutorOptions  $options
+ */
+function createExecutor(array|ExecutorOptions $options): LlmExecutor|LlmExecutorWithFunctions|StreamingLlmExecutor|StreamingLlmExecutorWithFunctions
+{
+    return Factory::createExecutor($options);
+}
+
+/**
  * Create a tool registry from executors.
  *
- * @param  list<CallableExecutor|array<string, mixed>>  $executors
+ * @param  list<CallableExecutor|CallableExecutorOptions|array<string, mixed>>  $executors
  */
 function createToolRegistry(array $executors): ToolRegistry
 {
@@ -132,11 +152,21 @@ function createToolRegistry(array $executors): ToolRegistry
 /**
  * Create a callable executor from config.
  *
- * @param  array<string, mixed>  $config
+ * @param  array<string, mixed>|CallableExecutorOptions  $config
  */
-function createCallableExecutor(array $config): CallableExecutor
+function createCallableExecutor(array|CallableExecutorOptions $config): CallableExecutor
 {
     return Factory::createCallableExecutor($config);
+}
+
+/**
+ * @param  list<ToolMiddleware>  $middleware
+ */
+function createMiddlewareToolExecutor(
+    \HelgeSverre\Synapse\Executor\ToolExecutorInterface $inner,
+    array $middleware = [],
+): MiddlewareToolExecutor {
+    return Factory::createMiddlewareToolExecutor($inner, $middleware);
 }
 
 /**
@@ -153,6 +183,11 @@ function createState(): ConversationState
 function createDialogue(?string $name = null): Dialogue
 {
     return Factory::createDialogue($name);
+}
+
+function createAgentRegistry(): AgentRegistry
+{
+    return Factory::createAgentRegistry();
 }
 
 /**

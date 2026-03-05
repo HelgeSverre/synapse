@@ -31,12 +31,15 @@ final class LlmExecutorWithFunctions extends LlmExecutor
         string $model,
         private readonly ToolExecutorInterface $tools,
         private readonly int $maxIterations = 10,
+        ?ToolCatalogResolver $toolCatalogResolver = null,
         ?float $temperature = null,
         ?int $maxTokens = null,
         ?string $name = null,
         ?HookDispatcherInterface $hooks = null,
         ?ConversationState $state = null,
     ) {
+        $this->toolCatalogResolver = $toolCatalogResolver ?? new VisibilityToolCatalogResolver;
+
         parent::__construct(
             $provider,
             $prompt,
@@ -50,6 +53,8 @@ final class LlmExecutorWithFunctions extends LlmExecutor
             $state,
         );
     }
+
+    private readonly ToolCatalogResolver $toolCatalogResolver;
 
     protected function handler(mixed $input): ExecutionResult
     {
@@ -68,7 +73,7 @@ final class LlmExecutorWithFunctions extends LlmExecutor
                 messages: $messages,
                 temperature: $this->temperature,
                 maxTokens: $this->maxTokens,
-                tools: $this->tools->getToolDefinitions(),
+                tools: $this->toolCatalogResolver->resolve($input, $this->state, $iterations, $this->tools),
             );
 
             $this->hooks->dispatch(new BeforeProviderCall($request));
@@ -122,5 +127,10 @@ final class LlmExecutorWithFunctions extends LlmExecutor
     public function getTools(): ToolExecutorInterface
     {
         return $this->tools;
+    }
+
+    public function getToolCatalogResolver(): ToolCatalogResolver
+    {
+        return $this->toolCatalogResolver;
     }
 }

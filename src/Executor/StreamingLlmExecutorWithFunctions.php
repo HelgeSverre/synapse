@@ -44,22 +44,29 @@ final class StreamingLlmExecutorWithFunctions
 
     protected ConversationState $state;
 
+    /** @var list<Message> */
+    protected array $history = [];
+
     public function __construct(
         private readonly StreamableProviderInterface $provider,
         private readonly PromptInterface $prompt,
         private readonly string $model,
         private readonly ToolExecutorInterface $tools,
         private readonly int $maxIterations = 10,
+        ?ToolCatalogResolver $toolCatalogResolver = null,
         private readonly ?float $temperature = null,
         private readonly ?int $maxTokens = null,
         ?string $name = null,
         ?HookDispatcherInterface $hooks = null,
         ?ConversationState $state = null,
     ) {
+        $this->toolCatalogResolver = $toolCatalogResolver ?? new VisibilityToolCatalogResolver;
         $this->metadata = ExecutorMetadata::create(self::class, $name ?? 'StreamingLlmExecutorWithFunctions');
         $this->hooks = $hooks ?? new HookDispatcher;
         $this->state = $state ?? new ConversationState;
     }
+
+    private readonly ToolCatalogResolver $toolCatalogResolver;
 
     /**
      * Stream the LLM response, handling tool calls automatically.
@@ -87,7 +94,7 @@ final class StreamingLlmExecutorWithFunctions
             $this->hooks->dispatch(new OnStreamStart(new GenerationRequest(
                 model: $this->model,
                 messages: $messages,
-                tools: $this->tools->getToolDefinitions(),
+                tools: $this->toolCatalogResolver->resolve($input, $this->state, 0, $this->tools),
             )));
 
             $iterations = 0;
@@ -105,7 +112,7 @@ final class StreamingLlmExecutorWithFunctions
                     messages: $messages,
                     temperature: $this->temperature,
                     maxTokens: $this->maxTokens,
-                    tools: $this->tools->getToolDefinitions(),
+                    tools: $this->toolCatalogResolver->resolve($input, $this->state, $iterations, $this->tools),
                 );
 
                 /** @var TurnResult $turn */
@@ -283,16 +290,54 @@ final class StreamingLlmExecutorWithFunctions
             $messages = [Message::user($rendered)];
         }
 
-        $dialogueKey = $input['_dialogueKey'] ?? null;
-        if ($dialogueKey !== null && isset($input[$dialogueKey])) {
-            $history = $input[$dialogueKey];
-            if (is_array($history)) {
-                $historyMessages = array_filter($history, fn ($m): bool => $m instanceof Message);
-                $messages = [...$historyMessages, ...$messages];
-            }
+        $history = $this->resolveHistory($input);
+        if ($history !== [] && ! $this->containsHistoryMessages($messages, $history)) {
+            $messages = [...$history, ...$messages];
         }
 
         return $messages;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @return list<Message>
+     */
+    private function resolveHistory(array $input): array
+    {
+        $history = $this->history;
+
+        if (isset($input['history']) && is_array($input['history'])) {
+            $inputHistory = array_filter($input['history'], fn ($m): bool => $m instanceof Message);
+            /** @var list<Message> $inputHistory */
+            $inputHistory = array_values($inputHistory);
+            $history = [...$history, ...$inputHistory];
+        }
+
+        return $history;
+    }
+
+    /**
+     * @param  list<Message>  $messages
+     * @param  list<Message>  $history
+     */
+    private function containsHistoryMessages(array $messages, array $history): bool
+    {
+        if ($messages === [] || $history === []) {
+            return false;
+        }
+
+        $historyIds = [];
+        foreach ($history as $message) {
+            $historyIds[spl_object_id($message)] = true;
+        }
+
+        foreach ($messages as $message) {
+            if (isset($historyIds[spl_object_id($message)])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getProvider(): StreamableProviderInterface
@@ -315,6 +360,11 @@ final class StreamingLlmExecutorWithFunctions
         return $this->tools;
     }
 
+    public function getToolCatalogResolver(): ToolCatalogResolver
+    {
+        return $this->toolCatalogResolver;
+    }
+
     public function getMetadata(): ExecutorMetadata
     {
         return $this->metadata;
@@ -323,6 +373,30 @@ final class StreamingLlmExecutorWithFunctions
     public function getState(): ConversationState
     {
         return $this->state;
+    }
+
+    /**
+     * @param  list<Message>  $history
+     */
+    public function withHistory(array $history): self
+    {
+        $clone = clone $this;
+        $clone->history = $history;
+
+        return $clone;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @param  list<Message>  $history
+     */
+    public function run(array $input = [], array $history = [], ?StreamContext $ctx = null): StreamingResult
+    {
+        if ($history !== []) {
+            $input['history'] = $history;
+        }
+
+        return $this->streamAndCollect($input, $ctx);
     }
 
     public function withState(ConversationState $state): self

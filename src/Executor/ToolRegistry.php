@@ -79,24 +79,6 @@ final class ToolRegistry implements ToolExecutorInterface
     }
 
     /**
-     * @deprecated Use callFunctionResult() for predictable, structured output.
-     *
-     * @param  array<string, mixed>  $input
-     */
-    public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
-    {
-        $executor = $this->executors[$name] ?? null;
-
-        if ($executor === null) {
-            throw new \InvalidArgumentException("Unknown function: {$name}");
-        }
-
-        $result = $this->callFunctionResult($name, $input, $state);
-
-        return $result->success ? $result->result : $result->toJson();
-    }
-
-    /**
      * @param  array<string, mixed>  $input
      * @return array{valid: bool, errors: list<string>}
      */

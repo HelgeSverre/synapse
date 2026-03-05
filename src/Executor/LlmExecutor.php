@@ -26,6 +26,9 @@ use HelgeSverre\Synapse\State\Message;
  */
 class LlmExecutor extends BaseExecutor
 {
+    /** @var list<Message> */
+    protected array $history = [];
+
     public function __construct(
         protected readonly LlmProviderInterface $provider,
         protected readonly PromptInterface $prompt,
@@ -102,18 +105,54 @@ class LlmExecutor extends BaseExecutor
             $messages = [Message::user($rendered)];
         }
 
-        // Include dialogue history from state if present
-        $dialogueKey = $input['_dialogueKey'] ?? null;
-        if ($dialogueKey !== null && isset($input[$dialogueKey])) {
-            $history = $input[$dialogueKey];
-            if (is_array($history)) {
-                // Prepend history before rendered messages
-                $historyMessages = array_filter($history, fn ($m): bool => $m instanceof Message);
-                $messages = [...$historyMessages, ...$messages];
-            }
+        $history = $this->resolveHistory($input);
+        if ($history !== [] && ! $this->containsHistoryMessages($messages, $history)) {
+            $messages = [...$history, ...$messages];
         }
 
         return $messages;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @return list<Message>
+     */
+    protected function resolveHistory(array $input): array
+    {
+        $history = $this->history;
+
+        if (isset($input['history']) && is_array($input['history'])) {
+            $inputHistory = array_filter($input['history'], fn ($m): bool => $m instanceof Message);
+            /** @var list<Message> $inputHistory */
+            $inputHistory = array_values($inputHistory);
+            $history = [...$history, ...$inputHistory];
+        }
+
+        return $history;
+    }
+
+    /**
+     * @param  list<Message>  $messages
+     * @param  list<Message>  $history
+     */
+    protected function containsHistoryMessages(array $messages, array $history): bool
+    {
+        if ($messages === [] || $history === []) {
+            return false;
+        }
+
+        $historyIds = [];
+        foreach ($history as $message) {
+            $historyIds[spl_object_id($message)] = true;
+        }
+
+        foreach ($messages as $message) {
+            if (isset($historyIds[spl_object_id($message)])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getProvider(): LlmProviderInterface
@@ -134,5 +173,16 @@ class LlmExecutor extends BaseExecutor
     public function getModel(): string
     {
         return $this->model;
+    }
+
+    /**
+     * @param  list<Message>  $history
+     */
+    public function withHistory(array $history): static
+    {
+        $clone = clone $this;
+        $clone->history = $history;
+
+        return $clone;
     }
 }

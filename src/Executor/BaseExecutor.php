@@ -35,14 +35,19 @@ abstract class BaseExecutor
 
     /**
      * @param  I  $input
+     * @param  list<\HelgeSverre\Synapse\State\Message>  $history
      * @return ExecutionResult<O>
      */
-    public function execute(array $input = []): ExecutionResult
+    public function execute(array $input = [], array $history = []): ExecutionResult
     {
         $start = hrtime(true);
         $this->metadata = $this->metadata->withExecution();
 
         try {
+            if ($history !== []) {
+                $input['history'] = $history;
+            }
+
             $handlerInput = $this->getHandlerInput($input);
             $result = $this->handler($handlerInput);
             $output = $this->getHandlerOutput($result);
@@ -61,9 +66,19 @@ abstract class BaseExecutor
     }
 
     /**
+     * @param  I  $input
+     * @param  list<\HelgeSverre\Synapse\State\Message>  $history
+     * @return ExecutionResult<O>
+     */
+    public function run(array $input = [], array $history = []): ExecutionResult
+    {
+        return $this->execute($input, $history);
+    }
+
+    /**
      * Transform input before handler.
      *
-     * @param  I  $input
+     * @param  array<string, mixed>  $input
      */
     protected function getHandlerInput(array $input): mixed
     {

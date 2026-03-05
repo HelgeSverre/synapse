@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Synapse;
 
+use HelgeSverre\Synapse\Agent\AgentRegistry;
 use HelgeSverre\Synapse\Embeddings\Cohere\CohereEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\EmbeddingProviderInterface;
 use HelgeSverre\Synapse\Embeddings\Jina\JinaEmbeddingProvider;
@@ -14,23 +15,16 @@ use HelgeSverre\Synapse\Executor\CallableExecutor;
 use HelgeSverre\Synapse\Executor\CoreExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\MiddlewareToolExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
 use HelgeSverre\Synapse\Executor\StreamingLlmExecutorWithFunctions;
 use HelgeSverre\Synapse\Executor\ToolExecutorInterface;
+use HelgeSverre\Synapse\Executor\ToolMiddleware;
 use HelgeSverre\Synapse\Executor\ToolRegistry;
-use HelgeSverre\Synapse\Parser\BooleanParser;
-use HelgeSverre\Synapse\Parser\CustomParser;
-use HelgeSverre\Synapse\Parser\EnumParser;
-use HelgeSverre\Synapse\Parser\JsonParser;
-use HelgeSverre\Synapse\Parser\ListParser;
-use HelgeSverre\Synapse\Parser\ListToJsonParser;
-use HelgeSverre\Synapse\Parser\ListToKeyValueParser;
-use HelgeSverre\Synapse\Parser\LlmFunctionParser;
-use HelgeSverre\Synapse\Parser\MarkdownCodeBlockParser;
-use HelgeSverre\Synapse\Parser\MarkdownCodeBlocksParser;
-use HelgeSverre\Synapse\Parser\NumberParser;
+use HelgeSverre\Synapse\Options\CallableExecutorOptions;
+use HelgeSverre\Synapse\Options\ExecutorOptions;
 use HelgeSverre\Synapse\Parser\ParserInterface;
-use HelgeSverre\Synapse\Parser\ReplaceStringTemplateParser;
+use HelgeSverre\Synapse\Parser\Parsers;
 use HelgeSverre\Synapse\Parser\StringParser;
 use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
@@ -106,7 +100,14 @@ final class Factory
 
         $parts = explode('.', $provider, 2);
         $providerName = $parts[0];
-        $model = $parts[1] ?? null;
+        $modelFromProvider = $parts[1] ?? null;
+        $modelFromOptions = $options['model'] ?? null;
+
+        if ($modelFromProvider !== null && $modelFromOptions !== null && $modelFromProvider !== $modelFromOptions) {
+            throw new \InvalidArgumentException('Model is configured twice. Use either provider.model or options["model"], not conflicting values.');
+        }
+
+        $model = $modelFromOptions ?? $modelFromProvider;
 
         $providerInstance = match ($providerName) {
             'openai' => new OpenAIProvider(
@@ -158,19 +159,35 @@ final class Factory
      *
      * @return array{0: LlmProviderInterface, 1: string}
      */
-    private static function resolveProviderAndModel(array $options): array
+    private static function resolveProviderAndModel(ExecutorOptions $options): array
     {
-        $llm = $options['llm'] ?? $options['provider'] ?? throw new \InvalidArgumentException('llm/provider is required');
+        $llm = $options->llm;
 
         if ($llm instanceof Llm) {
             $provider = $llm->provider;
-            $model = $options['model'] ?? $llm->model ?? throw new \InvalidArgumentException('model is required');
+            if ($options->model !== null && $llm->model !== null && $options->model !== $llm->model) {
+                throw new \InvalidArgumentException('Model is configured twice (useLlm + executor options). Remove one source of truth.');
+            }
+
+            $model = $options->model ?? $llm->model ?? throw new \InvalidArgumentException('model is required');
         } else {
             $provider = $llm;
-            $model = $options['model'] ?? throw new \InvalidArgumentException('model is required');
+            $model = $options->model ?? throw new \InvalidArgumentException('model is required');
         }
 
         return [$provider, $model];
+    }
+
+    /**
+     * @param  array<string, mixed>|ExecutorOptions  $options
+     */
+    private static function normalizeExecutorOptions(array|ExecutorOptions $options): ExecutorOptions
+    {
+        if ($options instanceof ExecutorOptions) {
+            return $options;
+        }
+
+        return ExecutorOptions::fromArray($options);
     }
 
     public static function createTextPrompt(): TextPrompt
@@ -189,39 +206,40 @@ final class Factory
     public static function createParser(string $type, array $options = []): ParserInterface
     {
         return match ($type) {
-            'string' => new StringParser($options['trim'] ?? true),
-            'boolean', 'bool' => new BooleanParser,
-            'number', 'int', 'float' => new NumberParser($options['intOnly'] ?? false),
-            'json' => new JsonParser(
+            'string' => Parsers::string($options['trim'] ?? true),
+            'boolean', 'bool' => Parsers::boolean(),
+            'number', 'int', 'float' => Parsers::number($options['intOnly'] ?? false),
+            'json' => Parsers::json(
                 schema: $options['schema'] ?? null,
                 validateSchema: $options['validateSchema'] ?? false,
                 validator: $options['validator'] ?? null,
             ),
-            'list', 'array' => new ListParser,
-            'code', 'codeblock', 'markdownCodeBlock' => new MarkdownCodeBlockParser(
+            'list', 'array' => Parsers::list(),
+            'code', 'codeblock', 'markdownCodeBlock' => Parsers::codeBlock(
                 language: $options['language'] ?? null,
                 firstOnly: $options['firstOnly'] ?? true,
             ),
-            'codeblocks', 'markdownCodeBlocks' => new MarkdownCodeBlocksParser,
-            'enum' => new EnumParser(
-                allowedValues: $options['values'] ?? throw new \InvalidArgumentException('values is required'),
+            'codeblocks', 'markdownCodeBlocks' => Parsers::codeBlocks(),
+            'enum' => Parsers::enum(
+                values: $options['values'] ?? throw new \InvalidArgumentException('values is required'),
                 caseSensitive: $options['caseSensitive'] ?? false,
             ),
-            'keyvalue', 'key-value' => new ListToKeyValueParser(
+            'keyvalue', 'key-value' => Parsers::keyValue(
                 separator: $options['separator'] ?? ':',
                 trimValues: $options['trimValues'] ?? true,
             ),
-            'listjson', 'list-json' => new ListToJsonParser(
+            'listjson', 'list-json' => Parsers::listJson(
                 separator: $options['separator'] ?? ':',
                 indentSpaces: $options['indentSpaces'] ?? 2,
             ),
-            'template', 'replace' => (new ReplaceStringTemplateParser(
+            'template', 'replace' => Parsers::template(
+                replacements: $options['replacements'] ?? [],
                 strict: $options['strict'] ?? false,
-            ))->withReplacements($options['replacements'] ?? []),
-            'function', 'tool' => new LlmFunctionParser(
-                wrappedParser: $options['parser'] ?? new StringParser,
             ),
-            'custom' => new CustomParser(
+            'function', 'tool' => Parsers::tool(
+                wrappedParser: $options['parser'] ?? null,
+            ),
+            'custom' => Parsers::custom(
                 handler: $options['handler'] ?? throw new \InvalidArgumentException('handler is required'),
             ),
             default => throw new \InvalidArgumentException("Unknown parser type: {$type}"),
@@ -240,34 +258,36 @@ final class Factory
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param  array<string, mixed>|ExecutorOptions  $options
      */
-    public static function createLlmExecutor(array $options): LlmExecutor
+    public static function createLlmExecutor(array|ExecutorOptions $options): LlmExecutor
     {
-        [$provider, $model] = self::resolveProviderAndModel($options);
+        $resolved = self::normalizeExecutorOptions($options);
+        [$provider, $model] = self::resolveProviderAndModel($resolved);
 
         return new LlmExecutor(
             provider: $provider,
-            prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
-            parser: $options['parser'] ?? new StringParser,
+            prompt: $resolved->prompt,
+            parser: $resolved->parser ?? new StringParser,
             model: $model,
-            temperature: $options['temperature'] ?? null,
-            maxTokens: $options['maxTokens'] ?? null,
-            responseFormat: $options['responseFormat'] ?? null,
-            name: $options['name'] ?? null,
-            hooks: $options['hooks'] ?? null,
-            state: $options['state'] ?? null,
+            temperature: $resolved->temperature,
+            maxTokens: $resolved->maxTokens,
+            responseFormat: $resolved->responseFormat,
+            name: $resolved->name,
+            hooks: $resolved->hooks,
+            state: $resolved->state,
         );
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param  array<string, mixed>|ExecutorOptions  $options
      */
-    public static function createLlmExecutorWithFunctions(array $options): LlmExecutorWithFunctions
+    public static function createLlmExecutorWithFunctions(array|ExecutorOptions $options): LlmExecutorWithFunctions
     {
-        [$provider, $model] = self::resolveProviderAndModel($options);
+        $resolved = self::normalizeExecutorOptions($options);
+        [$provider, $model] = self::resolveProviderAndModel($resolved);
 
-        $tools = $options['tools'] ?? null;
+        $tools = $resolved->tools;
         if (! $tools instanceof ToolExecutorInterface) {
             if (is_array($tools)) {
                 if (! array_is_list($tools)) {
@@ -284,25 +304,27 @@ final class Factory
 
         return new LlmExecutorWithFunctions(
             provider: $provider,
-            prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
-            parser: $options['parser'] ?? new StringParser,
+            prompt: $resolved->prompt,
+            parser: $resolved->parser ?? new StringParser,
             model: $model,
             tools: $tools,
-            maxIterations: $options['maxIterations'] ?? 10,
-            temperature: $options['temperature'] ?? null,
-            maxTokens: $options['maxTokens'] ?? null,
-            name: $options['name'] ?? null,
-            hooks: $options['hooks'] ?? null,
-            state: $options['state'] ?? null,
+            maxIterations: $resolved->maxIterations,
+            toolCatalogResolver: $resolved->toolCatalogResolver,
+            temperature: $resolved->temperature,
+            maxTokens: $resolved->maxTokens,
+            name: $resolved->name,
+            hooks: $resolved->hooks,
+            state: $resolved->state,
         );
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param  array<string, mixed>|ExecutorOptions  $options
      */
-    public static function createStreamingLlmExecutor(array $options): StreamingLlmExecutor
+    public static function createStreamingLlmExecutor(array|ExecutorOptions $options): StreamingLlmExecutor
     {
-        [$provider, $model] = self::resolveProviderAndModel($options);
+        $resolved = self::normalizeExecutorOptions($options);
+        [$provider, $model] = self::resolveProviderAndModel($resolved);
 
         if (! $provider instanceof StreamableProviderInterface) {
             throw new \InvalidArgumentException('Provider must implement StreamableProviderInterface for streaming');
@@ -310,28 +332,29 @@ final class Factory
 
         return new StreamingLlmExecutor(
             provider: $provider,
-            prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
+            prompt: $resolved->prompt,
             model: $model,
-            temperature: $options['temperature'] ?? null,
-            maxTokens: $options['maxTokens'] ?? null,
-            name: $options['name'] ?? null,
-            hooks: $options['hooks'] ?? null,
-            state: $options['state'] ?? null,
+            temperature: $resolved->temperature,
+            maxTokens: $resolved->maxTokens,
+            name: $resolved->name,
+            hooks: $resolved->hooks,
+            state: $resolved->state,
         );
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param  array<string, mixed>|ExecutorOptions  $options
      */
-    public static function createStreamingLlmExecutorWithFunctions(array $options): StreamingLlmExecutorWithFunctions
+    public static function createStreamingLlmExecutorWithFunctions(array|ExecutorOptions $options): StreamingLlmExecutorWithFunctions
     {
-        [$provider, $model] = self::resolveProviderAndModel($options);
+        $resolved = self::normalizeExecutorOptions($options);
+        [$provider, $model] = self::resolveProviderAndModel($resolved);
 
         if (! $provider instanceof StreamableProviderInterface) {
             throw new \InvalidArgumentException('Provider must implement StreamableProviderInterface for streaming');
         }
 
-        $tools = $options['tools'] ?? null;
+        $tools = $resolved->tools;
         if (! $tools instanceof ToolExecutorInterface) {
             if (is_array($tools)) {
                 if (! array_is_list($tools)) {
@@ -348,20 +371,44 @@ final class Factory
 
         return new StreamingLlmExecutorWithFunctions(
             provider: $provider,
-            prompt: $options['prompt'] ?? throw new \InvalidArgumentException('prompt is required'),
+            prompt: $resolved->prompt,
             model: $model,
             tools: $tools,
-            maxIterations: $options['maxIterations'] ?? 10,
-            temperature: $options['temperature'] ?? null,
-            maxTokens: $options['maxTokens'] ?? null,
-            name: $options['name'] ?? null,
-            hooks: $options['hooks'] ?? null,
-            state: $options['state'] ?? null,
+            maxIterations: $resolved->maxIterations,
+            toolCatalogResolver: $resolved->toolCatalogResolver,
+            temperature: $resolved->temperature,
+            maxTokens: $resolved->maxTokens,
+            name: $resolved->name,
+            hooks: $resolved->hooks,
+            state: $resolved->state,
         );
     }
 
     /**
-     * @param  list<CallableExecutor|array<string, mixed>>  $executors
+     * @param  array<string, mixed>|ExecutorOptions  $options
+     */
+    public static function createExecutor(array|ExecutorOptions $options): LlmExecutor|LlmExecutorWithFunctions|StreamingLlmExecutor|StreamingLlmExecutorWithFunctions
+    {
+        $resolved = self::normalizeExecutorOptions($options);
+        $hasTools = $resolved->tools !== null;
+
+        if ($resolved->stream && $hasTools) {
+            return self::createStreamingLlmExecutorWithFunctions($resolved);
+        }
+
+        if ($resolved->stream) {
+            return self::createStreamingLlmExecutor($resolved);
+        }
+
+        if ($hasTools) {
+            return self::createLlmExecutorWithFunctions($resolved);
+        }
+
+        return self::createLlmExecutor($resolved);
+    }
+
+    /**
+     * @param  list<mixed>  $executors
      */
     public static function createToolRegistry(array $executors): ToolRegistry
     {
@@ -370,10 +417,12 @@ final class Factory
         foreach ($executors as $executor) {
             if ($executor instanceof CallableExecutor) {
                 $callables[] = $executor;
+            } elseif ($executor instanceof CallableExecutorOptions) {
+                $callables[] = self::createCallableExecutor($executor);
             } elseif (is_array($executor)) {
                 $callables[] = self::createCallableExecutor($executor);
             } else {
-                throw new \InvalidArgumentException('Executor must be CallableExecutor or config array');
+                throw new \InvalidArgumentException('Executor must be CallableExecutor, CallableExecutorOptions, or config array');
             }
         }
 
@@ -381,19 +430,31 @@ final class Factory
     }
 
     /**
-     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>|CallableExecutorOptions  $config
      */
-    public static function createCallableExecutor(array $config): CallableExecutor
+    public static function createCallableExecutor(array|CallableExecutorOptions $config): CallableExecutor
     {
+        $options = $config instanceof CallableExecutorOptions ? $config : CallableExecutorOptions::fromArray($config);
+
         return new CallableExecutor(
-            name: $config['name'] ?? throw new \InvalidArgumentException('name is required'),
-            description: $config['description'] ?? throw new \InvalidArgumentException('description is required'),
-            handler: $config['handler'] ?? throw new \InvalidArgumentException('handler is required'),
-            parameters: $config['parameters'] ?? [],
-            attributes: $config['attributes'] ?? [],
-            visibilityHandler: $config['visibilityHandler'] ?? null,
-            validateInputHandler: $config['validateInput'] ?? null,
+            name: $options->name,
+            description: $options->description,
+            handler: $options->handler,
+            parameters: $options->parameters,
+            attributes: $options->attributes,
+            visibilityHandler: $options->visibilityHandler,
+            validateInputHandler: $options->validateInputHandler,
         );
+    }
+
+    /**
+     * @param  list<ToolMiddleware>  $middleware
+     */
+    public static function createMiddlewareToolExecutor(
+        ToolExecutorInterface $inner,
+        array $middleware = [],
+    ): MiddlewareToolExecutor {
+        return new MiddlewareToolExecutor($inner, $middleware);
     }
 
     public static function createState(): ConversationState
@@ -404,6 +465,11 @@ final class Factory
     public static function createDialogue(?string $name = null): Dialogue
     {
         return new Dialogue($name ?? 'default');
+    }
+
+    public static function createAgentRegistry(): AgentRegistry
+    {
+        return new AgentRegistry;
     }
 
     /**
