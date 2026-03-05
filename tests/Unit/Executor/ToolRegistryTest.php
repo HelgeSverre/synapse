@@ -159,21 +159,7 @@ final class ToolRegistryTest extends TestCase
         $this->assertSame([], $definitions);
     }
 
-    public function test_call_function_executes_and_returns_result(): void
-    {
-        $executor = new CallableExecutor(
-            name: 'multiply',
-            description: 'Multiply',
-            handler: fn ($input): int|float => $input['a'] * $input['b'],
-        );
-        $registry = new ToolRegistry([$executor]);
-
-        $result = $registry->callFunction('multiply', ['a' => 3, 'b' => 4]);
-
-        $this->assertSame(12, $result);
-    }
-
-    public function test_call_function_result_returns_structured_success(): void
+    public function test_call_function_result_executes_and_returns_result(): void
     {
         $executor = new CallableExecutor(
             name: 'multiply',
@@ -189,16 +175,6 @@ final class ToolRegistryTest extends TestCase
         $this->assertSame([], $result->errors);
     }
 
-    public function test_call_function_throws_for_unknown_function(): void
-    {
-        $registry = new ToolRegistry;
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown function: unknown');
-
-        $registry->callFunction('unknown', []);
-    }
-
     public function test_call_function_result_returns_failure_for_unknown_function(): void
     {
         $registry = new ToolRegistry;
@@ -209,7 +185,7 @@ final class ToolRegistryTest extends TestCase
         $this->assertContains('Unknown function: unknown', $result->errors);
     }
 
-    public function test_call_function_returns_error_json_on_failure(): void
+    public function test_call_function_result_returns_failure_payload_on_failure(): void
     {
         $executor = new CallableExecutor(
             name: 'failing',
@@ -218,12 +194,10 @@ final class ToolRegistryTest extends TestCase
         );
         $registry = new ToolRegistry([$executor]);
 
-        $result = $registry->callFunction('failing', []);
+        $result = $registry->callFunctionResult('failing', []);
 
-        $this->assertIsString($result);
-        $decoded = json_decode($result, true);
-        $this->assertArrayHasKey('error', $decoded);
-        $this->assertStringContainsString('Something went wrong', $decoded['error']);
+        $this->assertFalse($result->success);
+        $this->assertContains('Something went wrong', $result->errors);
     }
 
     public function test_validate_function_input_returns_valid_for_known_function(): void
@@ -350,7 +324,7 @@ final class ToolRegistryTest extends TestCase
         $this->assertSame('visible', $definitions[0]->name);
     }
 
-    public function test_call_function_with_state(): void
+    public function test_call_function_result_with_state(): void
     {
         $receivedState = null;
         $executor = new CallableExecutor(
@@ -365,7 +339,7 @@ final class ToolRegistryTest extends TestCase
         $registry = new ToolRegistry([$executor]);
         $state = new ConversationState;
 
-        $registry->callFunction('stateful', [], $state);
+        $registry->callFunctionResult('stateful', [], $state);
 
         $this->assertSame($state, $receivedState);
     }

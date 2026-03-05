@@ -4,16 +4,58 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Synapse\Tests\Unit;
 
+use function HelgeSverre\Synapse\createExecutor;
 use function HelgeSverre\Synapse\createPrompt;
 use function HelgeSverre\Synapse\createToolRegistry;
 
+use HelgeSverre\Synapse\Executor\LlmExecutor;
 use HelgeSverre\Synapse\Executor\ToolRegistry;
+use HelgeSverre\Synapse\Options\ExecutorOptions;
 use HelgeSverre\Synapse\Prompt\ChatPrompt;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
+use HelgeSverre\Synapse\Provider\LlmProviderInterface;
+use HelgeSverre\Synapse\Provider\ProviderCapabilities;
+use HelgeSverre\Synapse\Provider\Request\GenerationRequest;
+use HelgeSverre\Synapse\Provider\Response\GenerationResponse;
+use HelgeSverre\Synapse\State\Message;
 use PHPUnit\Framework\TestCase;
 
 final class FunctionsTest extends TestCase
 {
+    public function test_create_executor_returns_llm_executor_for_non_stream_options(): void
+    {
+        $provider = new class implements LlmProviderInterface
+        {
+            public function generate(GenerationRequest $request): GenerationResponse
+            {
+                return new GenerationResponse(
+                    text: 'ok',
+                    messages: [Message::assistant('ok')],
+                    toolCalls: [],
+                    model: $request->model,
+                );
+            }
+
+            public function getCapabilities(): ProviderCapabilities
+            {
+                return new ProviderCapabilities;
+            }
+
+            public function getName(): string
+            {
+                return 'fake';
+            }
+        };
+
+        $executor = createExecutor(new ExecutorOptions(
+            llm: $provider,
+            prompt: \HelgeSverre\Synapse\Factory::createTextPrompt()->setContent('hello'),
+            model: 'fake-model',
+        ));
+
+        $this->assertInstanceOf(LlmExecutor::class, $executor);
+    }
+
     public function test_create_prompt_creates_chat_prompt_by_default(): void
     {
         $prompt = createPrompt();

@@ -135,6 +135,22 @@ final class StreamingLlmExecutorTest extends TestCase
         $this->assertSame('Hello World', $provider->capturedRequest->messages[0]->content);
     }
 
+    public function test_stream_includes_explicit_history_messages(): void
+    {
+        $provider = new MockStreamableProvider;
+        $provider->events = [new StreamCompleted('stop')];
+
+        $prompt = $this->createPrompt('Question: {{q}}');
+        $history = [Message::assistant('Earlier answer')];
+
+        $executor = (new StreamingLlmExecutor($provider, $prompt, 'gpt-4'))->withHistory($history);
+        iterator_to_array($executor->stream(['q' => 'Next question']));
+
+        $this->assertCount(2, $provider->capturedRequest->messages);
+        $this->assertSame('Earlier answer', $provider->capturedRequest->messages[0]->content);
+        $this->assertSame('Question: Next question', $provider->capturedRequest->messages[1]->content);
+    }
+
     public function test_stream_and_collect_returns_full_text(): void
     {
         $provider = new MockStreamableProvider;
@@ -155,6 +171,25 @@ final class StreamingLlmExecutorTest extends TestCase
         $this->assertSame('stop', $result->finishReason);
         $this->assertNotNull($result->usage);
         $this->assertSame(10, $result->usage->inputTokens);
+    }
+
+    public function test_run_collects_stream_with_history_argument(): void
+    {
+        $provider = new MockStreamableProvider;
+        $provider->events = [
+            new TextDelta('A'),
+            new TextDelta('B'),
+            new StreamCompleted('stop'),
+        ];
+
+        $prompt = $this->createPrompt('Q: {{q}}');
+        $executor = new StreamingLlmExecutor($provider, $prompt, 'gpt-4');
+
+        $result = $executor->run(['q' => 'test'], [Message::user('prior')]);
+
+        $this->assertSame('AB', $result->text);
+        $this->assertCount(2, $provider->capturedRequest->messages);
+        $this->assertSame('prior', $provider->capturedRequest->messages[0]->content);
     }
 
     public function test_stream_updates_state_with_assistant_message(): void

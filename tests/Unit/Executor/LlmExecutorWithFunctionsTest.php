@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HelgeSverre\Synapse\Tests\Unit\Executor;
 
 use HelgeSverre\Synapse\Executor\LlmExecutorWithFunctions;
+use HelgeSverre\Synapse\Executor\ToolCatalogResolver;
 use HelgeSverre\Synapse\Executor\ToolExecutorInterface;
 use HelgeSverre\Synapse\Executor\ToolResult;
 use HelgeSverre\Synapse\Parser\StringParser;
@@ -78,13 +79,6 @@ final class RecordingToolExecutor implements ToolExecutorInterface
         ];
 
         return ToolResult::success(['value' => 42]);
-    }
-
-    public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
-    {
-        $result = $this->callFunctionResult($name, $input, $state);
-
-        return $result->success ? $result->result : $result->toJson();
     }
 }
 
@@ -212,5 +206,42 @@ final class LlmExecutorWithFunctionsTest extends TestCase
         $this->expectExceptionMessage('Max tool iterations (1) exceeded');
 
         $executor->execute(['question' => 'loop']);
+    }
+
+    public function test_uses_tool_catalog_resolver_for_request_tools(): void
+    {
+        $provider = new SequenceProvider;
+        $provider->responses = [
+            new GenerationResponse(
+                text: 'done',
+                messages: [Message::assistant('done')],
+                toolCalls: [],
+                model: 'test-model',
+                finishReason: 'stop',
+            ),
+        ];
+
+        $tools = new RecordingToolExecutor([new ToolDefinition('calc', 'Calculator')]);
+        $resolver = new class implements ToolCatalogResolver
+        {
+            public function resolve(array $input, ConversationState $state, int $iteration, ToolExecutorInterface $tools): array
+            {
+                return [];
+            }
+        };
+
+        $executor = new LlmExecutorWithFunctions(
+            provider: $provider,
+            prompt: (new TextPrompt)->setContent('Q: {{question}}'),
+            parser: new StringParser,
+            model: 'test-model',
+            tools: $tools,
+            toolCatalogResolver: $resolver,
+        );
+
+        $executor->execute(['question' => 'hello']);
+
+        $this->assertCount(1, $provider->requests);
+        $this->assertSame([], $provider->requests[0]->tools);
     }
 }

@@ -112,12 +112,13 @@ final class Profilinator2000Test extends TestCase
         $catalog = new ToolCatalog(new FakeCdpAdapter, $writer, $this->tmpDir);
         $tools = $catalog->createToolRegistry();
 
-        $result = $tools->callFunction('save_report', [
+        $result = $tools->callFunctionResult('save_report', [
             'markdown_content' => '# Performance Report',
         ]);
 
-        $this->assertIsArray($result);
-        $this->assertSame('error', $result['status']);
+        $this->assertTrue($result->success);
+        $this->assertIsArray($result->result);
+        $this->assertSame('error', $result->result['status']);
         $this->assertFalse($writer->hasSavedReport());
     }
 
@@ -178,17 +179,13 @@ final class Profilinator2000Test extends TestCase
             {
                 return \HelgeSverre\Synapse\Executor\ToolResult::success(str_repeat('x', 2000));
             }
-
-            public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
-            {
-                return str_repeat('x', 2000);
-            }
         };
 
         $safe = new SafeToolExecutor($inner, 120);
-        $result = $safe->callFunction('huge_tool', []);
+        $result = $safe->callFunctionResult('huge_tool', []);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('truncated tool output', $result);
+        $this->assertTrue($result->success);
+        $this->assertIsString($result->result);
+        $this->assertStringContainsString('truncated tool output', $result->result);
     }
 }

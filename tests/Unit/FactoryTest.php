@@ -215,6 +215,29 @@ final class FactoryTest extends TestCase
         $this->assertNull($llm->model);
     }
 
+    public function test_use_llm_accepts_model_in_options(): void
+    {
+        $llm = Factory::useLlm('openai', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+            'model' => 'gpt-4o-mini',
+        ]);
+
+        $this->assertSame('gpt-4o-mini', $llm->model);
+    }
+
+    public function test_use_llm_throws_for_conflicting_model_sources(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Model is configured twice');
+
+        Factory::useLlm('openai.gpt-4o-mini', [
+            'apiKey' => 'test-key',
+            'transport' => $this->mockTransport,
+            'model' => 'gpt-4o',
+        ]);
+    }
+
     public function test_use_llm_model_used_by_executor(): void
     {
         $llm = Factory::useLlm('openai.gpt-4o', [
@@ -231,21 +254,21 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(LlmExecutor::class, $executor);
     }
 
-    public function test_use_llm_model_can_be_overridden_by_executor(): void
+    public function test_use_llm_model_conflict_throws_when_executor_model_differs(): void
     {
         $llm = Factory::useLlm('openai.gpt-4o', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        // Explicit model overrides the one from useLlm
-        $executor = Factory::createLlmExecutor([
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Model is configured twice');
+
+        Factory::createLlmExecutor([
             'llm' => $llm,
             'prompt' => Factory::createChatPrompt(),
             'model' => 'gpt-4-turbo',
         ]);
-
-        $this->assertInstanceOf(LlmExecutor::class, $executor);
     }
 
     public function test_use_llm_without_model_requires_model_in_executor(): void
@@ -580,20 +603,21 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(LlmExecutor::class, $executor);
     }
 
-    public function test_create_llm_executor_with_provider_key(): void
+    public function test_create_llm_executor_with_provider_key_throws(): void
     {
         $provider = Factory::useLlm('openai.gpt-4', [
             'apiKey' => 'test-key',
             'transport' => $this->mockTransport,
         ]);
 
-        $executor = Factory::createLlmExecutor([
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('llm is required');
+
+        Factory::createLlmExecutor([
             'provider' => $provider,
             'prompt' => Factory::createChatPrompt(),
             'model' => 'gpt-4',
         ]);
-
-        $this->assertInstanceOf(LlmExecutor::class, $executor);
     }
 
     public function test_create_llm_executor_with_all_options(): void
@@ -619,7 +643,7 @@ final class FactoryTest extends TestCase
     public function test_create_llm_executor_throws_without_provider(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('llm/provider is required');
+        $this->expectExceptionMessage('llm is required');
 
         Factory::createLlmExecutor([
             'prompt' => Factory::createChatPrompt(),
@@ -725,11 +749,6 @@ final class FactoryTest extends TestCase
             {
                 return \HelgeSverre\Synapse\Executor\ToolResult::success(['ok' => true]);
             }
-
-            public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
-            {
-                return ['ok' => true];
-            }
         };
 
         $executor = Factory::createLlmExecutorWithFunctions([
@@ -763,7 +782,7 @@ final class FactoryTest extends TestCase
     public function test_create_llm_executor_with_functions_throws_without_provider(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('llm/provider is required');
+        $this->expectExceptionMessage('llm is required');
 
         Factory::createLlmExecutorWithFunctions([
             'prompt' => Factory::createChatPrompt(),
@@ -785,17 +804,18 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(StreamingLlmExecutor::class, $executor);
     }
 
-    public function test_create_streaming_llm_executor_with_provider_key(): void
+    public function test_create_streaming_llm_executor_with_provider_key_throws(): void
     {
         $provider = $this->createMock(StreamableProviderInterface::class);
 
-        $executor = Factory::createStreamingLlmExecutor([
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('llm is required');
+
+        Factory::createStreamingLlmExecutor([
             'provider' => $provider,
             'prompt' => Factory::createChatPrompt(),
             'model' => 'gpt-4o-mini',
         ]);
-
-        $this->assertInstanceOf(StreamingLlmExecutor::class, $executor);
     }
 
     public function test_create_streaming_llm_executor_with_all_options(): void
@@ -817,7 +837,7 @@ final class FactoryTest extends TestCase
     public function test_create_streaming_llm_executor_throws_without_provider(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('llm/provider is required');
+        $this->expectExceptionMessage('llm is required');
 
         Factory::createStreamingLlmExecutor([
             'prompt' => Factory::createChatPrompt(),
@@ -922,11 +942,6 @@ final class FactoryTest extends TestCase
             {
                 return \HelgeSverre\Synapse\Executor\ToolResult::success(['ok' => true]);
             }
-
-            public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
-            {
-                return ['ok' => true];
-            }
         };
 
         $executor = Factory::createStreamingLlmExecutorWithFunctions([
@@ -957,7 +972,7 @@ final class FactoryTest extends TestCase
     public function test_create_streaming_llm_executor_with_functions_throws_without_provider(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('llm/provider is required');
+        $this->expectExceptionMessage('llm is required');
 
         Factory::createStreamingLlmExecutorWithFunctions([
             'prompt' => Factory::createChatPrompt(),
@@ -1026,7 +1041,7 @@ final class FactoryTest extends TestCase
     public function test_create_tool_registry_throws_for_invalid_entry(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Executor must be CallableExecutor or config array');
+        $this->expectExceptionMessage('Executor must be CallableExecutor, CallableExecutorOptions, or config array');
 
         /** @var mixed $invalid */
         $invalid = [
@@ -1299,7 +1314,7 @@ final class FactoryTest extends TestCase
         ]);
     }
 
-    public function test_create_streaming_llm_executor_with_functions_with_provider_key(): void
+    public function test_create_streaming_llm_executor_with_functions_with_provider_key_throws(): void
     {
         $provider = $this->createMock(StreamableProviderInterface::class);
 
@@ -1311,13 +1326,14 @@ final class FactoryTest extends TestCase
             ],
         ]);
 
-        $executor = Factory::createStreamingLlmExecutorWithFunctions([
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('llm is required');
+
+        Factory::createStreamingLlmExecutorWithFunctions([
             'provider' => $provider,
             'prompt' => Factory::createChatPrompt(),
             'model' => 'gpt-4o-mini',
             'tools' => $tools,
         ]);
-
-        $this->assertInstanceOf(StreamingLlmExecutorWithFunctions::class, $executor);
     }
 }

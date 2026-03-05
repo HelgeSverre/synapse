@@ -68,10 +68,11 @@ final class ApprovalAgentTest extends TestCase
             minimumRiskForApproval: 'medium',
         );
 
-        $result = $tools->callFunction('read_file', ['path' => 'test.txt']);
+        $result = $tools->callFunctionResult('read_file', ['path' => 'test.txt']);
 
         $this->assertSame(0, $mockProvider->callCount); // No approval requested
-        $this->assertIsString($result);
+        $this->assertTrue($result->success);
+        $this->assertIsString($result->result);
     }
 
     public function test_high_risk_tools_require_approval(): void
@@ -94,9 +95,10 @@ final class ApprovalAgentTest extends TestCase
             minimumRiskForApproval: 'medium',
         );
 
-        $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
+        $result = $tools->callFunctionResult('delete_files', ['pattern' => '*.tmp']);
 
         $this->assertSame(1, $mockProvider->callCount); // Approval was requested
+        $this->assertTrue($result->success);
     }
 
     public function test_rejected_tool_returns_error(): void
@@ -114,12 +116,11 @@ final class ApprovalAgentTest extends TestCase
             $mockProvider,
         );
 
-        $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
-        $decoded = json_decode($result, true);
+        $result = $tools->callFunctionResult('delete_files', ['pattern' => '*.tmp']);
 
-        $this->assertArrayHasKey('error', $decoded);
-        $this->assertStringContainsString('Action rejected by user', $decoded['error']);
-        $this->assertStringContainsString('Not allowed', $decoded['error']);
+        $this->assertFalse($result->success);
+        $this->assertStringContainsString('Action rejected by user', implode(' | ', $result->errors));
+        $this->assertStringContainsString('Not allowed', implode(' | ', $result->errors));
     }
 
     public function test_edited_tool_uses_new_arguments(): void
@@ -137,10 +138,13 @@ final class ApprovalAgentTest extends TestCase
             $mockProvider,
         );
 
-        $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
-        $decoded = json_decode($result, true);
+        $result = $tools->callFunctionResult('delete_files', ['pattern' => '*.tmp']);
 
         // The edited pattern should be used
-        $this->assertSame('safe-only.txt', $decoded['pattern']);
+        $this->assertTrue($result->success);
+        $this->assertIsString($result->result);
+        $payload = json_decode($result->result, true);
+        $this->assertIsArray($payload);
+        $this->assertSame('safe-only.txt', $payload['pattern']);
     }
 }
