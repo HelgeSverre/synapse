@@ -10,11 +10,11 @@ $llm = useLlm('mistral.mistral-small-latest', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://api.mistral.ai/v1` |
-| `transport` | `TransportInterface` | Auto-discovered |
+| Option      | Type                 | Default                     |
+| ----------- | -------------------- | --------------------------- |
+| `apiKey`    | `string`             | Required                    |
+| `baseUrl`   | `string`             | `https://api.mistral.ai/v1` |
+| `transport` | `TransportInterface` | Auto-discovered             |
 
 ## Models
 

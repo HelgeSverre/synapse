@@ -10,12 +10,12 @@ $llm = useLlm('anthropic.claude-3-sonnet', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://api.anthropic.com/v1` |
-| `transport` | `TransportInterface` | Auto-discovered |
-| `apiVersion` | `string` | `'2023-06-01'` |
+| Option       | Type                 | Default                        |
+| ------------ | -------------------- | ------------------------------ |
+| `apiKey`     | `string`             | Required                       |
+| `baseUrl`    | `string`             | `https://api.anthropic.com/v1` |
+| `transport`  | `TransportInterface` | Auto-discovered                |
+| `apiVersion` | `string`             | `'2023-06-01'`                 |
 
 ::: warning
 Anthropic does not support JSON mode (`responseFormat`). To get structured JSON output, use prompt instructions instead.

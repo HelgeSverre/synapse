@@ -70,10 +70,10 @@ Parse response → Return result
 
 Same as [LlmExecutor](/executors/llm-executor), plus:
 
-| Option | Type | Required | Default | Description |
-|--------|------|----------|---------|-------------|
-| `tools` | `ToolRegistry` or `array` | Yes | — | Tool registry or array of tool configs |
-| `maxIterations` | `int` | No | `10` | Max tool calling rounds before throwing |
+| Option          | Type                      | Required | Default | Description                             |
+| --------------- | ------------------------- | -------- | ------- | --------------------------------------- |
+| `tools`         | `ToolRegistry` or `array` | Yes      | —       | Tool registry or array of tool configs  |
+| `maxIterations` | `int`                     | No       | `10`    | Max tool calling rounds before throwing |
 
 ## Multiple Tools
 

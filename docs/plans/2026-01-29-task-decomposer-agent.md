@@ -16,6 +16,7 @@
 ## Task 1: Create Plan Data Structures
 
 **Files:**
+
 - Create: `examples/task-decomposer/Plan.php`
 - Create: `examples/task-decomposer/PlanStep.php`
 - Create: `examples/task-decomposer/StepStatus.php`
@@ -241,6 +242,7 @@ Run: `php -l examples/task-decomposer/Plan.php && php -l examples/task-decompose
 ## Task 2: Create Plan Validator
 
 **Files:**
+
 - Create: `examples/task-decomposer/PlanValidator.php`
 
 **Step 1: Create validator with DAG check**
@@ -258,7 +260,7 @@ final class PlanValidator
 
     /**
      * Validate a plan structure.
-     * 
+     *
      * @param array<string, mixed> $data
      * @return array{valid: bool, errors: list<string>, plan: ?Plan}
      */
@@ -340,7 +342,7 @@ final class PlanValidator
 
     /**
      * Detect cycles in the dependency graph using DFS.
-     * 
+     *
      * @param list<array{id: string, depends_on?: list<string>}> $steps
      */
     private function detectCycle(array $steps): ?string
@@ -396,6 +398,7 @@ Run: `php -l examples/task-decomposer/PlanValidator.php`
 ## Task 3: Create Submit Plan Tool
 
 **Files:**
+
 - Create: `examples/task-decomposer/SubmitPlanTool.php`
 
 **Step 1: Create the tool**
@@ -504,6 +507,7 @@ Run: `php -l examples/task-decomposer/SubmitPlanTool.php`
 ## Task 4: Create Plan Executor
 
 **Files:**
+
 - Create: `examples/task-decomposer/PlanExecutor.php`
 
 **Step 1: Create the executor**
@@ -536,7 +540,7 @@ final class PlanExecutor
 
     /**
      * Execute a plan, yielding events for each step.
-     * 
+     *
      * @return Generator<StepEvent>
      */
     public function execute(Plan $plan): Generator
@@ -659,6 +663,7 @@ Run: `php -l examples/task-decomposer/PlanExecutor.php`
 ## Task 5: Create Main CLI Script
 
 **Files:**
+
 - Create: `examples/task-decomposer-cli.php`
 
 **Step 1: Create the CLI**
@@ -670,16 +675,16 @@ declare(strict_types=1);
 
 /**
  * Autonomous Task Decomposer Demo
- * 
+ *
  * Demonstrates an agent that:
  * 1. Decomposes complex goals into subtasks
  * 2. Validates plans as DAGs
  * 3. Executes steps in dependency order
  * 4. Tracks progress and handles failures
- * 
+ *
  * Usage:
  *   php examples/task-decomposer-cli.php [provider]
- * 
+ *
  * Examples:
  *   php examples/task-decomposer-cli.php openai
  *   php examples/task-decomposer-cli.php anthropic
@@ -889,6 +894,7 @@ Run: `php -l examples/task-decomposer-cli.php`
 ## Task 6: Write Tests
 
 **Files:**
+
 - Create: `tests/Unit/Examples/TaskDecomposerTest.php`
 
 **Step 1: Create test file**
@@ -917,13 +923,13 @@ final class TaskDecomposerTest extends TestCase
     public function test_plan_step_tracks_status(): void
     {
         $step = new PlanStep('s1', 'Test', 'Do something');
-        
+
         $this->assertSame(StepStatus::Pending, $step->status);
-        
+
         $step->markRunning();
         $this->assertSame(StepStatus::Running, $step->status);
         $this->assertSame(1, $step->attempts);
-        
+
         $step->markDone('Result');
         $this->assertSame(StepStatus::Done, $step->status);
         $this->assertSame('Result', $step->output);
@@ -932,7 +938,7 @@ final class TaskDecomposerTest extends TestCase
     public function test_plan_step_checks_dependencies(): void
     {
         $step = new PlanStep('s2', 'Test', 'Do something', dependsOn: ['s1']);
-        
+
         $this->assertFalse($step->canRun([]));
         $this->assertTrue($step->canRun(['s1']));
     }
@@ -970,7 +976,7 @@ final class TaskDecomposerTest extends TestCase
     public function test_validator_accepts_valid_plan(): void
     {
         $validator = new PlanValidator();
-        
+
         $result = $validator->validate([
             'goal' => 'Test goal',
             'steps' => [
@@ -987,7 +993,7 @@ final class TaskDecomposerTest extends TestCase
     public function test_validator_rejects_missing_goal(): void
     {
         $validator = new PlanValidator();
-        
+
         $result = $validator->validate([
             'steps' => [['id' => 's1', 'title' => 'Test', 'prompt' => 'Do']],
         ]);
@@ -999,7 +1005,7 @@ final class TaskDecomposerTest extends TestCase
     public function test_validator_rejects_duplicate_ids(): void
     {
         $validator = new PlanValidator();
-        
+
         $result = $validator->validate([
             'goal' => 'Test',
             'steps' => [
@@ -1017,7 +1023,7 @@ final class TaskDecomposerTest extends TestCase
     public function test_validator_rejects_cycles(): void
     {
         $validator = new PlanValidator();
-        
+
         $result = $validator->validate([
             'goal' => 'Test',
             'steps' => [

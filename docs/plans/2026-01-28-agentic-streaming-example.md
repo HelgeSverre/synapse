@@ -16,6 +16,7 @@
 ## Overview
 
 The example will demonstrate:
+
 1. Multi-tool agent with 5+ tools
 2. Real-time streaming with tool call progress indicators
 3. Multi-turn conversation with memory
@@ -29,6 +30,7 @@ The example will demonstrate:
 ### Task 1: Create Tool Library
 
 **Files:**
+
 - Create: `examples/agentic-tools/WeatherTool.php`
 - Create: `examples/agentic-tools/CalculatorTool.php`
 - Create: `examples/agentic-tools/NotesTool.php`
@@ -56,10 +58,10 @@ final class WeatherTool
             handler: function (array $input): string {
                 $city = $input['city'] ?? 'Unknown';
                 $unit = $input['unit'] ?? 'celsius';
-                
+
                 // Simulate API delay
                 usleep(200_000);
-                
+
                 // Generate realistic-ish mock data based on city name hash
                 $hash = crc32(strtolower($city));
                 $temp = ($hash % 35) + 5; // 5-40 range
@@ -69,7 +71,7 @@ final class WeatherTool
                 $conditions = ['sunny', 'partly cloudy', 'cloudy', 'light rain', 'thunderstorm', 'snow'][$hash % 6];
                 $humidity = ($hash % 60) + 30; // 30-90%
                 $wind = ($hash % 30) + 5; // 5-35 km/h
-                
+
                 return json_encode([
                     'city' => $city,
                     'temperature' => $temp,
@@ -119,22 +121,22 @@ final class CalculatorTool
             description: 'Perform mathematical calculations. Supports basic arithmetic (+, -, *, /), powers (^), parentheses, and common functions (sqrt, sin, cos, tan, log, abs).',
             handler: function (array $input): string {
                 $expression = $input['expression'] ?? '';
-                
+
                 // Sanitize - only allow safe characters
                 $sanitized = preg_replace('/[^0-9+\-*\/().^sqrtincoalg\s]/', '', strtolower($expression));
-                
+
                 // Replace common functions and ^ for power
                 $sanitized = str_replace('^', '**', $sanitized);
                 $sanitized = preg_replace('/sqrt\(/', 'sqrt(', $sanitized);
-                
+
                 try {
                     // Use BC math for precision where possible, fall back to eval for complex expressions
                     $result = @eval("return (float)($sanitized);");
-                    
+
                     if ($result === false || !is_numeric($result)) {
                         return json_encode(['error' => 'Invalid expression', 'expression' => $expression]);
                     }
-                    
+
                     // Format result nicely
                     if (floor($result) == $result && abs($result) < PHP_INT_MAX) {
                         $formatted = (string)(int)$result;
@@ -142,7 +144,7 @@ final class CalculatorTool
                         $formatted = number_format($result, 6, '.', '');
                         $formatted = rtrim(rtrim($formatted, '0'), '.');
                     }
-                    
+
                     return json_encode([
                         'expression' => $expression,
                         'result' => $formatted,
@@ -180,7 +182,7 @@ use HelgeSverre\Synapse\Executor\CallableExecutor;
 final class NotesTool
 {
     private static array $notes = [];
-    
+
     public static function create(): CallableExecutor
     {
         return new CallableExecutor(
@@ -190,7 +192,7 @@ final class NotesTool
                 $action = $input['action'] ?? 'list';
                 $content = $input['content'] ?? '';
                 $id = $input['id'] ?? null;
-                
+
                 return match ($action) {
                     'add' => self::addNote($content),
                     'list' => self::listNotes(),
@@ -220,7 +222,7 @@ final class NotesTool
             ],
         );
     }
-    
+
     private static function addNote(string $content): string
     {
         $id = count(self::$notes) + 1;
@@ -231,7 +233,7 @@ final class NotesTool
         ];
         return json_encode(['success' => true, 'note' => self::$notes[$id]], JSON_THROW_ON_ERROR);
     }
-    
+
     private static function listNotes(): string
     {
         if (empty(self::$notes)) {
@@ -239,7 +241,7 @@ final class NotesTool
         }
         return json_encode(['notes' => array_values(self::$notes)], JSON_THROW_ON_ERROR);
     }
-    
+
     private static function getNote(?int $id): string
     {
         if ($id === null || !isset(self::$notes[$id])) {
@@ -247,7 +249,7 @@ final class NotesTool
         }
         return json_encode(['note' => self::$notes[$id]], JSON_THROW_ON_ERROR);
     }
-    
+
     private static function deleteNote(?int $id): string
     {
         if ($id === null || !isset(self::$notes[$id])) {
@@ -257,7 +259,7 @@ final class NotesTool
         unset(self::$notes[$id]);
         return json_encode(['success' => true, 'deleted' => $note], JSON_THROW_ON_ERROR);
     }
-    
+
     public static function reset(): void
     {
         self::$notes = [];
@@ -286,14 +288,14 @@ final class WebSearchTool
             handler: function (array $input): string {
                 $query = $input['query'] ?? '';
                 $limit = min($input['limit'] ?? 3, 5);
-                
+
                 // Simulate search delay
                 usleep(300_000);
-                
+
                 // Generate mock search results based on query
                 $results = [];
                 $hash = crc32($query);
-                
+
                 $domains = ['wikipedia.org', 'stackoverflow.com', 'github.com', 'medium.com', 'dev.to'];
                 $snippetPrefixes = [
                     'Learn everything about',
@@ -302,18 +304,18 @@ final class WebSearchTool
                     'Expert insights on',
                     'The definitive resource for',
                 ];
-                
+
                 for ($i = 0; $i < $limit; $i++) {
                     $domain = $domains[($hash + $i) % count($domains)];
                     $prefix = $snippetPrefixes[($hash + $i) % count($snippetPrefixes)];
-                    
+
                     $results[] = [
                         'title' => ucfirst($query) . ' - ' . ucfirst($domain),
                         'url' => "https://$domain/article/" . urlencode(strtolower($query)),
                         'snippet' => "$prefix $query. This article covers key concepts, best practices, and common use cases...",
                     ];
                 }
-                
+
                 return json_encode([
                     'query' => $query,
                     'results_count' => count($results),
@@ -362,13 +364,13 @@ final class DateTimeTool
                 $timezone = $input['timezone'] ?? 'UTC';
                 $date1 = $input['date1'] ?? null;
                 $date2 = $input['date2'] ?? null;
-                
+
                 try {
                     $tz = new \DateTimeZone($timezone);
                 } catch (\Exception) {
                     return json_encode(['error' => "Invalid timezone: $timezone"]);
                 }
-                
+
                 return match ($action) {
                     'now' => json_encode([
                         'datetime' => (new \DateTime('now', $tz))->format('Y-m-d H:i:s'),
@@ -410,14 +412,14 @@ final class DateTimeTool
             ],
         );
     }
-    
+
     private static function calculateDiff(?string $date1, ?string $date2, \DateTimeZone $tz): string
     {
         try {
             $d1 = new \DateTime($date1 ?? 'now', $tz);
             $d2 = new \DateTime($date2 ?? 'now', $tz);
             $diff = $d1->diff($d2);
-            
+
             return json_encode([
                 'date1' => $d1->format('Y-m-d'),
                 'date2' => $d2->format('Y-m-d'),
@@ -428,13 +430,13 @@ final class DateTimeTool
             return json_encode(['error' => 'Invalid date format: ' . $e->getMessage()]);
         }
     }
-    
+
     private static function addToDate(?string $date, string $interval, \DateTimeZone $tz): string
     {
         try {
             $d = new \DateTime($date ?? 'now', $tz);
             $d->add(new \DateInterval($interval));
-            
+
             return json_encode([
                 'original' => (new \DateTime($date ?? 'now', $tz))->format('Y-m-d'),
                 'interval' => $interval,
@@ -457,6 +459,7 @@ Run: `ls -la examples/agentic-tools/`
 ### Task 2: Create Main Agent CLI Script
 
 **Files:**
+
 - Create: `examples/agentic-agent-cli.php`
 
 **Step 1: Create the interactive agent CLI**
@@ -556,14 +559,14 @@ function printBanner(string $modelName): void
 ║              LLM-EXE Agentic Streaming Demo                   ║
 ╚═══════════════════════════════════════════════════════════════╝' . RESET . '
   Model: ' . GREEN . $modelName . RESET . '
-  
+
   ' . BOLD . 'Available Tools:' . RESET . '
     ' . MAGENTA . '🌤  get_weather' . RESET . '   - Get weather for any city
-    ' . MAGENTA . '🔢 calculate' . RESET . '     - Mathematical calculations  
+    ' . MAGENTA . '🔢 calculate' . RESET . '     - Mathematical calculations
     ' . MAGENTA . '📝 notes' . RESET . '         - Save, list, and manage notes
     ' . MAGENTA . '🔍 web_search' . RESET . '    - Search the web (mock)
     ' . MAGENTA . '🕐 datetime' . RESET . '      - Date/time operations
-    
+
   ' . BOLD . 'Commands:' . RESET . '
     ' . DIM . '/clear' . RESET . '  Clear conversation    ' . DIM . '/tools' . RESET . '  List tools
     ' . DIM . '/stats' . RESET . '  Token usage           ' . DIM . '/exit' . RESET . '   Quit
@@ -630,34 +633,34 @@ $prompt = (new TextPrompt())->setContent('{{message}}');
 // Main chat loop
 while (true) {
     echo "\n" . BOLD . GREEN . 'You: ' . RESET;
-    
+
     $input = trim(fgets(STDIN) ?: '');
-    
+
     if ($input === '') {
         continue;
     }
-    
+
     // Handle commands
     if (str_starts_with($input, '/')) {
         $command = strtolower(trim($input));
-        
+
         if ($command === '/exit' || $command === '/quit') {
             echo DIM . 'Goodbye!' . RESET . "\n";
             break;
         }
-        
+
         if ($command === '/clear') {
             $messages = [Message::system($systemPrompt)];
             NotesTool::reset();
             echo DIM . 'Conversation and notes cleared.' . RESET . "\n";
             continue;
         }
-        
+
         if ($command === '/stats') {
             echo DIM . "Session stats: {$totalInputTokens} input tokens, {$totalOutputTokens} output tokens, {$totalToolCalls} tool calls" . RESET . "\n";
             continue;
         }
-        
+
         if ($command === '/tools') {
             echo "\n" . BOLD . "Available Tools:" . RESET . "\n";
             foreach ($tools->getToolDefinitions() as $tool) {
@@ -665,7 +668,7 @@ while (true) {
             }
             continue;
         }
-        
+
         if ($command === '/help') {
             echo "\n" . BOLD . "Commands:" . RESET . "\n";
             echo "  /clear  - Clear conversation history\n";
@@ -674,22 +677,22 @@ while (true) {
             echo "  /exit   - Exit the chat\n";
             continue;
         }
-        
+
         echo RED . 'Unknown command. Type /help for available commands.' . RESET . "\n";
         continue;
     }
-    
+
     // Add user message
     $messages[] = Message::user($input);
-    
+
     // Create executor with current state
     $hooks = new HookDispatcher();
-    
+
     // Hook to display tool calls
     $hooks->addListener(OnToolCall::class, function (OnToolCall $event): void {
         printToolCall($event->toolCall->name, $event->toolCall->arguments);
     });
-    
+
     $executor = new StreamingLlmExecutorWithFunctions(
         provider: $provider,
         prompt: $prompt,
@@ -699,14 +702,14 @@ while (true) {
         maxTokens: 1024,
         hooks: $hooks,
     );
-    
+
     echo "\n" . BOLD . CYAN . 'Agent: ' . RESET;
-    
+
     $responseText = '';
     $usage = null;
     $toolCallCount = 0;
     $startTime = microtime(true);
-    
+
     try {
         // Build request with message history in the _dialogueKey pattern
         $requestInput = [
@@ -714,18 +717,18 @@ while (true) {
             '_dialogueKey' => 'history',
             'history' => array_slice($messages, 0, -1), // All except the just-added user message
         ];
-        
+
         foreach ($executor->stream($requestInput) as $event) {
             if ($event instanceof TextDelta) {
                 echo $event->text;
                 $responseText .= $event->text;
                 flush();
             }
-            
+
             if ($event instanceof ToolCallsReady) {
                 $toolCallCount += count($event->toolCalls);
             }
-            
+
             if ($event instanceof StreamCompleted) {
                 $usage = $event->usage;
             }
@@ -736,27 +739,27 @@ while (true) {
         array_pop($messages);
         continue;
     }
-    
+
     // Add assistant response to history
     if ($responseText !== '') {
         $messages[] = Message::assistant($responseText);
     }
-    
+
     // Show stats
     $duration = round((microtime(true) - $startTime) * 1000);
     echo "\n" . DIM . "[{$duration}ms";
-    
+
     if ($usage) {
         echo " | {$usage->inputTokens}+{$usage->outputTokens} tokens";
         $totalInputTokens += $usage->inputTokens;
         $totalOutputTokens += $usage->outputTokens;
     }
-    
+
     if ($toolCallCount > 0) {
         echo " | {$toolCallCount} tool(s)";
         $totalToolCalls += $toolCallCount;
     }
-    
+
     echo ' | ' . (count($messages) - 1) . ' turns]' . RESET;
 }
 
@@ -772,6 +775,7 @@ Run: `php examples/agentic-agent-cli.php --help 2>&1 || echo "Check if it starts
 ### Task 3: Create Unit Tests for Tools
 
 **Files:**
+
 - Create: `tests/Unit/Examples/AgenticToolsTest.php`
 
 **Step 1: Create test file**
@@ -803,84 +807,84 @@ final class AgenticToolsTest extends TestCase
     {
         NotesTool::reset();
     }
-    
+
     public function test_weather_tool_returns_callable_executor(): void
     {
         $tool = WeatherTool::create();
         $this->assertInstanceOf(CallableExecutor::class, $tool);
         $this->assertSame('get_weather', $tool->getName());
     }
-    
+
     public function test_weather_tool_returns_weather_data(): void
     {
         $tool = WeatherTool::create();
         $result = json_decode($tool->execute(['city' => 'Oslo']), true);
-        
+
         $this->assertSame('Oslo', $result['city']);
         $this->assertArrayHasKey('temperature', $result);
         $this->assertArrayHasKey('conditions', $result);
         $this->assertArrayHasKey('humidity', $result);
     }
-    
+
     public function test_calculator_tool_performs_basic_arithmetic(): void
     {
         $tool = CalculatorTool::create();
-        
+
         $result = json_decode($tool->execute(['expression' => '2 + 2']), true);
         $this->assertSame('4', $result['result']);
-        
+
         $result = json_decode($tool->execute(['expression' => '10 * 5']), true);
         $this->assertSame('50', $result['result']);
     }
-    
+
     public function test_notes_tool_add_and_list(): void
     {
         $tool = NotesTool::create();
-        
+
         // Add a note
         $result = json_decode($tool->execute(['action' => 'add', 'content' => 'Test note']), true);
         $this->assertTrue($result['success']);
         $this->assertSame('Test note', $result['note']['content']);
-        
+
         // List notes
         $result = json_decode($tool->execute(['action' => 'list']), true);
         $this->assertCount(1, $result['notes']);
     }
-    
+
     public function test_notes_tool_delete(): void
     {
         $tool = NotesTool::create();
-        
+
         // Add and delete
         $tool->execute(['action' => 'add', 'content' => 'To delete']);
         $result = json_decode($tool->execute(['action' => 'delete', 'id' => 1]), true);
         $this->assertTrue($result['success']);
-        
+
         // Verify empty
         $result = json_decode($tool->execute(['action' => 'list']), true);
         $this->assertEmpty($result['notes']);
     }
-    
+
     public function test_web_search_returns_results(): void
     {
         $tool = WebSearchTool::create();
         $result = json_decode($tool->execute(['query' => 'PHP generators']), true);
-        
+
         $this->assertSame('PHP generators', $result['query']);
         $this->assertGreaterThan(0, $result['results_count']);
         $this->assertArrayHasKey('results', $result);
     }
-    
+
     public function test_datetime_tool_returns_current_time(): void
     {
         $tool = DateTimeTool::create();
         $result = json_decode($tool->execute(['action' => 'now', 'timezone' => 'UTC']), true);
-        
+
         $this->assertArrayHasKey('datetime', $result);
         $this->assertSame('UTC', $result['timezone']);
         $this->assertArrayHasKey('day_of_week', $result);
     }
-    
+
     public function test_datetime_tool_calculates_diff(): void
     {
         $tool = DateTimeTool::create();
@@ -889,7 +893,7 @@ final class AgenticToolsTest extends TestCase
             'date1' => '2024-01-01',
             'date2' => '2024-01-10',
         ]), true);
-        
+
         $this->assertSame(9, $result['days']);
     }
 }

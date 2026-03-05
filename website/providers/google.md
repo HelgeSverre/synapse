@@ -15,11 +15,11 @@ $llm = useLlm('gemini.gemini-1.5-flash', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://generativelanguage.googleapis.com/v1beta` |
-| `transport` | `TransportInterface` | Auto-discovered |
+| Option      | Type                 | Default                                            |
+| ----------- | -------------------- | -------------------------------------------------- |
+| `apiKey`    | `string`             | Required                                           |
+| `baseUrl`   | `string`             | `https://generativelanguage.googleapis.com/v1beta` |
+| `transport` | `TransportInterface` | Auto-discovered                                    |
 
 ## Models
 

@@ -19,10 +19,10 @@ $parser = createParser('keyvalue', [
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `separator` | `string` | `':'` | Delimiter between key and value |
-| `trimValues` | `bool` | `true` | Trim whitespace from values |
+| Option       | Type     | Default | Description                     |
+| ------------ | -------- | ------- | ------------------------------- |
+| `separator`  | `string` | `':'`   | Delimiter between key and value |
+| `trimValues` | `bool`   | `true`  | Trim whitespace from values     |
 
 ### Example
 
@@ -58,7 +58,7 @@ $parser = createParser('listjson', [
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `separator` | `string` | `':'` | Delimiter between key and value |
-| `indentSpaces` | `int` | `2` | Spaces per nesting level when parsing indented text |
+| Option         | Type     | Default | Description                                         |
+| -------------- | -------- | ------- | --------------------------------------------------- |
+| `separator`    | `string` | `':'`   | Delimiter between key and value                     |
+| `indentSpaces` | `int`    | `2`     | Spaces per nesting level when parsing indented text |

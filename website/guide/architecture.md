@@ -29,15 +29,15 @@ Every LLM interaction in Synapse flows through the same pipeline:
 
 Executors orchestrate the pipeline. Each executor type serves a different use case:
 
-| Executor | Use Case |
-|----------|----------|
-| [LlmExecutor](/executors/llm-executor) | Standard LLM call: prompt → response → parsed result |
-| [LlmExecutorWithFunctions](/executors/llm-executor-with-functions) | LLM with tool calling — automatic multi-turn loop |
-| [StreamingLlmExecutor](/executors/streaming-executor) | Real-time token streaming via generators |
-| [StreamingLlmExecutorWithFunctions](/executors/streaming-executor-with-functions) | Streaming with tool calling |
-| [CoreExecutor](/executors/core-executor) | Wrap a plain PHP function as an executor |
-| [CallableExecutor](/executors/callable-executor) | Define a tool/function for LLM tool calling |
-| [ToolRegistry](/executors/tool-registry) | Registry of multiple tools |
+| Executor                                                                          | Use Case                                             |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [LlmExecutor](/executors/llm-executor)                                            | Standard LLM call: prompt → response → parsed result |
+| [LlmExecutorWithFunctions](/executors/llm-executor-with-functions)                | LLM with tool calling — automatic multi-turn loop    |
+| [StreamingLlmExecutor](/executors/streaming-executor)                             | Real-time token streaming via generators             |
+| [StreamingLlmExecutorWithFunctions](/executors/streaming-executor-with-functions) | Streaming with tool calling                          |
+| [CoreExecutor](/executors/core-executor)                                          | Wrap a plain PHP function as an executor             |
+| [CallableExecutor](/executors/callable-executor)                                  | Define a tool/function for LLM tool calling          |
+| [ToolRegistry](/executors/tool-registry)                                          | Registry of multiple tools                           |
 
 ### Prompts
 
@@ -54,7 +54,7 @@ Template syntax uses <code v-pre>{{variable}}</code> notation with support for n
 
 ### Providers
 
-[Providers](/providers/) handle the HTTP communication with LLM APIs. Synapse includes providers for OpenAI, Anthropic, Google Gemini, Mistral, and xAI. All providers implement `LlmProviderInterface`.
+[Providers](/providers/) handle the HTTP communication with LLM APIs. Synapse includes providers for OpenAI, Anthropic, Google Gemini, Mistral, xAI, Groq, and Moonshot. All providers implement `LlmProviderInterface`.
 
 ### State
 

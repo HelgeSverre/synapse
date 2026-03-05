@@ -19,10 +19,10 @@ $parser = createParser('code', [
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `language` | `string\|null` | `null` | Filter by language tag |
-| `firstOnly` | `bool` | `true` | Return only the first code block |
+| Option      | Type           | Default | Description                      |
+| ----------- | -------------- | ------- | -------------------------------- |
+| `language`  | `string\|null` | `null`  | Filter by language tag           |
+| `firstOnly` | `bool`         | `true`  | Return only the first code block |
 
 ### Example
 

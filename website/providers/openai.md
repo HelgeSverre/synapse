@@ -10,11 +10,11 @@ $llm = useLlm('openai.gpt-4o-mini', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://api.openai.com/v1` |
-| `transport` | `TransportInterface` | Auto-discovered |
+| Option      | Type                 | Default                     |
+| ----------- | -------------------- | --------------------------- |
+| `apiKey`    | `string`             | Required                    |
+| `baseUrl`   | `string`             | `https://api.openai.com/v1` |
+| `transport` | `TransportInterface` | Auto-discovered             |
 
 ## Models
 

@@ -33,6 +33,7 @@ foreach ($executor->stream(['question' => 'Hello']) as $event) {
 ## When to Use
 
 Use `GuzzleStreamTransport` when:
+
 - You need real-time token streaming
 - You're building chat UIs with live output
 - You're using `StreamingLlmExecutor` or `StreamingLlmExecutorWithFunctions`

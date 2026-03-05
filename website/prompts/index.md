@@ -4,10 +4,10 @@ Prompts define what gets sent to the LLM. Synapse provides two prompt types with
 
 ## Prompt Types
 
-| Type | Returns | Use Case |
-|------|---------|----------|
+| Type                               | Returns     | Use Case                            |
+| ---------------------------------- | ----------- | ----------------------------------- |
 | [ChatPrompt](/prompts/chat-prompt) | `Message[]` | Structured conversations with roles |
-| [TextPrompt](/prompts/text-prompt) | `string` | Simple text completions |
+| [TextPrompt](/prompts/text-prompt) | `string`    | Simple text completions             |
 
 ## Template Variables
 

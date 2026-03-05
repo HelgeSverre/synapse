@@ -41,11 +41,11 @@ foreach ($executor->stream(['question' => 'What is the weather in Oslo?']) as $e
 
 ## Stream Events
 
-| Event | Description |
-|-------|-------------|
-| `TextDelta` | A chunk of text from the LLM |
-| `ToolCallsReady` | Tool calls are complete, about to be executed |
-| `StreamCompleted` | Stream finished |
+| Event             | Description                                   |
+| ----------------- | --------------------------------------------- |
+| `TextDelta`       | A chunk of text from the LLM                  |
+| `ToolCallsReady`  | Tool calls are complete, about to be executed |
+| `StreamCompleted` | Stream finished                               |
 
 ::: info
 `ToolCallDelta` events are accumulated internally and not yielded to consumers. Use `ToolCallsReady` for complete tool calls.

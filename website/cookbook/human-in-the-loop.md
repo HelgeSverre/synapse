@@ -89,6 +89,10 @@ $result = $executor->execute([
 echo $result->getValue();
 ```
 
+::: warning Security
+`unlink()` is destructive. In production, enforce path allowlists, run with least privilege, and require approval plus audit logging for destructive tools.
+:::
+
 ## Tips
 
 - Keep approval prompts clear and specific about what will happen

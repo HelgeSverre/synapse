@@ -10,7 +10,7 @@ A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers
 - **Tool/Function Calling**: Built-in support for multi-step tool calling
 - **State Management**: Conversation history and context tracking
 - **Streaming**: Token streaming and streaming tool calls
-- **Multi-Provider**: OpenAI, Anthropic, Google/Gemini, Mistral, xAI (plus more via custom providers)
+- **Multi-Provider**: OpenAI, Anthropic, Google/Gemini, Mistral, xAI, Groq, Moonshot
 - **Embeddings**: Unified embedding providers (OpenAI, Mistral, Jina, Cohere, Voyage)
 - **Event Hooks**: Lifecycle events for logging, metrics, and debugging
 - **PSR Standards**: PSR-4, PSR-7, PSR-17, PSR-18 compatible
@@ -38,10 +38,13 @@ composer require symfony/http-client
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{createChatPrompt, createLlmExecutor, createParser, useLlm};
+use function HelgeSverre\Synapse\{createChatPrompt, createExecutor, createParser, useLlm};
 
 // Create provider, prompt, and parser (transport auto-discovered if available)
-$llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
+$llm = useLlm('openai', [
+    'apiKey' => getenv('OPENAI_API_KEY'),
+    'model' => 'gpt-4o-mini',
+]);
 
 $prompt = createChatPrompt()
     ->addSystemMessage('You are a helpful assistant.')
@@ -50,14 +53,13 @@ $prompt = createChatPrompt()
 $parser = createParser('string');
 
 // Create and execute
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => $parser,
-    'model' => 'gpt-4o-mini',
 ]);
 
-$result = $executor->execute(['question' => 'What is the capital of France?']);
+$result = $executor->run(['question' => 'What is the capital of France?']);
 echo $result->getValue(); // "Paris"
 ```
 
@@ -82,14 +84,14 @@ Factory::setDefaultTransport(
 Executors are the core building blocks that orchestrate the LLM pipeline.
 
 ```php
-use function HelgeSverre\Synapse\{createCoreExecutor, createLlmExecutor};
+use function HelgeSverre\Synapse\{createCoreExecutor, createExecutor};
 
 // CoreExecutor - wrap any function
 $calc = createCoreExecutor(fn($input) => $input['a'] + $input['b']);
 $result = $calc->execute(['a' => 5, 'b' => 3]);
 
 // LlmExecutor - full LLM pipeline
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $provider,
     'prompt' => $prompt,
     'parser' => $parser,
@@ -232,8 +234,9 @@ use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
 use HelgeSverre\Synapse\Streaming\TextDelta;
 
 $transport = new GuzzleStreamTransport(new Client(['timeout' => 60]));
-$llm = useLlm('openai.gpt-4o-mini', [
+$llm = useLlm('openai', [
     'apiKey' => getenv('OPENAI_API_KEY'),
+    'model' => 'gpt-4o-mini',
     'transport' => $transport,
 ]);
 
@@ -248,6 +251,25 @@ foreach ($executor->stream([]) as $event) {
 ```
 
 See `examples/streaming-cli.php` and `examples/streaming-chat-cli.php` for full demos.
+
+## Example Index
+
+Key examples to start with:
+
+- `examples/basic-usage.php`
+- `examples/tool-calling.php`
+- `examples/streaming-cli.php`
+- `examples/agentic-agent-cli.php`
+- `examples/profilinator2000/`
+
+Production-oriented patterns:
+
+- `examples/production/retry-and-fallback.php`
+- `examples/production/safe-tools.php`
+- `examples/production/persistent-dialogue-redis.php`
+- `examples/production/http-sse-chat-endpoint.php`
+- `examples/production/observability-hooks.php`
+- `examples/production/testing-with-fakes.php`
 
 ### State Management
 
@@ -321,7 +343,7 @@ $vector = $response->getEmbedding();
 - `groq.*`
 - `moonshot.*`
 
-Additional providers exist as classes (e.g. Groq, Moonshot) and can be instantiated directly if needed.
+You can set model either inline (`prefix.model`) or in options (`['model' => '...']`). Do not provide conflicting model values in both places.
 
 ### OpenAI
 

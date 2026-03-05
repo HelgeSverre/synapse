@@ -67,9 +67,9 @@ new StreamingLlmExecutor(
 
 The `stream()` method yields these event types:
 
-| Event | Description |
-|-------|-------------|
-| `TextDelta` | A chunk of text (`$event->text`) |
+| Event             | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `TextDelta`       | A chunk of text (`$event->text`)                          |
 | `StreamCompleted` | Stream finished (`$event->finishReason`, `$event->usage`) |
 
 See [Stream Events](/streaming/events) for details.
@@ -89,16 +89,16 @@ echo $result->state;         // Updated ConversationState
 
 ## Supported Hook Events
 
-| Event | When |
-|-------|------|
-| `BeforePromptRender` | Before template rendering |
-| `AfterPromptRender` | After template rendering |
-| `OnStreamStart` | Stream connection opened |
-| `OnStreamChunk` | Each streamed event |
-| `OnStreamEnd` | Stream finished |
-| `OnStreamSuccess` | Stream completed successfully |
-| `OnError` | An exception occurred |
-| `OnComplete` | After execution (success or failure) |
+| Event                | When                                 |
+| -------------------- | ------------------------------------ |
+| `BeforePromptRender` | Before template rendering            |
+| `AfterPromptRender`  | After template rendering             |
+| `OnStreamStart`      | Stream connection opened             |
+| `OnStreamChunk`      | Each streamed event                  |
+| `OnStreamEnd`        | Stream finished                      |
+| `OnStreamSuccess`    | Stream completed successfully        |
+| `OnError`            | An exception occurred                |
+| `OnComplete`         | After execution (success or failure) |
 
 ```php
 use HelgeSverre\Synapse\Hooks\Events\{OnStreamStart, OnStreamChunk, OnStreamEnd};

@@ -5,7 +5,7 @@
 ## Usage
 
 ```php
-use HelgeSverre\Synapse\Streaming\{TextDelta, ToolCallDelta, ToolCallsReady, StreamCompleted};
+use HelgeSverre\Synapse\Streaming\{TextDelta, ToolCallsReady, StreamCompleted};
 use function HelgeSverre\Synapse\createStreamingLlmExecutorWithFunctions;
 
 $executor = createStreamingLlmExecutorWithFunctions([
@@ -17,7 +17,6 @@ $executor = createStreamingLlmExecutorWithFunctions([
 foreach ($executor->stream(['question' => 'Check the weather']) as $event) {
     match (true) {
         $event instanceof TextDelta => print($event->text),
-        $event instanceof ToolCallDelta => null, // Partial tool call data
         $event instanceof ToolCallsReady => print("[Executing tools...]\n"),
         $event instanceof StreamCompleted => print("\n[Done]\n"),
         default => null,
@@ -27,22 +26,11 @@ foreach ($executor->stream(['question' => 'Check the weather']) as $event) {
 
 ## Stream Events During Tool Calls
 
-1. **ToolCallDelta** events arrive as the LLM streams tool call data (name, arguments)
+1. Tool call deltas are accumulated internally by the executor
 2. Once all tool calls for a round are complete, **ToolCallsReady** fires
 3. Tools are executed automatically
 4. The LLM is called again and streams its next response
-5. **TextDelta** events arrive with the final answer (or more ToolCallDelta for another round)
-
-## ToolCallDelta
-
-Contains partial data as the tool call is being built:
-
-```php
-if ($event instanceof ToolCallDelta) {
-    echo "Building tool call: {$event->name}\n";
-    echo "Arguments so far: {$event->arguments}\n";
-}
-```
+5. **TextDelta** events continue until final completion
 
 ## ToolCallsReady
 

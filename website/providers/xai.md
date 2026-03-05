@@ -15,11 +15,11 @@ $llm = useLlm('grok.grok-beta', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://api.x.ai/v1` |
-| `transport` | `TransportInterface` | Auto-discovered |
+| Option      | Type                 | Default               |
+| ----------- | -------------------- | --------------------- |
+| `apiKey`    | `string`             | Required              |
+| `baseUrl`   | `string`             | `https://api.x.ai/v1` |
+| `transport` | `TransportInterface` | Auto-discovered       |
 
 ## Models
 

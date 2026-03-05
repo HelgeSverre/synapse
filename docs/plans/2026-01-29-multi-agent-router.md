@@ -16,6 +16,7 @@
 ## Task 1: Create Agent Registry and Specialist Definitions
 
 **Files:**
+
 - Create: `examples/router-agent/AgentDefinition.php`
 - Create: `examples/router-agent/AgentRegistry.php`
 
@@ -99,7 +100,7 @@ final class AgentRegistry
     public function getDescriptionForManager(): string
     {
         $lines = ["Available specialist agents:"];
-        
+
         foreach ($this->agents as $agent) {
             $lines[] = "- **{$agent->name}**: {$agent->toToolDescription()}";
         }
@@ -125,7 +126,7 @@ final class AgentRegistry
             - Potential bugs or edge cases
             - Performance considerations
             - Suggestions for improvement
-            
+
             Be constructive and specific in your feedback. Reference line numbers when possible.
             PROMPT,
             capabilities: ['code analysis', 'best practices', 'bug detection', 'refactoring suggestions'],
@@ -142,7 +143,7 @@ final class AgentRegistry
             - Authentication and authorization issues
             - Data exposure risks
             - Insecure configurations
-            
+
             Rate each finding by severity (Critical, High, Medium, Low, Info).
             Provide specific remediation steps.
             PROMPT,
@@ -160,7 +161,7 @@ final class AgentRegistry
             - Include relevant examples
             - Cite sources when applicable
             - Organize information logically
-            
+
             Be thorough but concise. Focus on accuracy.
             PROMPT,
             capabilities: ['topic research', 'summarization', 'explanation', 'examples'],
@@ -177,7 +178,7 @@ final class AgentRegistry
             - Document parameters, return types, and exceptions
             - Follow standard documentation formats (JSDoc, PHPDoc, etc.)
             - Consider the target audience (developers)
-            
+
             Good documentation is accurate, complete, and easy to understand.
             PROMPT,
             capabilities: ['API docs', 'code comments', 'README writing', 'tutorials'],
@@ -197,6 +198,7 @@ Run: `php -l examples/router-agent/AgentDefinition.php && php -l examples/router
 ## Task 2: Create Delegation Tool and Agent Runner
 
 **Files:**
+
 - Create: `examples/router-agent/DelegateTool.php`
 - Create: `examples/router-agent/AgentRunner.php`
 
@@ -230,7 +232,7 @@ final class AgentRunner
 
     /**
      * Run a specialist agent with the given task.
-     * 
+     *
      * @return Generator<AgentStreamEvent>
      */
     public function run(string $agentName, string $task): Generator
@@ -326,7 +328,7 @@ use HelgeSverre\Synapse\Streaming\StreamableProviderInterface;
 
 /**
  * Creates a delegate tool that the manager can use to invoke specialist agents.
- * 
+ *
  * NOTE: This is a synchronous version for simplicity.
  * The streaming version requires yielding from within tool execution,
  * which would need executor changes.
@@ -346,7 +348,7 @@ final class DelegateTool
     {
         $agentNames = $this->registry->names();
         $agentDescriptions = [];
-        
+
         foreach ($this->registry->all() as $agent) {
             $agentDescriptions[$agent->name] = $agent->toToolDescription();
         }
@@ -422,6 +424,7 @@ Run: `php -l examples/router-agent/AgentRunner.php && php -l examples/router-age
 ## Task 3: Create Main CLI Script
 
 **Files:**
+
 - Create: `examples/router-agent-cli.php`
 
 **Step 1: Create the CLI**
@@ -433,16 +436,16 @@ declare(strict_types=1);
 
 /**
  * Multi-Agent Router Demo
- * 
+ *
  * Demonstrates a manager agent that delegates tasks to specialist agents:
  * - code_reviewer: Reviews code quality
  * - security_auditor: Checks for vulnerabilities
  * - researcher: Researches topics
  * - documenter: Creates documentation
- * 
+ *
  * Usage:
  *   php examples/router-agent-cli.php [provider]
- * 
+ *
  * Examples:
  *   php examples/router-agent-cli.php openai
  *   php examples/router-agent-cli.php anthropic
@@ -643,6 +646,7 @@ Run: `php -l examples/router-agent-cli.php`
 ## Task 4: Write Tests
 
 **Files:**
+
 - Create: `tests/Unit/Examples/RouterAgentTest.php`
 
 **Step 1: Create test file**
@@ -672,7 +676,7 @@ final class RouterAgentTest extends TestCase
         );
 
         $desc = $agent->toToolDescription();
-        
+
         $this->assertStringContainsString('A test agent', $desc);
         $this->assertStringContainsString('testing', $desc);
         $this->assertStringContainsString('mocking', $desc);
@@ -681,7 +685,7 @@ final class RouterAgentTest extends TestCase
     public function test_registry_registers_and_retrieves_agents(): void
     {
         $registry = new AgentRegistry();
-        
+
         $agent = new AgentDefinition(
             name: 'my_agent',
             description: 'Test',
@@ -698,7 +702,7 @@ final class RouterAgentTest extends TestCase
     public function test_registry_lists_agent_names(): void
     {
         $registry = new AgentRegistry();
-        
+
         $registry->register(new AgentDefinition('agent1', 'Desc', 'Prompt', ['cap']));
         $registry->register(new AgentDefinition('agent2', 'Desc', 'Prompt', ['cap']));
 
@@ -723,7 +727,7 @@ final class RouterAgentTest extends TestCase
     public function test_registry_generates_manager_description(): void
     {
         $registry = AgentRegistry::withDefaults();
-        
+
         $desc = $registry->getDescriptionForManager();
 
         $this->assertStringContainsString('Available specialist agents', $desc);

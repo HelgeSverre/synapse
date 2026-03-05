@@ -17,10 +17,10 @@ $parser = createParser('enum', [
 
 ## Options
 
-| Option | Type | Required | Default | Description |
-|--------|------|----------|---------|-------------|
-| `values` | `array` | Yes | — | Allowed values to match against |
-| `caseSensitive` | `bool` | No | `false` | Whether matching is case-sensitive |
+| Option          | Type    | Required | Default | Description                        |
+| --------------- | ------- | -------- | ------- | ---------------------------------- |
+| `values`        | `array` | Yes      | —       | Allowed values to match against    |
+| `caseSensitive` | `bool`  | No       | `false` | Whether matching is case-sensitive |
 
 ## Example
 

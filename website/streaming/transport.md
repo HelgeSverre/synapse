@@ -72,9 +72,9 @@ $generator = $executor->stream($input, $ctx);
 
 ### Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
+| Property      | Type       | Description                         |
+| ------------- | ---------- | ----------------------------------- |
 | `isCancelled` | `?Closure` | Callback returning `true` to cancel |
-| `timeout` | `?float` | Timeout in seconds |
+| `timeout`     | `?float`   | Timeout in seconds                  |
 
 Use `$ctx->shouldCancel()` to check if the stream should be cancelled.

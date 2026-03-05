@@ -22,11 +22,11 @@ $parser = createParser('json', [
 
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `schema` | `array\|null` | `null` | JSON Schema for validation |
-| `validateSchema` | `bool` | `false` | Enable schema validation |
-| `validator` | `JsonSchemaValidatorInterface\|null` | `null` | Custom schema validator |
+| Option           | Type                                 | Default | Description                |
+| ---------------- | ------------------------------------ | ------- | -------------------------- |
+| `schema`         | `array\|null`                        | `null`  | JSON Schema for validation |
+| `validateSchema` | `bool`                               | `false` | Enable schema validation   |
+| `validator`      | `JsonSchemaValidatorInterface\|null` | `null`  | Custom schema validator    |
 
 ## Behavior
 

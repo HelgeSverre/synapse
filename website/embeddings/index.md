@@ -19,13 +19,13 @@ $all = $response->embeddings;            // array<array<float>> — all vectors
 
 ## Supported Providers
 
-| Provider | Factory String | Default Base URL |
-|----------|---------------|-----------------|
-| [OpenAI](/embeddings/openai) | `'openai'` | `https://api.openai.com/v1` |
-| [Mistral](/embeddings/mistral) | `'mistral'` | `https://api.mistral.ai/v1` |
-| [Jina](/embeddings/jina) | `'jina'` | `https://api.jina.ai/v1` |
-| [Cohere](/embeddings/cohere) | `'cohere'` | `https://api.cohere.com/v2` |
-| [Voyage](/embeddings/voyage) | `'voyage'` | `https://api.voyageai.com/v1` |
+| Provider                       | Factory String | Default Base URL              |
+| ------------------------------ | -------------- | ----------------------------- |
+| [OpenAI](/embeddings/openai)   | `'openai'`     | `https://api.openai.com/v1`   |
+| [Mistral](/embeddings/mistral) | `'mistral'`    | `https://api.mistral.ai/v1`   |
+| [Jina](/embeddings/jina)       | `'jina'`       | `https://api.jina.ai/v1`      |
+| [Cohere](/embeddings/cohere)   | `'cohere'`     | `https://api.cohere.com/v2`   |
+| [Voyage](/embeddings/voyage)   | `'voyage'`     | `https://api.voyageai.com/v1` |
 
 ## EmbeddingProviderInterface
 

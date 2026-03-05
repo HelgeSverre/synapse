@@ -40,9 +40,9 @@ foreach ($executor->stream(['question' => 'Write a poem']) as $event) {
 
 ## Streaming Executors
 
-| Executor | Description |
-|----------|-------------|
-| [StreamingLlmExecutor](/executors/streaming-executor) | Stream text responses |
+| Executor                                                                          | Description              |
+| --------------------------------------------------------------------------------- | ------------------------ |
+| [StreamingLlmExecutor](/executors/streaming-executor)                             | Stream text responses    |
 | [StreamingLlmExecutorWithFunctions](/executors/streaming-executor-with-functions) | Stream with tool calling |
 
 See [Stream Events](/streaming/events) for all event types and [Stream Transport](/streaming/transport) for transport setup.

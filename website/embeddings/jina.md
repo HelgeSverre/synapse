@@ -10,11 +10,11 @@ $embeddings = useEmbeddings('jina', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://api.jina.ai/v1` |
-| `transport` | `TransportInterface` | Auto-discovered |
+| Option      | Type                 | Default                  |
+| ----------- | -------------------- | ------------------------ |
+| `apiKey`    | `string`             | Required                 |
+| `baseUrl`   | `string`             | `https://api.jina.ai/v1` |
+| `transport` | `TransportInterface` | Auto-discovered          |
 
 ## Example
 

@@ -49,12 +49,18 @@ Returns `ToolDefinition[]` for sending to the LLM provider:
 $definitions = $tools->getToolDefinitions();
 ```
 
-### callFunction()
+### callFunctionResult()
 
 Execute a tool by name:
 
 ```php
-$result = $tools->callFunction('get_weather', ['location' => 'Oslo']);
+$result = $tools->callFunctionResult('get_weather', ['location' => 'Oslo']);
+
+if ($result->success) {
+    var_dump($result->result);
+} else {
+    var_dump($result->errors);
+}
 ```
 
 ### hasFunction() / getFunction()

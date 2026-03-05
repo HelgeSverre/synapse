@@ -7,24 +7,44 @@ Executors are the core building blocks that orchestrate the LLM pipeline. Each e
 Every executor follows the same base pattern: take input, run a handler, return a result. The `BaseExecutor` class provides lifecycle hooks, state management, and error handling.
 
 ```php
-$result = $executor->execute(['question' => 'What is PHP?']);
+$result = $executor->run(['question' => 'What is PHP?']);
 $result->getValue();    // The parsed output
 $result->state;         // Updated ConversationState
 $result->response;      // Raw GenerationResponse
 $result->metadata;      // Additional metadata
 ```
 
+For non-streaming executors, `run()` is the preferred API (it aliases `execute()`). You can also pass prior messages explicitly:
+
+```php
+$result = $executor->run(['question' => 'What is PHP?'], $historyMessages);
+```
+
 ## Executor Types
 
-| Type | Description |
-|------|-------------|
-| [LlmExecutor](/executors/llm-executor) | Standard LLM pipeline: prompt → provider → parser |
-| [LlmExecutorWithFunctions](/executors/llm-executor-with-functions) | LLM with automatic tool calling loop |
-| [StreamingLlmExecutor](/executors/streaming-executor) | Real-time token streaming |
-| [StreamingLlmExecutorWithFunctions](/executors/streaming-executor-with-functions) | Streaming with tool calling |
-| [CoreExecutor](/executors/core-executor) | Wrap a plain PHP function |
-| [CallableExecutor](/executors/callable-executor) | Define a tool for LLM function calling |
-| [ToolRegistry](/executors/tool-registry) | Tool registry for multiple tools |
+| Type                                                                              | Description                                       |
+| --------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [LlmExecutor](/executors/llm-executor)                                            | Standard LLM pipeline: prompt → provider → parser |
+| [LlmExecutorWithFunctions](/executors/llm-executor-with-functions)                | LLM with automatic tool calling loop              |
+| [StreamingLlmExecutor](/executors/streaming-executor)                             | Real-time token streaming                         |
+| [StreamingLlmExecutorWithFunctions](/executors/streaming-executor-with-functions) | Streaming with tool calling                       |
+| [CoreExecutor](/executors/core-executor)                                          | Wrap a plain PHP function                         |
+| [CallableExecutor](/executors/callable-executor)                                  | Define a tool for LLM function calling            |
+| [ToolRegistry](/executors/tool-registry)                                          | Tool registry for multiple tools                  |
+
+## Unified Factory
+
+`createExecutor()` is the canonical constructor. It selects executor type from `stream` + `tools` options:
+
+```php
+$executor = createExecutor([
+    'llm' => $llm,
+    'prompt' => $prompt,
+    'parser' => createParser('string'),
+    'stream' => false, // set true for streaming executor variants
+    'tools' => null,   // set ToolRegistry to enable tool-calling variants
+]);
+```
 
 ## Shared Features
 
@@ -65,10 +85,10 @@ $newExecutor = $executor->withState(new ConversationState());
 
 ## ExecutionResult
 
-Every `execute()` call returns an `ExecutionResult`:
+Every `run()` call returns an `ExecutionResult`:
 
 ```php
-$result = $executor->execute(['question' => 'Hello']);
+$result = $executor->run(['question' => 'Hello']);
 
 $result->getValue();   // mixed — the parsed value (string, array, bool, etc.)
 $result->state;        // ConversationState — updated with the assistant's response

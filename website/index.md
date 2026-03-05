@@ -30,6 +30,6 @@ features:
     details: Token streaming with event-driven generators. Build chat UIs and live demos with real-time output.
     link: /streaming/
   - title: Multi-Provider
-    details: OpenAI, Anthropic, Google Gemini, Mistral, xAI — switch providers by changing one line of code.
+    details: OpenAI, Anthropic, Google Gemini, Mistral, xAI, Groq, Moonshot — switch providers by changing one line of code.
     link: /providers/
 ---

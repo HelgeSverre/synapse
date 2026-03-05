@@ -10,11 +10,11 @@ $embeddings = useEmbeddings('voyage', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://api.voyageai.com/v1` |
-| `transport` | `TransportInterface` | Auto-discovered |
+| Option      | Type                 | Default                       |
+| ----------- | -------------------- | ----------------------------- |
+| `apiKey`    | `string`             | Required                      |
+| `baseUrl`   | `string`             | `https://api.voyageai.com/v1` |
+| `transport` | `TransportInterface` | Auto-discovered               |
 
 ## Example
 

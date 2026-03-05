@@ -2,10 +2,10 @@
 
 Synapse provides two approaches to managing conversation state:
 
-| Class | Style | Use Case |
-|-------|-------|----------|
+| Class                                          | Style                 | Use Case                             |
+| ---------------------------------------------- | --------------------- | ------------------------------------ |
 | [ConversationState](/state/conversation-state) | Immutable (`withX()`) | Functional pipelines, executor state |
-| [Dialogue](/state/dialogue) | Mutable (fluent) | Multi-turn chat loops |
+| [Dialogue](/state/dialogue)                    | Mutable (fluent)      | Multi-turn chat loops                |
 
 ## Quick Example
 

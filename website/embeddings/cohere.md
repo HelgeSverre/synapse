@@ -10,11 +10,11 @@ $embeddings = useEmbeddings('cohere', [
 
 ## Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `apiKey` | `string` | Required |
-| `baseUrl` | `string` | `https://api.cohere.com/v2` |
-| `transport` | `TransportInterface` | Auto-discovered |
+| Option      | Type                 | Default                     |
+| ----------- | -------------------- | --------------------------- |
+| `apiKey`    | `string`             | Required                    |
+| `baseUrl`   | `string`             | `https://api.cohere.com/v2` |
+| `transport` | `TransportInterface` | Auto-discovered             |
 
 ## Example
 

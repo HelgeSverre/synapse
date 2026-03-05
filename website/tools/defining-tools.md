@@ -18,6 +18,10 @@ $tools = createToolRegistry([
 ]);
 ```
 
+::: warning Security
+`eval()`, filesystem access, and shell execution tools are dangerous in production. Restrict tool inputs, run in a sandbox, and require explicit approvals for destructive operations.
+:::
+
 ## Parameters Schema
 
 Parameters use [JSON Schema](https://json-schema.org/) format:

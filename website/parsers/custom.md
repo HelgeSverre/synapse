@@ -20,9 +20,9 @@ $parser = createParser('custom', [
 
 ### Options
 
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `handler` | `callable` | Yes | Parsing function that receives `GenerationResponse` |
+| Option    | Type       | Required | Description                                         |
+| --------- | ---------- | -------- | --------------------------------------------------- |
+| `handler` | `callable` | Yes      | Parsing function that receives `GenerationResponse` |
 
 ### Example
 

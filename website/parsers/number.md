@@ -13,8 +13,8 @@ $parser = createParser('number', ['intOnly' => true]); // integers only
 
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
+| Option    | Type   | Default | Description          |
+| --------- | ------ | ------- | -------------------- |
 | `intOnly` | `bool` | `false` | Only return integers |
 
 ## Example

@@ -12,6 +12,7 @@ $parser = createParser('bool');
 ## Behavior
 
 Matches common affirmative/negative patterns in the response text:
+
 - **true**: "yes", "true", "1", "correct", etc.
 - **false**: "no", "false", "0", "incorrect", etc.
 

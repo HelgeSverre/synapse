@@ -12,9 +12,9 @@ $parser = createParser('string', ['trim' => false]); // no trimming
 
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `trim` | `bool` | `true` | Whether to trim whitespace |
+| Option | Type   | Default | Description                |
+| ------ | ------ | ------- | -------------------------- |
+| `trim` | `bool` | `true`  | Whether to trim whitespace |
 
 ## Behavior
 

@@ -25,18 +25,18 @@ echo $result->getValue();
 
 ## Factory Options
 
-| Option | Type | Required | Default | Description |
-|--------|------|----------|---------|-------------|
-| `llm` | `Llm` or `LlmProviderInterface` | Yes | — | The LLM provider (from `useLlm()`) |
-| `prompt` | `PromptInterface` | Yes | — | The prompt template |
-| `parser` | `ParserInterface` | No | `StringParser` | Response parser |
-| `model` | `string` | No | from `useLlm()` | Model name (auto-set if using `useLlm('provider.model')`) |
-| `temperature` | `float` | No | `null` | Sampling temperature |
-| `maxTokens` | `int` | No | `null` | Max output tokens |
-| `responseFormat` | `array` | No | `null` | Response format hint |
-| `name` | `string` | No | `'LlmExecutor'` | Executor name |
-| `hooks` | `HookDispatcherInterface` | No | `null` | Hook dispatcher |
-| `state` | `ConversationState` | No | `null` | Initial state |
+| Option           | Type                            | Required | Default         | Description                                               |
+| ---------------- | ------------------------------- | -------- | --------------- | --------------------------------------------------------- |
+| `llm`            | `Llm` or `LlmProviderInterface` | Yes      | —               | The LLM provider (from `useLlm()`)                        |
+| `prompt`         | `PromptInterface`               | Yes      | —               | The prompt template                                       |
+| `parser`         | `ParserInterface`               | No       | `StringParser`  | Response parser                                           |
+| `model`          | `string`                        | No       | from `useLlm()` | Model name (auto-set if using `useLlm('provider.model')`) |
+| `temperature`    | `float`                         | No       | `null`          | Sampling temperature                                      |
+| `maxTokens`      | `int`                           | No       | `null`          | Max output tokens                                         |
+| `responseFormat` | `array`                         | No       | `null`          | Response format hint                                      |
+| `name`           | `string`                        | No       | `'LlmExecutor'` | Executor name                                             |
+| `hooks`          | `HookDispatcherInterface`       | No       | `null`          | Hook dispatcher                                           |
+| `state`          | `ConversationState`             | No       | `null`          | Initial state                                             |
 
 ## How It Works
 
@@ -73,15 +73,15 @@ $result = $executor->execute(['text' => 'Contact John at john@example.com']);
 
 ## Supported Hook Events
 
-| Event | When |
-|-------|------|
-| `BeforePromptRender` | Before template rendering |
-| `AfterPromptRender` | After template rendering |
-| `BeforeProviderCall` | Before the LLM API call |
-| `AfterProviderCall` | After the LLM API responds |
-| `OnSuccess` | Execution completed successfully |
-| `OnError` | An exception occurred |
-| `OnComplete` | After execution (success or failure) |
+| Event                | When                                 |
+| -------------------- | ------------------------------------ |
+| `BeforePromptRender` | Before template rendering            |
+| `AfterPromptRender`  | After template rendering             |
+| `BeforeProviderCall` | Before the LLM API call              |
+| `AfterProviderCall`  | After the LLM API responds           |
+| `OnSuccess`          | Execution completed successfully     |
+| `OnError`            | An exception occurred                |
+| `OnComplete`         | After execution (success or failure) |
 
 ```php
 use HelgeSverre\Synapse\Hooks\Events\{BeforeProviderCall, AfterProviderCall, OnSuccess};

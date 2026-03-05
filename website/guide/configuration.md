@@ -10,12 +10,14 @@ If you have Guzzle or Symfony HTTP Client installed, Synapse auto-discovers them
 
 ```php
 // Just works — transport is auto-discovered
-$llm = useLlm('openai.gpt-4o-mini', [
+$llm = useLlm('openai', [
     'apiKey' => getenv('OPENAI_API_KEY'),
+    'model' => 'gpt-4o-mini',
 ]);
 ```
 
 Discovery order:
+
 1. **Guzzle** (`guzzlehttp/guzzle`) — tried first
 2. **Symfony HTTP Client** (`symfony/http-client`) — fallback
 
@@ -41,44 +43,48 @@ Override the transport for a specific provider:
 ```php
 $customTransport = Factory::createTransport($myClient, $myRequestFactory, $myStreamFactory);
 
-$llm = useLlm('openai.gpt-4o-mini', [
+$llm = useLlm('openai', [
     'apiKey' => getenv('OPENAI_API_KEY'),
+    'model' => 'gpt-4o-mini',
     'transport' => $customTransport,
 ]);
 ```
 
 ## Providers
 
-The `useLlm()` factory creates providers using a `prefix.model` string:
+The `useLlm()` factory creates providers using a provider prefix:
 
-| Prefix | Provider | Default Base URL |
-|--------|----------|-----------------|
-| `openai` | OpenAI | `https://api.openai.com/v1` |
-| `anthropic` | Anthropic | `https://api.anthropic.com/v1` |
+| Prefix             | Provider      | Default Base URL                                   |
+| ------------------ | ------------- | -------------------------------------------------- |
+| `openai`           | OpenAI        | `https://api.openai.com/v1`                        |
+| `anthropic`        | Anthropic     | `https://api.anthropic.com/v1`                     |
 | `google`, `gemini` | Google Gemini | `https://generativelanguage.googleapis.com/v1beta` |
-| `mistral` | Mistral | `https://api.mistral.ai/v1` |
-| `xai`, `grok` | xAI | `https://api.x.ai/v1` |
+| `mistral`          | Mistral       | `https://api.mistral.ai/v1`                        |
+| `xai`, `grok`      | xAI           | `https://api.x.ai/v1`                              |
+| `groq`             | Groq          | `https://api.groq.com/openai/v1`                   |
+| `moonshot`         | Moonshot      | `https://api.moonshot.ai/v1`                       |
 
 ### Common Options
 
 All providers accept:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `apiKey` | `string` | **Required.** API key for the provider |
-| `baseUrl` | `string` | Override the default base URL |
+| Option      | Type                 | Description                              |
+| ----------- | -------------------- | ---------------------------------------- |
+| `apiKey`    | `string`             | **Required.** API key for the provider   |
+| `baseUrl`   | `string`             | Override the default base URL            |
 | `transport` | `TransportInterface` | Override the transport for this provider |
 
 ```php
-$llm = useLlm('openai.gpt-4o', [
+$llm = useLlm('openai', [
     'apiKey' => getenv('OPENAI_API_KEY'),
+    'model' => 'gpt-4o',
     'baseUrl' => 'https://my-proxy.example.com/v1',
 ]);
 ```
 
-### Direct Instantiation
+### Direct Instantiation (Optional)
 
-Providers not in the factory (Groq, Moonshot) can be instantiated directly:
+All built-in providers are available through `useLlm()`, but direct instantiation is still supported:
 
 ```php
 use HelgeSverre\Synapse\Provider\Groq\GroqProvider;
@@ -93,21 +99,21 @@ $llm = new GroqProvider(
 
 The `createParser()` factory accepts a type string and optional options:
 
-| Type String | Parser | Description |
-|-------------|--------|-------------|
-| `'string'` | StringParser | Trims and returns text (default) |
-| `'boolean'`, `'bool'` | BooleanParser | Detects yes/no/true/false |
-| `'number'`, `'int'`, `'float'` | NumberParser | Extracts numeric values |
-| `'json'` | JsonParser | Parses JSON with optional schema |
-| `'list'`, `'array'` | ListParser | Splits by newlines into array |
-| `'enum'` | EnumParser | Matches against allowed values |
-| `'code'`, `'codeblock'`, `'markdownCodeBlock'` | MarkdownCodeBlockParser | Extracts code blocks |
-| `'codeblocks'`, `'markdownCodeBlocks'` | MarkdownCodeBlocksParser | Extracts multiple code blocks |
-| `'keyvalue'`, `'key-value'` | ListToKeyValueParser | Parses key:value lists |
-| `'listjson'`, `'list-json'` | ListToJsonParser | Converts lists to JSON |
-| `'template'`, `'replace'` | ReplaceStringTemplateParser | Template string replacement |
-| `'function'`, `'tool'` | LlmFunctionParser | Parses tool call results |
-| `'custom'` | CustomParser | Custom handler function |
+| Type String                                    | Parser                      | Description                      |
+| ---------------------------------------------- | --------------------------- | -------------------------------- |
+| `'string'`                                     | StringParser                | Trims and returns text (default) |
+| `'boolean'`, `'bool'`                          | BooleanParser               | Detects yes/no/true/false        |
+| `'number'`, `'int'`, `'float'`                 | NumberParser                | Extracts numeric values          |
+| `'json'`                                       | JsonParser                  | Parses JSON with optional schema |
+| `'list'`, `'array'`                            | ListParser                  | Splits by newlines into array    |
+| `'enum'`                                       | EnumParser                  | Matches against allowed values   |
+| `'code'`, `'codeblock'`, `'markdownCodeBlock'` | MarkdownCodeBlockParser     | Extracts code blocks             |
+| `'codeblocks'`, `'markdownCodeBlocks'`         | MarkdownCodeBlocksParser    | Extracts multiple code blocks    |
+| `'keyvalue'`, `'key-value'`                    | ListToKeyValueParser        | Parses key:value lists           |
+| `'listjson'`, `'list-json'`                    | ListToJsonParser            | Converts lists to JSON           |
+| `'template'`, `'replace'`                      | ReplaceStringTemplateParser | Template string replacement      |
+| `'function'`, `'tool'`                         | LlmFunctionParser           | Parses tool call results         |
+| `'custom'`                                     | CustomParser                | Custom handler function          |
 
 See [Parsers](/parsers/) for detailed documentation of each parser.
 

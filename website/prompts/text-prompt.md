@@ -38,11 +38,13 @@ $prompt = createTextPrompt()
 ## When to Use TextPrompt
 
 Use `TextPrompt` when:
+
 - You need a simple, single-string prompt
 - The LLM API accepts raw text (not chat format)
 - You're building simple completion tasks
 
 Use [ChatPrompt](/prompts/chat-prompt) when:
+
 - You need system/user/assistant message roles
 - You're building conversational flows
 - You need history management

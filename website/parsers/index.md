@@ -12,21 +12,21 @@ $parser = createParser('json', ['schema' => [...]]);
 
 ## Available Parsers
 
-| Factory String | Parser Class | Returns |
-|---------------|-------------|---------|
-| `'string'` | [StringParser](/parsers/string) | `string` |
-| `'json'` | [JsonParser](/parsers/json) | `array` |
-| `'boolean'`, `'bool'` | [BooleanParser](/parsers/boolean) | `bool` |
-| `'number'`, `'int'`, `'float'` | [NumberParser](/parsers/number) | `int\|float` |
-| `'list'`, `'array'` | [ListParser](/parsers/list) | `string[]` |
-| `'enum'` | [EnumParser](/parsers/enum) | `?string` |
-| `'code'`, `'codeblock'`, `'markdownCodeBlock'` | [MarkdownCodeBlockParser](/parsers/code-block) | `string` |
-| `'codeblocks'`, `'markdownCodeBlocks'` | [MarkdownCodeBlocksParser](/parsers/code-block) | `array[]` |
-| `'keyvalue'`, `'key-value'` | [ListToKeyValueParser](/parsers/key-value) | `array` |
-| `'listjson'`, `'list-json'` | [ListToJsonParser](/parsers/key-value) | `array` |
-| `'template'`, `'replace'` | [ReplaceStringTemplateParser](/parsers/custom) | `string` |
-| `'function'`, `'tool'` | [LlmFunctionParser](/parsers/custom) | `mixed` |
-| `'custom'` | [CustomParser](/parsers/custom) | `mixed` |
+| Factory String                                 | Parser Class                                    | Returns      |
+| ---------------------------------------------- | ----------------------------------------------- | ------------ |
+| `'string'`                                     | [StringParser](/parsers/string)                 | `string`     |
+| `'json'`                                       | [JsonParser](/parsers/json)                     | `array`      |
+| `'boolean'`, `'bool'`                          | [BooleanParser](/parsers/boolean)               | `bool`       |
+| `'number'`, `'int'`, `'float'`                 | [NumberParser](/parsers/number)                 | `int\|float` |
+| `'list'`, `'array'`                            | [ListParser](/parsers/list)                     | `string[]`   |
+| `'enum'`                                       | [EnumParser](/parsers/enum)                     | `?string`    |
+| `'code'`, `'codeblock'`, `'markdownCodeBlock'` | [MarkdownCodeBlockParser](/parsers/code-block)  | `string`     |
+| `'codeblocks'`, `'markdownCodeBlocks'`         | [MarkdownCodeBlocksParser](/parsers/code-block) | `array[]`    |
+| `'keyvalue'`, `'key-value'`                    | [ListToKeyValueParser](/parsers/key-value)      | `array`      |
+| `'listjson'`, `'list-json'`                    | [ListToJsonParser](/parsers/key-value)          | `array`      |
+| `'template'`, `'replace'`                      | [ReplaceStringTemplateParser](/parsers/custom)  | `string`     |
+| `'function'`, `'tool'`                         | [LlmFunctionParser](/parsers/custom)            | `mixed`      |
+| `'custom'`                                     | [CustomParser](/parsers/custom)                 | `mixed`      |
 
 ## How Parsers Work
 

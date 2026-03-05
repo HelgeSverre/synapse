@@ -7,13 +7,19 @@ Providers handle HTTP communication with LLM APIs. Synapse includes built-in pro
 ```php
 use function HelgeSverre\Synapse\useLlm;
 
-$llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
+$llm = useLlm('openai', [
+    'apiKey' => getenv('OPENAI_API_KEY'),
+    'model' => 'gpt-4o-mini',
+]);
 ```
 
-The format is `prefix.model`. The prefix selects the provider and the model is carried on the returned `Llm` object. Executors created with this `Llm` instance automatically use the model — no need to specify it again.
+Use `prefix` for provider selection and set the model once (either in `useLlm()` options or in executor options). Avoid specifying two different model values.
 
 ```php
-$llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
+$llm = useLlm('openai', [
+    'apiKey' => getenv('OPENAI_API_KEY'),
+    'model' => 'gpt-4o-mini',
+]);
 
 // Model 'gpt-4o-mini' is used automatically
 $executor = createLlmExecutor([
@@ -21,29 +27,30 @@ $executor = createLlmExecutor([
     'prompt' => $prompt,
 ]);
 
-// You can override the model if needed
+// If no model is provided via useLlm(), set it on the executor
+$llmWithoutModel = useLlm('openai', ['apiKey' => getenv('OPENAI_API_KEY')]);
 $executor = createLlmExecutor([
-    'llm' => $llm,
+    'llm' => $llmWithoutModel,
     'prompt' => $prompt,
-    'model' => 'gpt-4-turbo', // overrides 'gpt-4o-mini'
+    'model' => 'gpt-4o-mini',
 ]);
 ```
 
-If you omit the model from the string (e.g. `useLlm('openai', [...])`), you must provide it in the executor options.
+`useLlm('provider.model')` is still supported, but mixing that with a different `model` value in executor options throws.
 
 ::: tip Streaming
 All providers require `GuzzleStreamTransport` for streaming. See [Stream Transport](/streaming/transport) for setup.
 :::
 
-| Prefix | Provider | Default Base URL |
-|--------|----------|-----------------|
-| `openai` | [OpenAI](/providers/openai) | `https://api.openai.com/v1` |
-| `anthropic` | [Anthropic](/providers/anthropic) | `https://api.anthropic.com/v1` |
+| Prefix             | Provider                           | Default Base URL                                   |
+| ------------------ | ---------------------------------- | -------------------------------------------------- |
+| `openai`           | [OpenAI](/providers/openai)        | `https://api.openai.com/v1`                        |
+| `anthropic`        | [Anthropic](/providers/anthropic)  | `https://api.anthropic.com/v1`                     |
 | `google`, `gemini` | [Google Gemini](/providers/google) | `https://generativelanguage.googleapis.com/v1beta` |
-| `mistral` | [Mistral](/providers/mistral) | `https://api.mistral.ai/v1` |
-| `xai`, `grok` | [xAI / Grok](/providers/xai) | `https://api.x.ai/v1` |
-
-Additional providers ([Groq](/providers/groq), [Moonshot](/providers/moonshot)) require direct instantiation.
+| `mistral`          | [Mistral](/providers/mistral)      | `https://api.mistral.ai/v1`                        |
+| `xai`, `grok`      | [xAI / Grok](/providers/xai)       | `https://api.x.ai/v1`                              |
+| `groq`             | [Groq](/providers/groq)            | `https://api.groq.com/openai/v1`                   |
+| `moonshot`         | [Moonshot](/providers/moonshot)    | `https://api.moonshot.ai/v1`                       |
 
 ## LlmProviderInterface
 
@@ -75,11 +82,11 @@ $caps->supportsSystemPrompt; // bool — system message role
 
 All providers via `useLlm()` accept:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `apiKey` | `string` | **Required.** API key |
-| `baseUrl` | `string` | Override default base URL |
-| `transport` | `TransportInterface` | Override HTTP transport |
+| Option      | Type                 | Description               |
+| ----------- | -------------------- | ------------------------- |
+| `apiKey`    | `string`             | **Required.** API key     |
+| `baseUrl`   | `string`             | Override default base URL |
+| `transport` | `TransportInterface` | Override HTTP transport   |
 
 ## GenerationRequest
 

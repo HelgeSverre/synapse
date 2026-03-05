@@ -16,6 +16,7 @@
 ## Task 1: Create Approval Value Objects
 
 **Files:**
+
 - Create: `examples/approval-agent/ApprovalRequest.php`
 - Create: `examples/approval-agent/ApprovalDecision.php`
 
@@ -116,6 +117,7 @@ Run: `php -l examples/approval-agent/ApprovalRequest.php && php -l examples/appr
 ## Task 2: Create Approval Provider Interface and CLI Implementation
 
 **Files:**
+
 - Create: `examples/approval-agent/ApprovalProviderInterface.php`
 - Create: `examples/approval-agent/CliApprovalProvider.php`
 
@@ -177,12 +179,12 @@ final class CliApprovalProvider implements ApprovalProviderInterface
         echo self::CYAN . "Risk: " . self::RESET . $riskColor . strtoupper($request->riskLevel) . self::RESET . "\n";
         echo self::CYAN . "Description: " . self::RESET . $request->description . "\n";
         echo self::CYAN . "Arguments: " . self::RESET . "\n";
-        
+
         $argsJson = json_encode($request->arguments, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         foreach (explode("\n", $argsJson) as $line) {
             echo "  " . $line . "\n";
         }
-        
+
         echo str_repeat('─', 50) . "\n";
         echo self::BOLD . "[y]" . self::RESET . " Approve  ";
         echo self::BOLD . "[n]" . self::RESET . " Reject  ";
@@ -209,7 +211,7 @@ final class CliApprovalProvider implements ApprovalProviderInterface
     {
         echo "Enter new arguments as JSON (or press Enter to cancel):\n";
         $json = trim(fgets(STDIN) ?: '');
-        
+
         if ($json === '') {
             return ApprovalDecision::reject('User cancelled edit');
         }
@@ -234,6 +236,7 @@ Run: `php -l examples/approval-agent/CliApprovalProvider.php`
 ## Task 3: Create ApprovingToolRegistry Decorator
 
 **Files:**
+
 - Create: `examples/approval-agent/ApprovingToolRegistry.php`
 
 **Step 1: Create the decorator**
@@ -250,7 +253,7 @@ use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
 
 /**
  * Decorator that intercepts tool calls and requires approval for risky tools.
- * 
+ *
  * Risk is determined by tool attributes:
  * - No 'risk' attribute or 'risk' => 'low': no approval needed
  * - 'risk' => 'medium': approval requested
@@ -331,6 +334,7 @@ Run: `php -l examples/approval-agent/ApprovingToolRegistry.php`
 ## Task 4: Create Example Tools with Risk Attributes
 
 **Files:**
+
 - Create: `examples/approval-agent/RiskyTools.php`
 
 **Step 1: Create risky tools**
@@ -480,6 +484,7 @@ Run: `php -l examples/approval-agent/RiskyTools.php`
 ## Task 5: Create the Main CLI Script
 
 **Files:**
+
 - Create: `examples/approval-agent-cli.php`
 
 **Step 1: Create the CLI**
@@ -491,12 +496,12 @@ declare(strict_types=1);
 
 /**
  * Human-in-the-Loop Agent Demo
- * 
+ *
  * Demonstrates an agent that pauses for human approval before executing risky tools.
- * 
+ *
  * Usage:
  *   php examples/approval-agent-cli.php [provider]
- * 
+ *
  * Examples:
  *   php examples/approval-agent-cli.php openai
  *   php examples/approval-agent-cli.php anthropic
@@ -655,6 +660,7 @@ Run: `php -l examples/approval-agent-cli.php`
 ## Task 6: Add getAttributes to CallableExecutor
 
 **Files:**
+
 - Modify: `src/Executor/CallableExecutor.php`
 
 **Step 1: Check if attributes already exist**
@@ -687,6 +693,7 @@ Run: `./vendor/bin/phpstan analyse src/Executor/CallableExecutor.php`
 ## Task 7: Write Tests
 
 **Files:**
+
 - Create: `tests/Unit/Examples/ApprovalAgentTest.php`
 
 **Step 1: Create test file**
@@ -758,7 +765,7 @@ final class ApprovalAgentTest extends TestCase
         );
 
         $result = $tools->callFunction('read_file', ['path' => 'test.txt']);
-        
+
         $this->assertSame(0, $mockProvider->callCount); // No approval requested
         $this->assertIsString($result);
     }
@@ -780,7 +787,7 @@ final class ApprovalAgentTest extends TestCase
         );
 
         $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
-        
+
         $this->assertSame(1, $mockProvider->callCount); // Approval was requested
     }
 
@@ -799,7 +806,7 @@ final class ApprovalAgentTest extends TestCase
 
         $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
         $decoded = json_decode($result, true);
-        
+
         $this->assertSame('Action rejected by user', $decoded['error']);
         $this->assertSame('Not allowed', $decoded['reason']);
     }
@@ -807,7 +814,7 @@ final class ApprovalAgentTest extends TestCase
     public function test_edited_tool_uses_new_arguments(): void
     {
         $capturedArgs = null;
-        
+
         $mockProvider = new class implements ApprovalProviderInterface {
             public function requestApproval(ApprovalRequest $request): ApprovalDecision {
                 return ApprovalDecision::edit(['pattern' => 'safe-only.txt']);
@@ -821,7 +828,7 @@ final class ApprovalAgentTest extends TestCase
 
         $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
         $decoded = json_decode($result, true);
-        
+
         // The edited pattern should be used
         $this->assertSame('safe-only.txt', $decoded['pattern']);
     }

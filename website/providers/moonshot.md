@@ -1,18 +1,16 @@
 # Moonshot
 
-Moonshot is not available via the `useLlm()` factory. Instantiate it directly.
+Moonshot is available via the `useLlm()` factory.
 
 ## Setup
 
 ```php
-use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
-use HelgeSverre\Synapse\Factory;
+use function HelgeSverre\Synapse\useLlm;
 
-$llm = new MoonshotProvider(
-    transport: Factory::getDefaultTransport(),
-    apiKey: getenv('MOONSHOT_API_KEY'),
-    baseUrl: 'https://api.moonshot.ai/v1', // default
-);
+$llm = useLlm('moonshot', [
+    'apiKey' => getenv('MOONSHOT_API_KEY'),
+    'model' => 'moonshot-v1-8k',
+]);
 ```
 
 ## Usage
@@ -24,7 +22,6 @@ $executor = createLlmExecutor([
         ->addSystemMessage('You are helpful.')
         ->addUserMessage('{{question}}', parseTemplate: true),
     'parser' => createParser('string'),
-    'model' => 'moonshot-v1-8k',
 ]);
 
 $result = $executor->execute(['question' => 'Hello']);

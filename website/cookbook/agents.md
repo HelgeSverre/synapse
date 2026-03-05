@@ -96,6 +96,10 @@ while (true) {
 }
 ```
 
+::: warning Security
+The example uses `eval()` and writes to `/tmp` for demonstration only. In production, replace this with a validated math parser and a restricted storage layer.
+:::
+
 ## Tips
 
 - Write clear tool descriptions — the LLM uses these to decide when to use each tool

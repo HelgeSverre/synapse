@@ -30,7 +30,7 @@ $result = $executor->execute([
 ]);
 
 $code = $result->getValue();
-echo $code['code'];
+echo $code;
 // <?php class Money { ... }
 ```
 

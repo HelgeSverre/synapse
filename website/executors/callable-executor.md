@@ -30,15 +30,15 @@ $tool = createCallableExecutor([
 
 ## Config Options
 
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `name` | `string` | Yes | Tool name (used by the LLM to call it) |
-| `description` | `string` | Yes | What the tool does (helps the LLM decide when to use it) |
-| `handler` | `callable` | Yes | Function to run when the tool is called |
-| `parameters` | `array` | No | JSON Schema for the tool's parameters |
-| `attributes` | `array` | No | Extra metadata |
-| `visibilityHandler` | `callable` | No | Controls when this tool is available |
-| `validateInput` | `callable` | No | Validates arguments before execution |
+| Option              | Type       | Required | Description                                              |
+| ------------------- | ---------- | -------- | -------------------------------------------------------- |
+| `name`              | `string`   | Yes      | Tool name (used by the LLM to call it)                   |
+| `description`       | `string`   | Yes      | What the tool does (helps the LLM decide when to use it) |
+| `handler`           | `callable` | Yes      | Function to run when the tool is called                  |
+| `parameters`        | `array`    | No       | JSON Schema for the tool's parameters                    |
+| `attributes`        | `array`    | No       | Extra metadata                                           |
+| `visibilityHandler` | `callable` | No       | Controls when this tool is available                     |
+| `validateInput`     | `callable` | No       | Validates arguments before execution                     |
 
 ## Parameters Schema
 

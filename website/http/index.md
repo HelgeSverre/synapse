@@ -4,10 +4,10 @@ Synapse uses a transport layer to make HTTP requests to LLM APIs. All transports
 
 ## Transport Types
 
-| Transport | Use Case |
-|-----------|----------|
-| [Psr18Transport](/http/psr18) | Standard buffered HTTP requests |
-| [GuzzleStreamTransport](/http/guzzle-stream) | Streaming responses |
+| Transport                                    | Use Case                        |
+| -------------------------------------------- | ------------------------------- |
+| [Psr18Transport](/http/psr18)                | Standard buffered HTTP requests |
+| [GuzzleStreamTransport](/http/guzzle-stream) | Streaming responses             |
 
 ## Auto-Discovery
 
