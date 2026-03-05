@@ -55,16 +55,6 @@ final class SafeToolExecutor implements ToolExecutorInterface
         ], $result->attributes);
     }
 
-    /**
-     * @deprecated Use callFunctionResult() for predictable, structured output.
-     */
-    public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
-    {
-        $result = $this->callFunctionResult($name, $input, $state);
-
-        return $result->success ? $result->result : $result->toJson();
-    }
-
     private function truncate(string $tool, string $payload): string
     {
         if (strlen($payload) <= $this->maxChars) {

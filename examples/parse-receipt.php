@@ -128,7 +128,7 @@ Then look for financial totals:
 DO NOT MAKE UP DATA. Extract only what you see in the text below.
 
 Receipt text:
-{{ receipt_text }}
+{{receipt_text}}
 PROMPT
     );
 
@@ -152,7 +152,6 @@ $parser = Factory::createParser('json', [
 // 6. Create LLM executor with response_format for structured output
 $executor = Factory::createLlmExecutor([
     'llm' => $provider,
-    'model' => 'gpt-4o',
     'prompt' => $prompt,
     'parser' => $parser,
     'responseFormat' => [

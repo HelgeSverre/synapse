@@ -78,18 +78,6 @@ final class ApprovingToolRegistry implements ToolExecutorInterface
         return $this->inner->callFunctionResult($name, $input, $state);
     }
 
-    /**
-     * @deprecated Use callFunctionResult() for predictable, structured output.
-     *
-     * @param  array<string, mixed>  $input
-     */
-    public function callFunction(string $name, array $input, ?ConversationState $state = null): mixed
-    {
-        $result = $this->callFunctionResult($name, $input, $state);
-
-        return $result->success ? $result->result : $result->toJson();
-    }
-
     private function requiresApproval(string $riskLevel): bool
     {
         $levels = ['low' => 1, 'medium' => 2, 'high' => 3, 'critical' => 4];

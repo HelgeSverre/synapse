@@ -40,7 +40,6 @@ final class PerfAgentLoop
                 : TaskPromptBuilder::nudge($turn, $maxTurns);
 
             $result = $executor->streamAndCollect([
-                '_dialogueKey' => 'history',
                 'history' => $history,
                 'message' => $message,
             ]);

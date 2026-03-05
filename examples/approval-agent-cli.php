@@ -132,7 +132,6 @@ while (true) {
     try {
         foreach ($executor->stream([
             'message' => $input,
-            '_dialogueKey' => 'history',
             'history' => array_slice($messages, 0, -1),
         ]) as $event) {
             if ($event instanceof TextDelta) {
