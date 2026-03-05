@@ -96,6 +96,17 @@ final class EvaluationSuiteTest extends TestCase
         $this->assertSame(['ok' => true], $store->load('suite', 'case'));
     }
 
+    public function test_filesystem_snapshot_store_avoids_path_collisions_for_distinct_keys(): void
+    {
+        $store = new FilesystemSnapshotStore($this->tmpDir);
+
+        $store->save('suite/a', 'case', ['value' => 1]);
+        $store->save('suite_a', 'case', ['value' => 2]);
+
+        $this->assertSame(['value' => 1], $store->load('suite/a', 'case'));
+        $this->assertSame(['value' => 2], $store->load('suite_a', 'case'));
+    }
+
     public function test_from_executor_uses_run_method(): void
     {
         $executor = new class

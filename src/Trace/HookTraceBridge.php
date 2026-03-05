@@ -17,9 +17,11 @@ final class HookTraceBridge
 {
     private TraceContext $context;
 
-    private float $runStartedAtMs;
+    private float $runStartedAtMs = 0.0;
 
-    private string $runSpanId;
+    private string $runSpanId = '';
+
+    private bool $runStarted = false;
 
     private bool $runCompleted = false;
 
@@ -37,8 +39,6 @@ final class HookTraceBridge
         private readonly string $runName = 'executor.run',
     ) {
         $this->context = $context ?? TraceContext::root();
-        $this->runStartedAtMs = $this->nowMs();
-        $this->runSpanId = $this->generateSpanId();
     }
 
     public function register(HookDispatcherInterface $hooks): self
@@ -48,6 +48,8 @@ final class HookTraceBridge
         }
 
         $hooks->addListener(BeforeProviderCall::class, function (BeforeProviderCall $event): void {
+            $this->ensureRunStarted();
+
             $request = $event->request;
             $requestKey = (string) spl_object_id($request);
 
@@ -96,6 +98,8 @@ final class HookTraceBridge
         });
 
         $hooks->addListener(OnStreamStart::class, function (OnStreamStart $event): void {
+            $this->ensureRunStarted();
+
             $this->openStreamSpan = [
                 'name' => 'stream.call',
                 'spanId' => $this->generateSpanId(),
@@ -143,6 +147,8 @@ final class HookTraceBridge
         });
 
         $hooks->addListener(OnToolCall::class, function (OnToolCall $event): void {
+            $this->ensureRunStarted();
+
             $timestamp = $this->nowMs();
 
             $this->exportRecord(
@@ -160,7 +166,40 @@ final class HookTraceBridge
         });
 
         $hooks->addListener(OnError::class, function (OnError $event): void {
+            $this->ensureRunStarted();
+
             $timestamp = $this->nowMs();
+
+            foreach ($this->openProviderSpans as $requestKey => $span) {
+                $this->exportRecord(
+                    name: $span['name'],
+                    spanId: $span['spanId'],
+                    parentSpanId: $span['parentSpanId'],
+                    startedAtMs: $span['startedAtMs'],
+                    endedAtMs: $timestamp,
+                    success: false,
+                    attributes: $span['attributes'],
+                    error: $event->error->getMessage(),
+                );
+
+                unset($this->openProviderSpans[$requestKey]);
+            }
+
+            if ($this->openStreamSpan !== null) {
+                $span = $this->openStreamSpan;
+                $this->openStreamSpan = null;
+
+                $this->exportRecord(
+                    name: $span['name'],
+                    spanId: $span['spanId'],
+                    parentSpanId: $span['parentSpanId'],
+                    startedAtMs: $span['startedAtMs'],
+                    endedAtMs: $timestamp,
+                    success: false,
+                    attributes: $span['attributes'],
+                    error: $event->error->getMessage(),
+                );
+            }
 
             $this->exportRecord(
                 name: 'executor.error',
@@ -177,8 +216,14 @@ final class HookTraceBridge
         });
 
         $hooks->addListener(OnComplete::class, function (OnComplete $event): void {
-            if ($this->runCompleted) {
+            if ($this->runCompleted && $this->runStarted) {
                 return;
+            }
+
+            if (! $this->runStarted || $this->runCompleted) {
+                $endedAtMs = $this->nowMs();
+                $startedAtMs = max(0.0, $endedAtMs - $event->durationMs);
+                $this->startRun($startedAtMs);
             }
 
             $this->runCompleted = true;
@@ -205,6 +250,21 @@ final class HookTraceBridge
     public function getContext(): TraceContext
     {
         return $this->context;
+    }
+
+    private function ensureRunStarted(): void
+    {
+        if (! $this->runStarted || $this->runCompleted) {
+            $this->startRun();
+        }
+    }
+
+    private function startRun(?float $startedAtMs = null): void
+    {
+        $this->runSpanId = $this->generateSpanId();
+        $this->runStartedAtMs = $startedAtMs ?? $this->nowMs();
+        $this->runStarted = true;
+        $this->runCompleted = false;
     }
 
     private function exportRecord(

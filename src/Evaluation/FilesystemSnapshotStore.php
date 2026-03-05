@@ -50,16 +50,18 @@ final class FilesystemSnapshotStore implements SnapshotStoreInterface
 
     private function getPath(string $suite, string $case): string
     {
-        $suiteSafe = $this->sanitize($suite);
-        $caseSafe = $this->sanitize($case);
+        $suiteSafe = $this->encodeSegment($suite);
+        $caseSafe = $this->encodeSegment($case);
 
         return rtrim($this->baseDirectory, '/')."/{$suiteSafe}/{$caseSafe}.json";
     }
 
-    private function sanitize(string $value): string
+    private function encodeSegment(string $value): string
     {
         $sanitized = preg_replace('/[^a-zA-Z0-9_.-]+/', '_', $value);
+        $prefix = trim($sanitized ?? '', '_') ?: 'snapshot';
+        $hash = substr(sha1($value), 0, 12);
 
-        return trim($sanitized ?? '', '_') ?: 'snapshot';
+        return "{$prefix}--{$hash}";
     }
 }

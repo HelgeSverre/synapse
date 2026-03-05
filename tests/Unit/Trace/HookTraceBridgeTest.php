@@ -7,6 +7,7 @@ namespace HelgeSverre\Synapse\Tests\Unit\Trace;
 use HelgeSverre\Synapse\Hooks\Events\AfterProviderCall;
 use HelgeSverre\Synapse\Hooks\Events\BeforeProviderCall;
 use HelgeSverre\Synapse\Hooks\Events\OnComplete;
+use HelgeSverre\Synapse\Hooks\Events\OnError;
 use HelgeSverre\Synapse\Hooks\Events\OnStreamEnd;
 use HelgeSverre\Synapse\Hooks\Events\OnStreamStart;
 use HelgeSverre\Synapse\Hooks\Events\OnToolCall;
@@ -85,5 +86,80 @@ final class HookTraceBridgeTest extends TestCase
         $this->assertContains('stream.call', $names);
         $this->assertContains('tool.call', $names);
         $this->assertContains('executor.run', $names);
+    }
+
+    public function test_bridge_emits_run_span_for_each_completed_run_when_reused(): void
+    {
+        $hooks = new HookDispatcher;
+        $exporter = new InMemoryTraceExporter;
+
+        (new HookTraceBridge($exporter))->register($hooks);
+
+        $firstRequest = new GenerationRequest(
+            model: 'model-a',
+            messages: [Message::user('hello')],
+        );
+        $firstResponse = new GenerationResponse(
+            text: 'ok-a',
+            messages: [Message::assistant('ok-a')],
+            toolCalls: [],
+            model: 'model-a',
+            usage: new UsageInfo(1, 1),
+        );
+
+        $hooks->dispatch(new BeforeProviderCall($firstRequest));
+        $hooks->dispatch(new AfterProviderCall($firstRequest, $firstResponse));
+        $hooks->dispatch(new OnComplete(success: true, durationMs: 4.0));
+
+        $secondRequest = new GenerationRequest(
+            model: 'model-b',
+            messages: [Message::user('world')],
+        );
+        $secondResponse = new GenerationResponse(
+            text: 'ok-b',
+            messages: [Message::assistant('ok-b')],
+            toolCalls: [],
+            model: 'model-b',
+            usage: new UsageInfo(2, 1),
+        );
+
+        $hooks->dispatch(new BeforeProviderCall($secondRequest));
+        $hooks->dispatch(new AfterProviderCall($secondRequest, $secondResponse));
+        $hooks->dispatch(new OnComplete(success: true, durationMs: 6.0));
+
+        $records = $exporter->getRecords();
+        $runSpans = array_values(array_filter($records, static fn ($record): bool => $record->name === 'executor.run'));
+
+        $this->assertCount(2, $runSpans);
+    }
+
+    public function test_bridge_closes_open_provider_span_on_error(): void
+    {
+        $hooks = new HookDispatcher;
+        $exporter = new InMemoryTraceExporter;
+
+        (new HookTraceBridge($exporter))->register($hooks);
+
+        $request = new GenerationRequest(
+            model: 'error-model',
+            messages: [Message::user('boom')],
+        );
+
+        $hooks->dispatch(new BeforeProviderCall($request));
+        $hooks->dispatch(new OnError(new \RuntimeException('provider exploded')));
+        $hooks->dispatch(new OnComplete(success: false, durationMs: 1.2, error: new \RuntimeException('provider exploded')));
+
+        $records = $exporter->getRecords();
+
+        $failedProviderSpans = array_values(array_filter(
+            $records,
+            static fn ($record): bool => $record->name === 'provider.call' && ! $record->success,
+        ));
+        $runSpans = array_values(array_filter($records, static fn ($record): bool => $record->name === 'executor.run'));
+
+        $this->assertCount(1, $failedProviderSpans);
+        $this->assertSame('provider exploded', $failedProviderSpans[0]->error);
+        $this->assertCount(1, $runSpans);
+        $this->assertFalse($runSpans[0]->success);
     }
 }
