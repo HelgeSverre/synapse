@@ -15,7 +15,7 @@ Tool calling (also called function calling) lets the LLM request execution of PH
 ```php
 use function HelgeSverre\Synapse\{
     useLlm, createChatPrompt, createParser,
-    createLlmExecutorWithFunctions, createToolRegistry,
+    createExecutor, createToolRegistry,
 };
 
 $tools = createToolRegistry([
@@ -33,7 +33,7 @@ $tools = createToolRegistry([
     ],
 ]);
 
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]),
     'prompt' => createChatPrompt()
         ->addSystemMessage('You are a weather assistant.')
@@ -42,7 +42,7 @@ $executor = createLlmExecutorWithFunctions([
     'tools' => $tools,
 ]);
 
-$result = $executor->execute(['question' => 'What is the weather in Oslo?']);
+$result = $executor->run(['question' => 'What is the weather in Oslo?']);
 ```
 
 ## Related Pages

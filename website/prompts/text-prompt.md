@@ -57,13 +57,13 @@ When a `TextPrompt` is used with `LlmExecutor`, the rendered text is wrapped in 
 $prompt = createTextPrompt()
     ->setContent('Translate to {{language}}: {{text}}');
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
 ]);
 
-$result = $executor->execute([
+$result = $executor->run([
     'language' => 'French',
     'text' => 'Hello, world!',
 ]);

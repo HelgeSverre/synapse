@@ -7,7 +7,7 @@ Generate code using the code block parser to cleanly extract generated code from
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
@@ -18,13 +18,13 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('{{spec}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('code', ['language' => 'php']),
 ]);
 
-$result = $executor->execute([
+$result = $executor->run([
     'spec' => 'Create a value object class called Money with amount (int, cents) ' .
               'and currency (string). Include add(), subtract(), and format() methods.',
 ]);
@@ -46,13 +46,13 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('{{spec}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('codeblocks'),
 ]);
 
-$result = $executor->execute([
+$result = $executor->run([
     'spec' => 'A Stack class with push(), pop(), peek(), and isEmpty() methods.',
 ]);
 

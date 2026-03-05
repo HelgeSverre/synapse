@@ -13,7 +13,7 @@ Extract structured data from unstructured text using the JSON parser with schema
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
@@ -40,13 +40,13 @@ $parser = createParser('json', [
     ],
 ]);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => $parser,
 ]);
 
-$result = $executor->execute([
+$result = $executor->run([
     'text' => 'Hi, I\'m Jane Doe from Acme Corp. You can reach me at ' .
               'jane@acme.com or call 555-0123.',
 ]);
@@ -82,7 +82,7 @@ $parser = createParser('json', [
     ],
 ]);
 
-$result = $executor->execute([
+$result = $executor->run([
     'text' => 'The PHP conference is on March 15th in Amsterdam. ' .
               'There\'s also a Laravel meetup on April 2nd in London.',
 ]);

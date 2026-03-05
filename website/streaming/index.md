@@ -26,10 +26,14 @@ $llm = useLlm('openai.gpt-4o-mini', [
 ## Quick Example
 
 ```php
-use HelgeSverre\Synapse\Executor\StreamingLlmExecutor;
+use function HelgeSverre\Synapse\createExecutor;
 use HelgeSverre\Synapse\Streaming\TextDelta;
 
-$executor = new StreamingLlmExecutor($llm, $prompt, 'gpt-4o-mini');
+$executor = createExecutor([
+    'llm' => $llm,
+    'prompt' => $prompt,
+    'stream' => true,
+]);
 
 foreach ($executor->stream(['question' => 'Write a poem']) as $event) {
     if ($event instanceof TextDelta) {

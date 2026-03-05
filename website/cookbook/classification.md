@@ -9,7 +9,7 @@ The simplest approach for single-label classification:
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
@@ -21,7 +21,7 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('{{message}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('enum', [
@@ -29,7 +29,7 @@ $executor = createLlmExecutor([
     ]),
 ]);
 
-$result = $executor->execute(['message' => 'Your product broke after one day!']);
+$result = $executor->run(['message' => 'Your product broke after one day!']);
 echo $result->getValue(); // "complaint"
 ```
 
@@ -45,7 +45,7 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('{{text}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json', [
@@ -59,7 +59,7 @@ $executor = createLlmExecutor([
     ]),
 ]);
 
-$result = $executor->execute(['text' => 'I absolutely love this product!']);
+$result = $executor->run(['text' => 'I absolutely love this product!']);
 // ['sentiment' => 'positive', 'confidence' => 0.95]
 ```
 
@@ -72,12 +72,12 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Is this message spam? Answer "yes" or "no" only.')
     ->addUserMessage('{{message}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('boolean'),
 ]);
 
-$result = $executor->execute(['message' => 'BUY NOW! Limited time offer!!!']);
+$result = $executor->run(['message' => 'BUY NOW! Limited time offer!!!']);
 $result->getValue(); // true (is spam)
 ```

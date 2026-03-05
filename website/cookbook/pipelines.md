@@ -12,13 +12,13 @@ Synapse executors can be chained manually — the `ExecutionResult` from one exe
 <?php
 
 use function HelgeSverre\Synapse\{
-    useLlm, createChatPrompt, createParser, createLlmExecutor, createCoreExecutor,
+    useLlm, createChatPrompt, createParser, createExecutor, createCoreExecutor,
 };
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
 // Step 1: Summarize
-$summarizer = createLlmExecutor([
+$summarizer = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('Summarize the following text in 2-3 sentences.')
@@ -27,7 +27,7 @@ $summarizer = createLlmExecutor([
 ]);
 
 // Step 2: Extract keywords
-$keywordExtractor = createLlmExecutor([
+$keywordExtractor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('Extract the top 5 keywords from this text. One per line.')
@@ -36,7 +36,7 @@ $keywordExtractor = createLlmExecutor([
 ]);
 
 // Step 3: Classify topic
-$classifier = createLlmExecutor([
+$classifier = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage(
@@ -53,9 +53,9 @@ $classifier = createLlmExecutor([
 // Run the pipeline
 $article = "Long article text...";
 
-$summary = $summarizer->execute(['text' => $article]);
-$keywords = $keywordExtractor->execute(['text' => $summary->getValue()]);
-$topic = $classifier->execute(['keywords' => implode(', ', $keywords->getValue())]);
+$summary = $summarizer->run(['text' => $article]);
+$keywords = $keywordExtractor->run(['text' => $summary->getValue()]);
+$topic = $classifier->run(['keywords' => implode(', ', $keywords->getValue())]);
 
 echo "Summary: " . $summary->getValue() . "\n";
 echo "Keywords: " . implode(', ', $keywords->getValue()) . "\n";
@@ -73,9 +73,9 @@ $cleaner = createCoreExecutor(fn($input) => [
 ]);
 
 // LLM step: analyze
-$analyzer = createLlmExecutor([...]);
+$analyzer = createExecutor([...]);
 
 // Pipeline
-$cleaned = $cleaner->execute(['html' => $rawHtml]);
-$analysis = $analyzer->execute(['text' => $cleaned->getValue()['text']]);
+$cleaned = $cleaner->run(['html' => $rawHtml]);
+$analysis = $analyzer->run(['text' => $cleaned->getValue()['text']]);
 ```

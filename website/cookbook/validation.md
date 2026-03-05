@@ -11,7 +11,7 @@ Use the boolean parser to get yes/no validation from an LLM.
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
@@ -27,18 +27,18 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('{{description}}', parseTemplate: true);
 
-$validator = createLlmExecutor([
+$validator = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('boolean'),
 ]);
 
-$result = $validator->execute([
+$result = $validator->run([
     'description' => 'good product buy now',
 ]);
 echo $result->getValue(); // false
 
-$result = $validator->execute([
+$result = $validator->run([
     'description' => 'The Synapse library provides a modern, composable approach to ' .
                      'LLM orchestration in PHP. It supports multiple providers and ' .
                      'includes built-in parsers for structured output.',
@@ -58,12 +58,12 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('Validate this email: {{email}}', parseTemplate: true);
 
-$validator = createLlmExecutor([
+$validator = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json'),
 ]);
 
-$result = $validator->execute(['email' => 'not-an-email']);
+$result = $validator->run(['email' => 'not-an-email']);
 // ['valid' => false, 'issues' => ['Missing @ symbol', 'No domain']]
 ```

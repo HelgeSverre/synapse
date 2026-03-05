@@ -44,13 +44,13 @@ They receive the raw `GenerationResponse` from the provider and return a parsed 
 ## Using with Executors
 
 ```php
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json'),  // Parse response as JSON
 ]);
 
-$result = $executor->execute(['text' => 'John, age 34']);
+$result = $executor->run(['text' => 'John, age 34']);
 $data = $result->getValue(); // PHP array from JSON
 ```
 

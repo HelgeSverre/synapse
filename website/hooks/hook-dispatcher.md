@@ -49,8 +49,8 @@ $hooks->addListener(AfterProviderCall::class, function ($e) {
     echo "[{$e->request->model}] {$e->response->usage->getTotal()} tokens\n";
 });
 
-$executor1 = createLlmExecutor([..., 'hooks' => $hooks]);
-$executor2 = createLlmExecutor([..., 'hooks' => $hooks]);
+$executor1 = createExecutor([..., 'hooks' => $hooks]);
+$executor2 = createExecutor([..., 'hooks' => $hooks]);
 ```
 
 ## Logging Example

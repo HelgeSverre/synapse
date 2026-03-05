@@ -36,7 +36,7 @@ $llm = useLlm('google.gemini-1.5-flash', [
     'apiKey' => getenv('GOOGLE_API_KEY'),
 ]);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('You are helpful.')
@@ -44,5 +44,5 @@ $executor = createLlmExecutor([
     'parser' => createParser('string'),
 ]);
 
-$result = $executor->execute(['question' => 'Explain quantum computing']);
+$result = $executor->run(['question' => 'Explain quantum computing']);
 ```

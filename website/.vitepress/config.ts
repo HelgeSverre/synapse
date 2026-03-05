@@ -107,6 +107,17 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Runtime',
+        collapsed: true,
+        items: [
+          { text: 'Overview', link: '/runtime/' },
+          { text: 'TraceContext & Exporters', link: '/runtime/trace' },
+          { text: 'Checkpoints & Memory', link: '/runtime/memory' },
+          { text: 'WorkflowEngine', link: '/runtime/workflow' },
+          { text: 'EvaluationSuite', link: '/runtime/evaluation' },
+        ]
+      },
+      {
         text: 'Hooks & Events',
         collapsed: true,
         items: [

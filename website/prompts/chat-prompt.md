@@ -91,7 +91,7 @@ $prompt = createChatPrompt()
     ->addUserMessage('{{message}}', parseTemplate: true);
 
 // When executing, pass history as Message[] in the input
-$result = $executor->execute([
+$result = $executor->run([
     'history' => $previousMessages,
     'message' => 'What did I say earlier?',
 ]);
@@ -110,7 +110,7 @@ $prompt = createChatPrompt()
 $history = [];
 
 // Turn 1
-$result = $executor->execute([
+$result = $executor->run([
     'history' => $history,
     'message' => 'My name is Alice.',
 ]);
@@ -118,7 +118,7 @@ $history[] = Message::user('My name is Alice.');
 $history[] = Message::assistant($result->getValue());
 
 // Turn 2
-$result = $executor->execute([
+$result = $executor->run([
     'history' => $history,
     'message' => 'What is my name?',
 ]);

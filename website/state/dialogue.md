@@ -18,7 +18,7 @@ $prompt = createChatPrompt()
     ->addHistoryPlaceholder('history')
     ->addUserMessage('{{message}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
@@ -32,7 +32,7 @@ while (true) {
 
     $dialogue->setUserMessage($userInput);
 
-    $result = $executor->execute([
+    $result = $executor->run([
         'history' => $dialogue->getHistory(),
         'message' => $userInput,
     ]);

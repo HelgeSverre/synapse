@@ -15,3 +15,5 @@ Practical patterns and recipes for common LLM tasks with Synapse.
 | [LLM Validation](/cookbook/validation)           | Use LLMs to validate data                      |
 | [Code Generation](/cookbook/code-generation)     | Generate code with code block parsing          |
 | [Human-in-the-Loop](/cookbook/human-in-the-loop) | Approval workflows with tools                  |
+| [WorkflowEngine](/runtime/workflow)              | Step DAGs with retries and dependency control  |
+| [EvaluationSuite](/runtime/evaluation)           | Regression-safe eval runs and snapshots        |

@@ -14,7 +14,7 @@ Generate output, validate it, and retry if it doesn't meet requirements.
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
@@ -26,7 +26,7 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('Create a profile for: {{description}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json'),
@@ -55,7 +55,7 @@ $maxRetries = 3;
 $input = ['description' => 'A PHP developer named Alice who loves open source'];
 
 for ($i = 0; $i < $maxRetries; $i++) {
-    $result = $executor->execute($input);
+    $result = $executor->run($input);
     $data = $result->getValue();
     $errors = validateProfile($data);
 

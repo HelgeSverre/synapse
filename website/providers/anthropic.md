@@ -37,7 +37,7 @@ $llm = useLlm('anthropic.claude-3-5-sonnet-latest', [
     'apiKey' => getenv('ANTHROPIC_API_KEY'),
 ]);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('You are a helpful assistant.')
@@ -45,5 +45,5 @@ $executor = createLlmExecutor([
     'parser' => createParser('string'),
 ]);
 
-$result = $executor->execute(['question' => 'What is Rust?']);
+$result = $executor->run(['question' => 'What is Rust?']);
 ```

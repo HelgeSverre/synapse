@@ -16,7 +16,7 @@ $llm = useLlm('groq', [
 ## Usage
 
 ```php
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('You are helpful.')
@@ -24,5 +24,5 @@ $executor = createLlmExecutor([
     'parser' => createParser('string'),
 ]);
 
-$result = $executor->execute(['question' => 'What is Groq?']);
+$result = $executor->run(['question' => 'What is Groq?']);
 ```

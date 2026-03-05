@@ -16,13 +16,13 @@ $prompt = createChatPrompt()
     ->addSystemMessage('List items one per line, no numbering or bullets.')
     ->addUserMessage('List 5 programming languages', parseTemplate: false);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('list'),
 ]);
 
-$result = $executor->execute([]);
+$result = $executor->run([]);
 $result->getValue();
 // ['Python', 'JavaScript', 'PHP', 'Go', 'Rust']
 ```

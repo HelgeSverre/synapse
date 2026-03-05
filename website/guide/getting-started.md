@@ -40,7 +40,7 @@ Here is a complete example that sends a question to OpenAI and gets a plain text
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 // 1. Create a provider
 $llm = useLlm('openai.gpt-4o-mini', [
@@ -56,14 +56,14 @@ $prompt = createChatPrompt()
 $parser = createParser('string');
 
 // 4. Wire it all together in an executor (model comes from useLlm)
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => $parser,
 ]);
 
 // 5. Execute with input variables
-$result = $executor->execute(['question' => 'What is the capital of France?']);
+$result = $executor->run(['question' => 'What is the capital of France?']);
 
 echo $result->getValue(); // "Paris"
 ```
@@ -87,10 +87,7 @@ use function HelgeSverre\Synapse\{
     createTextPrompt,
     createPrompt,
     createParser,
-    createLlmExecutor,
-    createLlmExecutorWithFunctions,
-    createStreamingLlmExecutor,
-    createStreamingLlmExecutorWithFunctions,
+    createExecutor,
     createCoreExecutor,
     createCallableExecutor,
     createToolRegistry,
@@ -100,7 +97,7 @@ use function HelgeSverre\Synapse\{
 };
 ```
 
-These are thin wrappers over `Factory` static methods. You can use either style.
+`createExecutor()` is the unified constructor for LLM pipelines.
 
 ## Structured Output with JSON
 
@@ -109,7 +106,7 @@ Use the `json` parser to extract structured data from LLM responses:
 ```php
 <?php
 
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 $llm = useLlm('openai.gpt-4o-mini', [
     'apiKey' => getenv('OPENAI_API_KEY'),
@@ -129,13 +126,13 @@ $parser = createParser('json', [
     ],
 ]);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => $parser,
 ]);
 
-$result = $executor->execute([
+$result = $executor->run([
     'text' => 'John Smith is 34 years old and lives in Oslo.',
 ]);
 

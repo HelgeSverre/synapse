@@ -6,12 +6,13 @@
 
 ```php
 use HelgeSverre\Synapse\Streaming\{TextDelta, ToolCallsReady, StreamCompleted};
-use function HelgeSverre\Synapse\createStreamingLlmExecutorWithFunctions;
+use function HelgeSverre\Synapse\createExecutor;
 
-$executor = createStreamingLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'tools' => $tools,
+    'stream' => true,
 ]);
 
 foreach ($executor->stream(['question' => 'Check the weather']) as $event) {

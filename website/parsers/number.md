@@ -24,13 +24,13 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Respond with only a number.')
     ->addUserMessage('How many countries are in Europe?');
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('number'),
 ]);
 
-$result = $executor->execute([]);
+$result = $executor->run([]);
 $result->getValue(); // 44
 ```
 

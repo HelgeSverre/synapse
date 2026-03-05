@@ -142,7 +142,7 @@ XAI_API_KEY=...
 ### LlmExecutor
 
 ```php
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $provider,          // Required: LlmProviderInterface or Llm
     'prompt' => $prompt,         // Required: PromptInterface
     'parser' => $parser,         // Optional: ParserInterface (defaults to StringParser)
@@ -159,7 +159,7 @@ $executor = createLlmExecutor([
 ### LlmExecutorWithFunctions
 
 ```php
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $provider,          // Required: LlmProviderInterface or Llm
     'prompt' => $prompt,         // Required
     'parser' => $parser,         // Optional

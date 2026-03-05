@@ -117,7 +117,7 @@ $llm = new MyProvider(
     apiKey: getenv('MY_API_KEY'),
 );
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),

@@ -75,7 +75,7 @@ Template syntax uses <code v-pre>{{variable}}</code> notation with support for n
 
 ## Execution Flow
 
-Here's what happens when you call `$executor->execute($input)`:
+Here's what happens when you call `$executor->run($input)`:
 
 1. `BaseExecutor::execute()` starts timing, transforms input via `getHandlerInput()`, and calls `handler()`
 2. `LlmExecutor::handler()` dispatches `BeforePromptRender` event

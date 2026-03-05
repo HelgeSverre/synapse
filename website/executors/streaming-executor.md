@@ -16,7 +16,7 @@ $transport = new GuzzleStreamTransport(new Client(['timeout' => 60]));
 ## Usage
 
 ```php
-use function HelgeSverre\Synapse\createStreamingLlmExecutor;
+use function HelgeSverre\Synapse\createExecutor;
 use HelgeSverre\Synapse\Streaming\TextDelta;
 use HelgeSverre\Synapse\Streaming\StreamCompleted;
 
@@ -30,9 +30,10 @@ $prompt = createChatPrompt()
     ->addUserMessage('{{question}}', parseTemplate: true);
 
 // Via factory (model comes from useLlm)
-$executor = createStreamingLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
+    'stream' => true,
 ]);
 
 // Or direct instantiation

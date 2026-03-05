@@ -23,16 +23,16 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Answer with "yes" or "no" only.')
     ->addUserMessage('Is "{{text}}" appropriate content?', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('boolean'),
 ]);
 
-$result = $executor->execute(['text' => 'The weather is lovely today.']);
+$result = $executor->run(['text' => 'The weather is lovely today.']);
 $result->getValue(); // true
 
-$result = $executor->execute(['text' => 'Some inappropriate content...']);
+$result = $executor->run(['text' => 'Some inappropriate content...']);
 $result->getValue(); // false
 ```
 

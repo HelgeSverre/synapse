@@ -12,6 +12,7 @@ A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers
 - **Streaming**: Token streaming and streaming tool calls
 - **Multi-Provider**: OpenAI, Anthropic, Google/Gemini, Mistral, xAI, Groq, Moonshot
 - **Embeddings**: Unified embedding providers (OpenAI, Mistral, Jina, Cohere, Voyage)
+- **Runtime Modules**: Trace bridge/exporters, checkpoints, memory store, workflow engine, and evaluation suite
 - **Event Hooks**: Lifecycle events for logging, metrics, and debugging
 - **PSR Standards**: PSR-4, PSR-7, PSR-17, PSR-18 compatible
 
@@ -193,7 +194,7 @@ $parser = createParser('custom', [
 ### Tool/Function Calling
 
 ```php
-use function HelgeSverre\Synapse\{createLlmExecutorWithFunctions, createToolRegistry};
+use function HelgeSverre\Synapse\{createExecutor, createToolRegistry};
 
 $tools = createToolRegistry([
     [
@@ -270,6 +271,10 @@ Production-oriented patterns:
 - `examples/production/http-sse-chat-endpoint.php`
 - `examples/production/observability-hooks.php`
 - `examples/production/testing-with-fakes.php`
+- `examples/production/trace-bridge.php`
+- `examples/production/checkpoints-and-memory.php`
+- `examples/production/workflow-engine.php`
+- `examples/production/evaluation-suite.php`
 
 ### State Management
 

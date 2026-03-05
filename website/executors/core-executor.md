@@ -9,7 +9,7 @@ use function HelgeSverre\Synapse\createCoreExecutor;
 
 $calculator = createCoreExecutor(fn($input) => $input['a'] + $input['b']);
 
-$result = $calculator->execute(['a' => 5, 'b' => 3]);
+$result = $calculator->run(['a' => 5, 'b' => 3]);
 echo $result->getValue(); // 8
 ```
 
@@ -36,7 +36,7 @@ $normalizer = createCoreExecutor(fn($input) => [
     'email' => strtolower($input['email']),
 ]);
 
-$result = $normalizer->execute([
+$result = $normalizer->run([
     'name' => '  John Smith  ',
     'email' => 'JOHN@Example.COM',
 ]);
@@ -64,9 +64,9 @@ $clean = createCoreExecutor(fn($input) => [
 ]);
 
 // Step 2: Summarize with LLM
-$summarize = createLlmExecutor([...]);
+$summarize = createExecutor([...]);
 
 // Run in sequence
-$cleaned = $clean->execute(['html' => $rawHtml]);
-$summary = $summarize->execute(['text' => $cleaned->getValue()['text']]);
+$cleaned = $clean->run(['html' => $rawHtml]);
+$summary = $summarize->run(['text' => $cleaned->getValue()['text']]);
 ```

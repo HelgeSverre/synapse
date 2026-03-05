@@ -121,7 +121,7 @@ The return value is JSON-encoded and sent back to the LLM as a tool result.
 The `execute()` method returns a `ToolResult`:
 
 ```php
-$result = $tool->execute(['location' => 'Oslo']);
+$result = $tool->run(['location' => 'Oslo']);
 
 $result->result;      // mixed — the return value
 $result->success;     // bool — whether execution succeeded

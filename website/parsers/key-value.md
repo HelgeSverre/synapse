@@ -31,13 +31,13 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Extract metadata as key: value pairs, one per line.')
     ->addUserMessage('{{text}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('keyvalue'),
 ]);
 
-$result = $executor->execute(['text' => 'The book "1984" by George Orwell, published 1949']);
+$result = $executor->run(['text' => 'The book "1984" by George Orwell, published 1949']);
 // ['title' => '1984', 'author' => 'George Orwell', 'year' => '1949']
 ```
 

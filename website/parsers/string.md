@@ -18,12 +18,12 @@ $parser = createParser('string', ['trim' => false]); // no trimming
 
 ## Behavior
 
-StringParser is the default parser when no parser is specified in `createLlmExecutor()`. It extracts the text from the LLM response and optionally trims whitespace.
+StringParser is the default parser when no parser is specified in `createExecutor()`. It extracts the text from the LLM response and optionally trims whitespace.
 
 ## Example
 
 ```php
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('Respond concisely.')
@@ -31,6 +31,6 @@ $executor = createLlmExecutor([
     'parser' => createParser('string'),
 ]);
 
-$result = $executor->execute(['question' => 'What is PHP?']);
+$result = $executor->run(['question' => 'What is PHP?']);
 echo $result->getValue(); // "PHP is a server-side scripting language..."
 ```

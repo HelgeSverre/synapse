@@ -5,14 +5,15 @@ Combines streaming with tool calling. Streams the LLM response in real-time and 
 ## Usage
 
 ```php
-use function HelgeSverre\Synapse\createStreamingLlmExecutorWithFunctions;
+use function HelgeSverre\Synapse\createExecutor;
 use HelgeSverre\Synapse\Streaming\{TextDelta, ToolCallsReady, StreamCompleted};
 
 // Via factory (model comes from useLlm)
-$executor = createStreamingLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'tools' => $tools,
+    'stream' => true,
     'maxIterations' => 10,
 ]);
 

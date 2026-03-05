@@ -18,7 +18,7 @@
 Controls how many rounds of tool calling are allowed before throwing:
 
 ```php
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),

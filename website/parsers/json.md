@@ -43,13 +43,13 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Always respond with valid JSON.')
     ->addUserMessage('Extract name and age from: "{{text}}"', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('json'),
 ]);
 
-$result = $executor->execute(['text' => 'John is 34 years old']);
+$result = $executor->run(['text' => 'John is 34 years old']);
 $data = $result->getValue();
 // ['name' => 'John', 'age' => 34]
 ```

@@ -486,7 +486,7 @@
     <div class="hero-right reveal d3">
         <pre><code class="language-php">$llm = useLlm('openai.gpt-4o-mini', ['apiKey' =&gt; $key]);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'prompt' =&gt; createChatPrompt()
@@ -502,7 +502,7 @@ $executor = createLlmExecutor([
     ]),
 ]);
 
-$result = $executor-&gt;execute(['question' =&gt; 'What is PHP?']);
+$result = $executor-&gt;run(['question' =&gt; 'What is PHP?']);
 // ['answer' =&gt; 'A scripting language...', 'confidence' =&gt; 0.95]</code></pre>
     </div>
 </section>
@@ -532,13 +532,13 @@ composer require guzzlehttp/guzzle</code></pre>
                 <div class="qs-step-num">3</div>
                 <h3>Execute</h3>
                 <p>Build a prompt, parse the response, get typed data.</p>
-                <pre><code class="language-php">$result = createLlmExecutor([
+                <pre><code class="language-php">$result = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'prompt' =&gt; createChatPrompt()
         -&gt;addUserMessage('{{q}}', parseTemplate: true),
     'parser' =&gt; createParser('json'),
-])-&gt;execute(['q' =&gt; 'List 3 planets']);</code></pre>
+])-&gt;run(['q' =&gt; 'List 3 planets']);</code></pre>
             </div>
         </div>
     </section>
@@ -579,12 +579,13 @@ $enum   = createParser('enum', ['values' =&gt; ['low', 'medium', 'high']]);</cod
             <p>Get tokens as they generate. Every provider supports streaming with the same event-driven interface. Build chat UIs, live demos, interactive agents.</p>
         </div>
         <div class="s-code">
-            <pre><code class="language-php">$executor = new StreamingLlmExecutorWithFunctions(
-    provider: $provider,
-    prompt: $prompt,
-    model: 'gpt-4o-mini',
-    tools: $tools,
-);
+            <pre><code class="language-php">$executor = createExecutor([
+    'llm' =&gt; $provider,
+    'model' =&gt; 'gpt-4o-mini',
+    'prompt' =&gt; $prompt,
+    'tools' =&gt; $tools,
+    'stream' =&gt; true,
+]);
 
 foreach ($executor-&gt;stream(['message' =&gt; $input]) as $event) {
     if ($event instanceof TextDelta) {
@@ -619,7 +620,7 @@ foreach ($executor-&gt;stream(['message' =&gt; $input]) as $event) {
     'handler' =&gt; fn($args) =&gt; fetchWeatherApi($args['city']),
 ]]);
 
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm'           =&gt; $provider,
     'model'         =&gt; 'gpt-4o-mini',
     'prompt'        =&gt; $prompt,
@@ -646,7 +647,7 @@ $groq      = useLlm('groq.llama-3.3-70b-versatile', ['apiKey' =&gt; $key]);
 $moonshot  = useLlm('moonshot.moonshot-v1-8k', ['apiKey' =&gt; $key]);
 
 // Same executor, swap provider freely
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm'    =&gt; $anthropic,
     'model'  =&gt; 'claude-3-5-sonnet-20241022',
     'prompt' =&gt; $prompt,
@@ -695,7 +696,7 @@ $prompt = createChatPrompt()
     -&gt;addHistoryPlaceholder('history')
     -&gt;addUserMessage('{{message}}', parseTemplate: true);
 
-$result = $executor-&gt;execute([
+$result = $executor-&gt;run([
     'history' =&gt; $state-&gt;messages,
     'message' =&gt; 'What did I say earlier?',
 ]);</code></pre>
@@ -717,7 +718,7 @@ $result = $executor-&gt;execute([
     -&gt;setUserMessage('What if I forgot my email?');
 
 // Pass history to executor
-$result = $executor-&gt;execute([
+$result = $executor-&gt;run([
     'history' =&gt; $dialogue-&gt;getHistory(),
     'message' =&gt; 'Thanks!',
 ]);</code></pre>
@@ -765,14 +766,14 @@ $vector = $embeddings-&gt;embed($question, 'text-embedding-3-small');
 $docs = $vectorStore-&gt;search($vector-&gt;embeddings[0], limit: 5);
 
 // 3. Augment prompt with retrieved context
-$answer = createLlmExecutor([
+$answer = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'prompt' =&gt; createChatPrompt()
         -&gt;addSystemMessage('Answer using this context: {{context}}')
         -&gt;addUserMessage('{{question}}', parseTemplate: true),
     'parser' =&gt; createParser('string'),
-])-&gt;execute([
+])-&gt;run([
     'context'  =&gt; implode("\n", $docs),
     'question' =&gt; $question,
 ])-&gt;getValue();</code></pre>
@@ -787,7 +788,7 @@ $answer = createLlmExecutor([
             <p>Pull structured information from unstructured text. Hotel bookings, receipts, contacts, support tickets &mdash; define a schema and let the LLM do the parsing.</p>
         </div>
         <div class="s-code">
-            <pre><code class="language-php">$data = createLlmExecutor([
+            <pre><code class="language-php">$data = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'prompt' =&gt; createChatPrompt()
@@ -803,7 +804,7 @@ $answer = createLlmExecutor([
             ],
         ],
     ]),
-])-&gt;execute([
+])-&gt;run([
     'input' =&gt; "I'll be in Berlin from the 14th to 18th",
 ])-&gt;getValue();
 
@@ -819,7 +820,7 @@ $answer = createLlmExecutor([
             <p>Route user input to the right handler. Define intents, get structured classifications with confidence scores.</p>
         </div>
         <div class="s-code">
-            <pre><code class="language-php">$classifier = createLlmExecutor([
+            <pre><code class="language-php">$classifier = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'prompt' =&gt; createChatPrompt()
@@ -829,7 +830,7 @@ $answer = createLlmExecutor([
     'parser' =&gt; createParser('json'),
 ]);
 
-$result = $classifier-&gt;execute([
+$result = $classifier-&gt;run([
     'input' =&gt; 'I need a hotel in Paris for 3 nights',
 ])-&gt;getValue();
 
@@ -846,24 +847,24 @@ $result = $classifier-&gt;execute([
         </div>
         <div class="s-code">
             <pre><code class="language-php">// Step 1: Generate outline
-$outline = createLlmExecutor([
+$outline = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'parser' =&gt; createParser('list'),
     'prompt' =&gt; createChatPrompt()
         -&gt;addSystemMessage('Create a 4-point story outline.')
         -&gt;addUserMessage('{{idea}}', parseTemplate: true),
-])-&gt;execute(['idea' =&gt; 'A robot learns to paint'])-&gt;getValue();
+])-&gt;run(['idea' =&gt; 'A robot learns to paint'])-&gt;getValue();
 
 // Step 2: Write story from outline
-$story = createLlmExecutor([
+$story = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'parser' =&gt; createParser('string'),
     'prompt' =&gt; createChatPrompt()
         -&gt;addSystemMessage('Write a short story from this outline.')
         -&gt;addUserMessage('{{outline}}', parseTemplate: true),
-])-&gt;execute(['outline' =&gt; implode("\n", $outline)])-&gt;getValue();</code></pre>
+])-&gt;run(['outline' =&gt; implode("\n", $outline)])-&gt;getValue();</code></pre>
         </div>
     </div>
 
@@ -877,23 +878,23 @@ $story = createLlmExecutor([
         <div class="s-code">
             <pre><code class="language-php">for ($i = 0; $i &lt; 3; $i++) {
     // Generate answer
-    $answer = createLlmExecutor([
+    $answer = createExecutor([
         'llm'    =&gt; $llm,
         'model'  =&gt; 'gpt-4o-mini',
         'parser' =&gt; createParser('string'),
         'prompt' =&gt; createChatPrompt()
             -&gt;addUserMessage('Answer briefly: {{q}}', parseTemplate: true),
-    ])-&gt;execute(['q' =&gt; $question])-&gt;getValue();
+    ])-&gt;run(['q' =&gt; $question])-&gt;getValue();
 
     // Validate
-    $ok = createLlmExecutor([
+    $ok = createExecutor([
         'llm'    =&gt; $llm,
         'model'  =&gt; 'gpt-4o-mini',
         'parser' =&gt; createParser('json'),
         'prompt' =&gt; createChatPrompt()
             -&gt;addSystemMessage('Is this concise? {"pass": bool}')
             -&gt;addUserMessage('{{a}}', parseTemplate: true),
-    ])-&gt;execute(['a' =&gt; $answer])-&gt;getValue();
+    ])-&gt;run(['a' =&gt; $answer])-&gt;getValue();
 
     if ($ok['pass']) break;
 }</code></pre>
@@ -918,12 +919,13 @@ $story = createLlmExecutor([
     'handler' =&gt; fn($args) =&gt; eval("return {$args['expr']};"),
 ]]);
 
-$executor = new StreamingLlmExecutorWithFunctions(
-    provider: $provider,
-    prompt:   $prompt,
-    model:    'gpt-4o-mini',
-    tools:    $tools,
-);
+$executor = createExecutor([
+    'llm' =&gt; $provider,
+    'model' =&gt; 'gpt-4o-mini',
+    'prompt' =&gt; $prompt,
+    'tools' =&gt; $tools,
+    'stream' =&gt; true,
+]);
 
 foreach ($executor-&gt;stream(['message' =&gt; $input]) as $event) {
     if ($event instanceof TextDelta) {
@@ -944,7 +946,7 @@ foreach ($executor-&gt;stream(['message' =&gt; $input]) as $event) {
             <p>Use LLMs as validators. Check statements against conversations, verify outputs meet criteria, gate actions on confidence scores.</p>
         </div>
         <div class="s-code">
-            <pre><code class="language-php">$validator = createLlmExecutor([
+            <pre><code class="language-php">$validator = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'parser' =&gt; createParser('json'),
@@ -954,7 +956,7 @@ foreach ($executor-&gt;stream(['message' =&gt; $input]) as $event) {
         -&gt;addUserMessage("{{conversation}}\n\n{{statements}}", parseTemplate: true),
 ]);
 
-$result = $validator-&gt;execute([
+$result = $validator-&gt;run([
     'conversation' =&gt; "User: Hi, I'm Alice",
     'statements'   =&gt; "User shared their name\nUser shared their age",
 ])-&gt;getValue();
@@ -971,7 +973,7 @@ $result = $validator-&gt;execute([
             <p>Generate code from specs, parse into structured file outputs, validate syntax. Build scaffolding tools, test generators, migration scripts.</p>
         </div>
         <div class="s-code">
-            <pre><code class="language-php">$result = createLlmExecutor([
+            <pre><code class="language-php">$result = createExecutor([
     'llm'    =&gt; $llm,
     'model'  =&gt; 'gpt-4o-mini',
     'prompt' =&gt; createChatPrompt()
@@ -979,7 +981,7 @@ $result = $validator-&gt;execute([
             {"files": [{"path": "...", "code": "..."}]}')
         -&gt;addUserMessage('{{spec}}', parseTemplate: true),
     'parser' =&gt; createParser('json'),
-])-&gt;execute([
+])-&gt;run([
     'spec' =&gt; 'Create a User class with name and email',
 ])-&gt;getValue();
 
@@ -1007,7 +1009,7 @@ foreach ($result['files'] as $file) {
                     continue;
                 }
             }
-            $tools-&gt;callFunction($call-&gt;name, $call-&gt;arguments);
+            $tools-&gt;callFunctionResult($call-&gt;name, $call-&gt;arguments);
         }
     }
 }</code></pre>

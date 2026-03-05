@@ -7,7 +7,7 @@ An executor that supports tool/function calling. When the LLM responds with tool
 ```php
 use function HelgeSverre\Synapse\{
     useLlm, createChatPrompt, createParser,
-    createLlmExecutorWithFunctions, createToolRegistry,
+    createExecutor, createToolRegistry,
 };
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
@@ -27,7 +27,7 @@ $tools = createToolRegistry([
     ],
 ]);
 
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('You are a weather assistant.')
@@ -37,7 +37,7 @@ $executor = createLlmExecutorWithFunctions([
     'maxIterations' => 10,
 ]);
 
-$result = $executor->execute(['question' => 'What is the weather in Oslo?']);
+$result = $executor->run(['question' => 'What is the weather in Oslo?']);
 echo $result->getValue();
 // "The weather in Oslo is 22°C and sunny."
 ```

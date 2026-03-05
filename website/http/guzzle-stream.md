@@ -21,7 +21,11 @@ $llm = useLlm('openai.gpt-4o-mini', [
     'transport' => $transport,
 ]);
 
-$executor = new StreamingLlmExecutor($llm, $prompt, 'gpt-4o-mini');
+$executor = createExecutor([
+    'llm' => $llm,
+    'prompt' => $prompt,
+    'stream' => true,
+]);
 
 foreach ($executor->stream(['question' => 'Hello']) as $event) {
     if ($event instanceof TextDelta) {

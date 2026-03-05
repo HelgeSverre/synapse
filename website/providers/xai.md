@@ -35,7 +35,7 @@ $llm = useLlm('xai.grok-beta', [
     'apiKey' => getenv('XAI_API_KEY'),
 ]);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('You are helpful.')

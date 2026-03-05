@@ -31,7 +31,7 @@ $llm = useLlm('mistral.mistral-small-latest', [
     'apiKey' => getenv('MISTRAL_API_KEY'),
 ]);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('You are helpful.')

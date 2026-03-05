@@ -64,8 +64,8 @@ $state->attributes;  // array<string, mixed>
 Executors automatically update state with assistant responses:
 
 ```php
-$executor = createLlmExecutor([...])->withState($state);
-$result = $executor->execute(['question' => 'Hello']);
+$executor = createExecutor([...])->withState($state);
+$result = $executor->run(['question' => 'Hello']);
 
 $newState = $result->state; // Contains the new assistant message
 ```

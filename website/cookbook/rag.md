@@ -15,7 +15,7 @@ Retrieval-Augmented Generation: embed a query, find relevant context, and pass i
 <?php
 
 use function HelgeSverre\Synapse\{
-    useLlm, useEmbeddings, createChatPrompt, createParser, createLlmExecutor,
+    useLlm, useEmbeddings, createChatPrompt, createParser, createExecutor,
 };
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
@@ -37,14 +37,14 @@ $prompt = createChatPrompt()
     )
     ->addUserMessage('{{question}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
 ]);
 
 // Step 4: Generate with context
-$result = $executor->execute([
+$result = $executor->run([
     'context' => $context,
     'question' => $userQuery,
 ]);

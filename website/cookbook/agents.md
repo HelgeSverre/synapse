@@ -13,7 +13,7 @@ An agent is an `LlmExecutorWithFunctions` with a set of tools. The LLM decides w
 
 use function HelgeSverre\Synapse\{
     useLlm, createChatPrompt, createParser, createDialogue,
-    createLlmExecutorWithFunctions, createToolRegistry,
+    createExecutor, createToolRegistry,
 };
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
@@ -69,7 +69,7 @@ $prompt = createChatPrompt()
     ->addHistoryPlaceholder('history')
     ->addUserMessage('{{message}}', parseTemplate: true);
 
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
@@ -86,7 +86,7 @@ while (true) {
 
     $dialogue->setUserMessage($input);
 
-    $result = $executor->execute([
+    $result = $executor->run([
         'history' => $dialogue->getHistory(),
         'message' => $input,
     ]);

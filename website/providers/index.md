@@ -22,14 +22,14 @@ $llm = useLlm('openai', [
 ]);
 
 // Model 'gpt-4o-mini' is used automatically
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
 ]);
 
 // If no model is provided via useLlm(), set it on the executor
 $llmWithoutModel = useLlm('openai', ['apiKey' => getenv('OPENAI_API_KEY')]);
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llmWithoutModel,
     'prompt' => $prompt,
     'model' => 'gpt-4o-mini',

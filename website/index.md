@@ -29,6 +29,9 @@ features:
   - title: Streaming
     details: Token streaming with event-driven generators. Build chat UIs and live demos with real-time output.
     link: /streaming/
+  - title: Runtime Modules
+    details: Optional tracing, checkpoints, memory, workflows, and evaluations for production orchestration.
+    link: /runtime/
   - title: Multi-Provider
     details: OpenAI, Anthropic, Google Gemini, Mistral, xAI, Groq, Moonshot — switch providers by changing one line of code.
     link: /providers/

@@ -29,7 +29,7 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Classify the urgency as: low, medium, or high. Respond with one word only.')
     ->addUserMessage('{{message}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('enum', [
@@ -37,7 +37,7 @@ $executor = createLlmExecutor([
     ]),
 ]);
 
-$result = $executor->execute(['message' => 'The server is on fire!']);
+$result = $executor->run(['message' => 'The server is on fire!']);
 $result->getValue(); // "high"
 ```
 

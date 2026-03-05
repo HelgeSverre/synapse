@@ -31,7 +31,7 @@ $tools = createToolRegistry([
 ]);
 
 // Use with an executor
-$executor = createLlmExecutorWithFunctions([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),

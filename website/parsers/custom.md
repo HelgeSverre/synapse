@@ -99,7 +99,7 @@ class MarkdownTableParser implements ParserInterface
 }
 
 // Use directly
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => new MarkdownTableParser(),

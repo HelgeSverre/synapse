@@ -31,13 +31,13 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Generate PHP code. Wrap it in a code block.')
     ->addUserMessage('Write a function that adds two numbers', parseTemplate: false);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('code', ['language' => 'php']),
 ]);
 
-$result = $executor->execute([]);
+$result = $executor->run([]);
 $block = $result->getValue();
 // "function add(int $a, int $b): int { ... }"
 ```
@@ -59,13 +59,13 @@ $prompt = createChatPrompt()
     ->addSystemMessage('Generate both the PHP class and a PHPUnit test.')
     ->addUserMessage('Create a Calculator class', parseTemplate: false);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('codeblocks'),
 ]);
 
-$result = $executor->execute([]);
+$result = $executor->run([]);
 $blocks = $result->getValue();
 // [
 //     ['language' => 'php', 'code' => 'class Calculator { ... }'],

@@ -5,7 +5,7 @@ The standard executor that orchestrates the full LLM pipeline: render prompt, ca
 ## Usage
 
 ```php
-use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createLlmExecutor};
+use function HelgeSverre\Synapse\{useLlm, createChatPrompt, createParser, createExecutor};
 
 $llm = useLlm('openai.gpt-4o-mini', ['apiKey' => getenv('OPENAI_API_KEY')]);
 
@@ -13,13 +13,13 @@ $prompt = createChatPrompt()
     ->addSystemMessage('You are a helpful assistant.')
     ->addUserMessage('{{question}}', parseTemplate: true);
 
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => $prompt,
     'parser' => createParser('string'),
 ]);
 
-$result = $executor->execute(['question' => 'What is PHP?']);
+$result = $executor->run(['question' => 'What is PHP?']);
 echo $result->getValue();
 ```
 
@@ -51,7 +51,7 @@ When you call `execute($input)`:
 ## With JSON Output
 
 ```php
-$executor = createLlmExecutor([
+$executor = createExecutor([
     'llm' => $llm,
     'prompt' => createChatPrompt()
         ->addSystemMessage('Extract data as JSON.')
@@ -67,7 +67,7 @@ $executor = createLlmExecutor([
     ]),
 ]);
 
-$result = $executor->execute(['text' => 'Contact John at john@example.com']);
+$result = $executor->run(['text' => 'Contact John at john@example.com']);
 // ['name' => 'John', 'email' => 'john@example.com']
 ```
 
@@ -91,7 +91,7 @@ $executor
     ->on(AfterProviderCall::class, fn($e) => echo "Used {$e->response->usage->getTotal()} tokens")
     ->on(OnSuccess::class, fn($e) => echo "Completed in {$e->durationMs}ms");
 
-$result = $executor->execute(['question' => 'Hello']);
+$result = $executor->run(['question' => 'Hello']);
 ```
 
 ## Accessing Internals
