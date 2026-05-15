@@ -11,6 +11,7 @@ Practical patterns and recipes for common LLM tasks with Synapse.
 | [Chaining Executors](/cookbook/pipelines)        | Compose multiple steps into a pipeline         |
 | [Self-Refinement](/cookbook/self-refinement)     | Generate, validate, retry loops                |
 | [Building Agents](/cookbook/agents)              | Interactive agents with tool calling           |
+| [Advanced Agent Patterns](/cookbook/agent-patterns) | Multi-agent routing, RAG with citations, task decomposition, local Ollama stack |
 | [RAG Patterns](/cookbook/rag)                    | Retrieval-augmented generation                 |
 | [LLM Validation](/cookbook/validation)           | Use LLMs to validate data                      |
 | [Code Generation](/cookbook/code-generation)     | Generate code with code block parsing          |

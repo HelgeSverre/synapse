@@ -169,6 +169,7 @@ export default defineConfig({
           { text: 'Chaining Executors', link: '/cookbook/pipelines' },
           { text: 'Self-Refinement', link: '/cookbook/self-refinement' },
           { text: 'Building Agents', link: '/cookbook/agents' },
+          { text: 'Advanced Agent Patterns', link: '/cookbook/agent-patterns' },
           { text: 'RAG Patterns', link: '/cookbook/rag' },
           { text: 'LLM Validation', link: '/cookbook/validation' },
           { text: 'Code Generation', link: '/cookbook/code-generation' },
