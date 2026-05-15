@@ -1,5 +1,4 @@
 {
-  "version": "1.0.0",
   "name": "helgesverre/synapse",
   "description": "A modern PHP library for LLM orchestration with executors, prompts, parsers, and tool calling",
   "type": "library",
