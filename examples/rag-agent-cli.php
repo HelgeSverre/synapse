@@ -39,6 +39,7 @@ use HelgeSverre\Synapse\Executor\ToolRegistry;
 use HelgeSverre\Synapse\Prompt\TextPrompt;
 use HelgeSverre\Synapse\Provider\Anthropic\AnthropicProvider;
 use HelgeSverre\Synapse\Provider\Http\GuzzleStreamTransport;
+use HelgeSverre\Synapse\Provider\Ollama\OllamaProvider;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
 use HelgeSverre\Synapse\State\Message;
 use HelgeSverre\Synapse\Streaming\StreamCompleted;
@@ -66,6 +67,10 @@ function createProvider(string $name, GuzzleStreamTransport $transport): array
         'anthropic' => [
             new AnthropicProvider($transport, getenv('ANTHROPIC_API_KEY') ?: exit(RED."ANTHROPIC_API_KEY not set\n".RESET)),
             'claude-3-haiku-20240307',
+        ],
+        'ollama' => [
+            new OllamaProvider($transport, getenv('OLLAMA_BASE_URL') ?: 'http://localhost:11434/v1'),
+            getenv('OLLAMA_MODEL') ?: 'gemma4:latest',
         ],
         default => exit(RED."Unknown provider: {$name}\n".RESET),
     };
