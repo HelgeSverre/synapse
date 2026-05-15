@@ -10,8 +10,8 @@ A modern PHP 8.2+ library for LLM orchestration with executors, prompts, parsers
 - **Tool/Function Calling**: Built-in support for multi-step tool calling
 - **State Management**: Conversation history and context tracking
 - **Streaming**: Token streaming and streaming tool calls
-- **Multi-Provider**: OpenAI, Anthropic, Google/Gemini, Mistral, xAI, Groq, Moonshot
-- **Embeddings**: Unified embedding providers (OpenAI, Mistral, Jina, Cohere, Voyage)
+- **Multi-Provider**: OpenAI, Anthropic, Google/Gemini, Mistral, xAI, Groq, Moonshot, plus local models via Ollama
+- **Embeddings**: Unified embedding providers (OpenAI, Mistral, Jina, Cohere, Voyage, Ollama)
 - **Runtime Modules**: Trace bridge/exporters, checkpoints, memory store, workflow engine, and evaluation suite
 - **Event Hooks**: Lifecycle events for logging, metrics, and debugging
 - **PSR Standards**: PSR-4, PSR-7, PSR-17, PSR-18 compatible
@@ -347,6 +347,7 @@ $vector = $response->getEmbedding();
 - `xai.*` / `grok.*`
 - `groq.*`
 - `moonshot.*`
+- `ollama.*` (local; no API key required, defaults to `http://localhost:11434/v1`)
 
 You can set model either inline (`prefix.model`) or in options (`['model' => '...']`). Do not provide conflicting model values in both places.
 
@@ -406,6 +407,29 @@ $llm = useLlm('moonshot.moonshot-v1-8k', [
     'apiKey' => '...',
 ]);
 ```
+
+### Ollama (local)
+
+Run open-weights models locally — no API key required. Synapse uses Ollama's OpenAI-compatible endpoint at `http://localhost:11434/v1`.
+
+```php
+$llm = useLlm('ollama.gemma4:latest');
+
+// Or override the host (remote Ollama):
+$llm = useLlm('ollama', [
+    'baseUrl' => 'http://gpu-box.local:11434/v1',
+    'model'   => 'qwen3.6:latest',
+]);
+```
+
+Embeddings work the same way:
+
+```php
+$embeddings = useEmbeddings('ollama');
+$vec = $embeddings->embed('hello world', 'granite-embedding:latest')->getEmbedding();
+```
+
+See [`examples/ollama-react-agent.php`](examples/ollama-react-agent.php) for a manual ReAct loop with tools running entirely against local Gemma.
 
 ### Custom Provider
 

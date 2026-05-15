@@ -84,6 +84,7 @@ export default defineConfig({
           { text: 'xAI / Grok', link: '/providers/xai' },
           { text: 'Groq', link: '/providers/groq' },
           { text: 'Moonshot', link: '/providers/moonshot' },
+          { text: 'Ollama (local)', link: '/providers/ollama' },
           { text: 'Custom Provider', link: '/providers/custom-provider' },
         ]
       },
@@ -146,6 +147,7 @@ export default defineConfig({
           { text: 'Jina', link: '/embeddings/jina' },
           { text: 'Cohere', link: '/embeddings/cohere' },
           { text: 'Voyage', link: '/embeddings/voyage' },
+          { text: 'Ollama (local)', link: '/embeddings/ollama' },
         ]
       },
       {

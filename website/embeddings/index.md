@@ -26,6 +26,7 @@ $all = $response->embeddings;            // array<array<float>> — all vectors
 | [Jina](/embeddings/jina)       | `'jina'`       | `https://api.jina.ai/v1`      |
 | [Cohere](/embeddings/cohere)   | `'cohere'`     | `https://api.cohere.com/v2`   |
 | [Voyage](/embeddings/voyage)   | `'voyage'`     | `https://api.voyageai.com/v1` |
+| [Ollama](/embeddings/ollama)   | `'ollama'`     | `http://localhost:11434/v1`   |
 
 ## EmbeddingProviderInterface
 

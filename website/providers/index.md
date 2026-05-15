@@ -51,6 +51,7 @@ All providers require `GuzzleStreamTransport` for streaming. See [Stream Transpo
 | `xai`, `grok`      | [xAI / Grok](/providers/xai)       | `https://api.x.ai/v1`                              |
 | `groq`             | [Groq](/providers/groq)            | `https://api.groq.com/openai/v1`                   |
 | `moonshot`         | [Moonshot](/providers/moonshot)    | `https://api.moonshot.ai/v1`                       |
+| `ollama`           | [Ollama](/providers/ollama)        | `http://localhost:11434/v1`                        |
 
 ## LlmProviderInterface
 
@@ -82,11 +83,11 @@ $caps->supportsSystemPrompt; // bool — system message role
 
 All providers via `useLlm()` accept:
 
-| Option      | Type                 | Description               |
-| ----------- | -------------------- | ------------------------- |
-| `apiKey`    | `string`             | **Required.** API key     |
-| `baseUrl`   | `string`             | Override default base URL |
-| `transport` | `TransportInterface` | Override HTTP transport   |
+| Option      | Type                 | Description                                                    |
+| ----------- | -------------------- | -------------------------------------------------------------- |
+| `apiKey`    | `string`             | **Required** for hosted providers; optional for `ollama`       |
+| `baseUrl`   | `string`             | Override default base URL                                      |
+| `transport` | `TransportInterface` | Override HTTP transport                                        |
 
 ## GenerationRequest
 
