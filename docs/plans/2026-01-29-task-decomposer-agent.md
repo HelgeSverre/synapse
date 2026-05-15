@@ -1050,7 +1050,7 @@ final class TaskDecomposerTest extends TestCase
             ],
         ]);
 
-        $decoded = json_decode($result, true);
+        $decoded = json_decode($result->result, true);
         $this->assertTrue($decoded['ok']);
         $this->assertNotNull($submitPlanTool->getLastValidPlan());
     }
@@ -1064,7 +1064,7 @@ final class TaskDecomposerTest extends TestCase
             'steps' => [], // Missing goal, empty steps
         ]);
 
-        $decoded = json_decode($result, true);
+        $decoded = json_decode($result->result, true);
         $this->assertFalse($decoded['ok']);
         $this->assertNotEmpty($decoded['errors']);
     }

@@ -818,7 +818,7 @@ final class AgenticToolsTest extends TestCase
     public function test_weather_tool_returns_weather_data(): void
     {
         $tool = WeatherTool::create();
-        $result = json_decode($tool->execute(['city' => 'Oslo']), true);
+        $result = json_decode($tool->execute(['city' => 'Oslo'])->result, true);
 
         $this->assertSame('Oslo', $result['city']);
         $this->assertArrayHasKey('temperature', $result);
@@ -830,10 +830,10 @@ final class AgenticToolsTest extends TestCase
     {
         $tool = CalculatorTool::create();
 
-        $result = json_decode($tool->execute(['expression' => '2 + 2']), true);
+        $result = json_decode($tool->execute(['expression' => '2 + 2'])->result, true);
         $this->assertSame('4', $result['result']);
 
-        $result = json_decode($tool->execute(['expression' => '10 * 5']), true);
+        $result = json_decode($tool->execute(['expression' => '10 * 5'])->result, true);
         $this->assertSame('50', $result['result']);
     }
 
@@ -842,12 +842,12 @@ final class AgenticToolsTest extends TestCase
         $tool = NotesTool::create();
 
         // Add a note
-        $result = json_decode($tool->execute(['action' => 'add', 'content' => 'Test note']), true);
+        $result = json_decode($tool->execute(['action' => 'add', 'content' => 'Test note'])->result, true);
         $this->assertTrue($result['success']);
         $this->assertSame('Test note', $result['note']['content']);
 
         // List notes
-        $result = json_decode($tool->execute(['action' => 'list']), true);
+        $result = json_decode($tool->execute(['action' => 'list'])->result, true);
         $this->assertCount(1, $result['notes']);
     }
 
@@ -857,18 +857,18 @@ final class AgenticToolsTest extends TestCase
 
         // Add and delete
         $tool->execute(['action' => 'add', 'content' => 'To delete']);
-        $result = json_decode($tool->execute(['action' => 'delete', 'id' => 1]), true);
+        $result = json_decode($tool->execute(['action' => 'delete', 'id' => 1])->result, true);
         $this->assertTrue($result['success']);
 
         // Verify empty
-        $result = json_decode($tool->execute(['action' => 'list']), true);
+        $result = json_decode($tool->execute(['action' => 'list'])->result, true);
         $this->assertEmpty($result['notes']);
     }
 
     public function test_web_search_returns_results(): void
     {
         $tool = WebSearchTool::create();
-        $result = json_decode($tool->execute(['query' => 'PHP generators']), true);
+        $result = json_decode($tool->execute(['query' => 'PHP generators'])->result, true);
 
         $this->assertSame('PHP generators', $result['query']);
         $this->assertGreaterThan(0, $result['results_count']);
@@ -878,7 +878,7 @@ final class AgenticToolsTest extends TestCase
     public function test_datetime_tool_returns_current_time(): void
     {
         $tool = DateTimeTool::create();
-        $result = json_decode($tool->execute(['action' => 'now', 'timezone' => 'UTC']), true);
+        $result = json_decode($tool->execute(['action' => 'now', 'timezone' => 'UTC'])->result, true);
 
         $this->assertArrayHasKey('datetime', $result);
         $this->assertSame('UTC', $result['timezone']);
@@ -892,7 +892,7 @@ final class AgenticToolsTest extends TestCase
             'action' => 'diff',
             'date1' => '2024-01-01',
             'date2' => '2024-01-10',
-        ]), true);
+        ])->result, true);
 
         $this->assertSame(9, $result['days']);
     }

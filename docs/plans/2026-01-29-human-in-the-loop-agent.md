@@ -248,8 +248,12 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Synapse\Examples\ApprovalAgent;
 
+use HelgeSverre\Synapse\Executor\CallableExecutor;
+use HelgeSverre\Synapse\Executor\ToolExecutorInterface;
 use HelgeSverre\Synapse\Executor\ToolRegistry;
+use HelgeSverre\Synapse\Executor\ToolResult;
 use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
+use HelgeSverre\Synapse\State\ConversationState;
 
 /**
  * Decorator that intercepts tool calls and requires approval for risky tools.
@@ -259,8 +263,10 @@ use HelgeSverre\Synapse\Provider\Request\ToolDefinition;
  * - 'risk' => 'medium': approval requested
  * - 'risk' => 'high' or 'critical': approval required
  */
-final class ApprovingToolRegistry extends ToolRegistry
+final class ApprovingToolRegistry implements ToolExecutorInterface
 {
+    private ToolRegistry $inner;
+
     /** @var array<string, string> Tool name => risk level */
     private array $riskLevels = [];
 
@@ -268,16 +274,16 @@ final class ApprovingToolRegistry extends ToolRegistry
     private array $descriptions = [];
 
     public function __construct(
-        array $executors,
+        array $executors, // list<CallableExecutor>
         private readonly ApprovalProviderInterface $approvalProvider,
         private readonly string $minimumRiskForApproval = 'medium',
     ) {
-        parent::__construct($executors);
+        $this->inner = new ToolRegistry($executors);
 
         // Extract risk levels from executor attributes
         foreach ($executors as $executor) {
             $name = $executor->getName();
-            $attrs = method_exists($executor, 'getAttributes') ? $executor->getAttributes() : [];
+            $attrs = $executor->getAttributes();
             $this->riskLevels[$name] = $attrs['risk'] ?? 'low';
             $this->descriptions[$name] = $attrs['description'] ?? $executor->getDescription();
         }
@@ -286,7 +292,7 @@ final class ApprovingToolRegistry extends ToolRegistry
     /**
      * @param array<string, mixed> $arguments
      */
-    public function callFunction(string $name, array $arguments): mixed
+    public function callFunctionResult(string $name, array $arguments, ?ConversationState $state = null): ToolResult
     {
         $riskLevel = $this->riskLevels[$name] ?? 'low';
 
@@ -301,17 +307,16 @@ final class ApprovingToolRegistry extends ToolRegistry
             $decision = $this->approvalProvider->requestApproval($request);
 
             return match ($decision->action) {
-                ApprovalAction::Approve => parent::callFunction($name, $arguments),
-                ApprovalAction::Edit => parent::callFunction($name, $decision->editedArguments ?? $arguments),
-                ApprovalAction::Reject => json_encode([
-                    'error' => 'Action rejected by user',
-                    'reason' => $decision->reason,
-                    'tool' => $name,
-                ]),
+                ApprovalAction::Approve => $this->inner->callFunctionResult($name, $arguments, $state),
+                ApprovalAction::Edit => $this->inner->callFunctionResult($name, $decision->editedArguments ?? $arguments, $state),
+                ApprovalAction::Reject => ToolResult::failure(
+                    errors: ['Action rejected by user', $decision->reason ?? 'No reason provided'],
+                    attributes: ['tool' => $name, 'risk' => $riskLevel],
+                ),
             };
         }
 
-        return parent::callFunction($name, $arguments);
+        return $this->inner->callFunctionResult($name, $arguments, $state);
     }
 
     private function requiresApproval(string $riskLevel): bool
@@ -321,6 +326,66 @@ final class ApprovingToolRegistry extends ToolRegistry
         $minLevel = $levels[$this->minimumRiskForApproval] ?? 2;
 
         return $toolLevel >= $minLevel;
+    }
+
+    /** @return list<ToolDefinition> */
+    public function getToolDefinitions(): array
+    {
+        return $this->inner->getToolDefinitions();
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return list<ToolDefinition>
+     */
+    public function getVisibleToolDefinitions(array $input = [], ?ConversationState $state = null): array
+    {
+        return $this->inner->getVisibleToolDefinitions($input, $state);
+    }
+
+    public function hasFunction(string $name): bool
+    {
+        return $this->inner->hasFunction($name);
+    }
+
+    public function getFunction(string $name): ?CallableExecutor
+    {
+        return $this->inner->getFunction($name);
+    }
+
+    /** @return list<CallableExecutor> */
+    public function getFunctions(): array
+    {
+        return $this->inner->getFunctions();
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return list<CallableExecutor>
+     */
+    public function getVisibleFunctions(array $input = [], ?ConversationState $state = null): array
+    {
+        return $this->inner->getVisibleFunctions($input, $state);
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array{valid: bool, errors: list<string>}
+     */
+    public function validateFunctionInput(string $name, array $input): array
+    {
+        return $this->inner->validateFunctionInput($name, $input);
+    }
+
+    public function register(CallableExecutor $executor): self
+    {
+        $this->inner->register($executor);
+        $name = $executor->getName();
+        $attrs = $executor->getAttributes();
+        $this->riskLevels[$name] = $attrs['risk'] ?? 'low';
+        $this->descriptions[$name] = $attrs['description'] ?? $executor->getDescription();
+
+        return $this;
     }
 }
 ```
@@ -764,10 +829,10 @@ final class ApprovalAgentTest extends TestCase
             minimumRiskForApproval: 'medium',
         );
 
-        $result = $tools->callFunction('read_file', ['path' => 'test.txt']);
+        $result = $tools->callFunctionResult('read_file', ['path' => 'test.txt']);
 
         $this->assertSame(0, $mockProvider->callCount); // No approval requested
-        $this->assertIsString($result);
+        $this->assertTrue($result->success);
     }
 
     public function test_high_risk_tools_require_approval(): void
@@ -786,9 +851,10 @@ final class ApprovalAgentTest extends TestCase
             minimumRiskForApproval: 'medium',
         );
 
-        $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
+        $result = $tools->callFunctionResult('delete_files', ['pattern' => '*.tmp']);
 
         $this->assertSame(1, $mockProvider->callCount); // Approval was requested
+        $this->assertTrue($result->success);
     }
 
     public function test_rejected_tool_returns_error(): void
@@ -804,17 +870,15 @@ final class ApprovalAgentTest extends TestCase
             $mockProvider,
         );
 
-        $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
-        $decoded = json_decode($result, true);
+        $result = $tools->callFunctionResult('delete_files', ['pattern' => '*.tmp']);
 
-        $this->assertSame('Action rejected by user', $decoded['error']);
-        $this->assertSame('Not allowed', $decoded['reason']);
+        $this->assertFalse($result->success);
+        $this->assertSame('Action rejected by user', $result->errors[0] ?? null);
+        $this->assertSame('Not allowed', $result->errors[1] ?? null);
     }
 
     public function test_edited_tool_uses_new_arguments(): void
     {
-        $capturedArgs = null;
-
         $mockProvider = new class implements ApprovalProviderInterface {
             public function requestApproval(ApprovalRequest $request): ApprovalDecision {
                 return ApprovalDecision::edit(['pattern' => 'safe-only.txt']);
@@ -826,8 +890,8 @@ final class ApprovalAgentTest extends TestCase
             $mockProvider,
         );
 
-        $result = $tools->callFunction('delete_files', ['pattern' => '*.tmp']);
-        $decoded = json_decode($result, true);
+        $result = $tools->callFunctionResult('delete_files', ['pattern' => '*.tmp']);
+        $decoded = json_decode((string) $result->result, true);
 
         // The edited pattern should be used
         $this->assertSame('safe-only.txt', $decoded['pattern']);
