@@ -9,6 +9,7 @@ use HelgeSverre\Synapse\Embeddings\Cohere\CohereEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\EmbeddingProviderInterface;
 use HelgeSverre\Synapse\Embeddings\Jina\JinaEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\Mistral\MistralEmbeddingProvider;
+use HelgeSverre\Synapse\Embeddings\Ollama\OllamaEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\OpenAI\OpenAIEmbeddingProvider;
 use HelgeSverre\Synapse\Embeddings\Voyage\VoyageEmbeddingProvider;
 use HelgeSverre\Synapse\Evaluation\EvalCase;
@@ -41,6 +42,7 @@ use HelgeSverre\Synapse\Provider\Http\TransportInterface;
 use HelgeSverre\Synapse\Provider\LlmProviderInterface;
 use HelgeSverre\Synapse\Provider\Mistral\MistralProvider;
 use HelgeSverre\Synapse\Provider\Moonshot\MoonshotProvider;
+use HelgeSverre\Synapse\Provider\Ollama\OllamaProvider;
 use HelgeSverre\Synapse\Provider\OpenAI\OpenAIProvider;
 use HelgeSverre\Synapse\Provider\XAI\XAIProvider;
 use HelgeSverre\Synapse\Runtime\Checkpoint\InMemoryRunCheckpointStore;
@@ -159,6 +161,11 @@ final class Factory
                 transport: $transport,
                 apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
                 baseUrl: $options['baseUrl'] ?? 'https://api.moonshot.ai/v1',
+            ),
+            'ollama' => new OllamaProvider(
+                transport: $transport,
+                baseUrl: $options['baseUrl'] ?? 'http://localhost:11434/v1',
+                apiKey: $options['apiKey'] ?? null,
             ),
             default => throw new \InvalidArgumentException("Unknown provider: {$providerName}"),
         };
@@ -602,6 +609,11 @@ final class Factory
                 transport: $transport,
                 apiKey: $options['apiKey'] ?? throw new \InvalidArgumentException('apiKey is required'),
                 baseUrl: $options['baseUrl'] ?? 'https://api.jina.ai/v1',
+            ),
+            'ollama' => new OllamaEmbeddingProvider(
+                transport: $transport,
+                baseUrl: $options['baseUrl'] ?? 'http://localhost:11434/v1',
+                apiKey: $options['apiKey'] ?? null,
             ),
             default => throw new \InvalidArgumentException("Unknown embedding provider: {$provider}"),
         };
